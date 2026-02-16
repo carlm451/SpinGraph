@@ -1,0 +1,43 @@
+{
+  "lattice_name": "santa_fe",
+  "size_label": "XL",
+  "nx": 100,
+  "ny": 100,
+  "boundary": "periodic",
+  "face_strategy": "all",
+  "n_vertices": 60000,
+  "n_edges": 90000,
+  "n_faces": 30000,
+  "coordination_dist": {
+    "2": 20000,
+    "3": 20000,
+    "4": 20000
+  },
+  "beta_0": 1,
+  "beta_1": 2,
+  "beta_2": 1,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.00032250138423959576,
+  "L1_spectral_gap": 0.0003225013842397003,
+  "compute_time_seconds": 136.70549893379211,
+  "harmonic_validation": [
+    {
+      "mode_index": 0,
+      "divergence_norm": 2.0676766403516362e-14,
+      "curl_norm": 1.925731925178986e-14,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 1,
+      "divergence_norm": 1.5620020103444123e-14,
+      "curl_norm": 1.128501359535206e-14,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    }
+  ]
+}

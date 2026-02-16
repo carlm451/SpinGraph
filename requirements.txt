@@ -1,0 +1,16 @@
+# Data Processing & Graph Theory
+numpy>=1.24.0
+scipy>=1.10.0
+networkx>=3.0
+
+# Web Framework & Interactivity
+flask>=2.3.0
+dash>=2.11.0
+dash-bootstrap-components>=1.4.0
+plotly>=5.15.0
+
+# Production Server
+gunicorn>=20.1.0
+
+# Optional: For advanced geometric/face calculations
+shapely>=2.0.0

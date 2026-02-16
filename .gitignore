@@ -1,0 +1,81 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Results — large/generated files
+# =========================
+
+# Computed spectral catalog (npz can be huge at L/XL sizes)
+results/catalog/*.npz
+
+# Generated figures — reproducible from code
+results/figures/*.png
+results/*.png
+
+# Keep tables and summaries (small text files)
+# results/tables/  -- tracked
+# results/spectral_catalog_summary.md  -- tracked
+
+# =========================
+# Reference images (not code)
+# =========================
+*.jpeg
+*.jpg
+
+# =========================
+# PDFs — reference papers
+# =========================
+KeyPapers/*.pdf
+
+# =========================
+# Large / binary files (safety net)
+# =========================
+*.hdf5
+*.h5
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.tar.gz
+*.zip

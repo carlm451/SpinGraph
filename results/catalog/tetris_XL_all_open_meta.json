@@ -1,0 +1,26 @@
+{
+  "lattice_name": "tetris",
+  "size_label": "XL",
+  "nx": 100,
+  "ny": 100,
+  "boundary": "open",
+  "face_strategy": "all",
+  "n_vertices": 80000,
+  "n_edges": 119500,
+  "n_faces": 39501,
+  "coordination_dist": {
+    "1": 201,
+    "2": 20299,
+    "3": 39799,
+    "4": 19701
+  },
+  "beta_0": 1,
+  "beta_1": 0,
+  "beta_2": 0,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 2.4618670161059727e-05,
+  "L1_spectral_gap": 2.4618670160458984e-05,
+  "compute_time_seconds": 225.60722994804382
+}

@@ -1,0 +1,41 @@
+{
+  "lattice_name": "kagome",
+  "size_label": "M",
+  "nx": 20,
+  "ny": 20,
+  "boundary": "periodic",
+  "face_strategy": "all",
+  "n_vertices": 1200,
+  "n_edges": 2400,
+  "n_faces": 1200,
+  "coordination_dist": {
+    "4": 1200
+  },
+  "beta_0": 1,
+  "beta_1": 2,
+  "beta_2": 1,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.03280838751848972,
+  "L1_spectral_gap": 0.0328083875184881,
+  "compute_time_seconds": 6.774232864379883,
+  "harmonic_validation": [
+    {
+      "mode_index": 0,
+      "divergence_norm": 4.420565319498459e-15,
+      "curl_norm": 5.5276436841583534e-15,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 1,
+      "divergence_norm": 1.187716582136368e-14,
+      "curl_norm": 9.462463868889732e-15,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    }
+  ]
+}

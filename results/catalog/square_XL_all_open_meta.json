@@ -1,0 +1,25 @@
+{
+  "lattice_name": "square",
+  "size_label": "XL",
+  "nx": 100,
+  "ny": 100,
+  "boundary": "open",
+  "face_strategy": "all",
+  "n_vertices": 10000,
+  "n_edges": 19800,
+  "n_faces": 9801,
+  "coordination_dist": {
+    "2": 4,
+    "3": 392,
+    "4": 9604
+  },
+  "beta_0": 1,
+  "beta_1": 0,
+  "beta_2": 0,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.0009868792685368787,
+  "L1_spectral_gap": 0.0009868792685356238,
+  "compute_time_seconds": 25.05085301399231
+}

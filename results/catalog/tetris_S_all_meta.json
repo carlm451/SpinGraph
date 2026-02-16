@@ -1,0 +1,43 @@
+{
+  "lattice_name": "tetris",
+  "size_label": "S",
+  "nx": 10,
+  "ny": 10,
+  "boundary": "periodic",
+  "face_strategy": "all",
+  "n_vertices": 800,
+  "n_edges": 1200,
+  "n_faces": 400,
+  "coordination_dist": {
+    "2": 200,
+    "3": 400,
+    "4": 200
+  },
+  "beta_0": 1,
+  "beta_1": 2,
+  "beta_2": 1,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.009844409622845319,
+  "L1_spectral_gap": 0.009844409622846158,
+  "compute_time_seconds": 2.743859052658081,
+  "harmonic_validation": [
+    {
+      "mode_index": 0,
+      "divergence_norm": 4.2362194136200284e-15,
+      "curl_norm": 3.1231606594631347e-15,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 1,
+      "divergence_norm": 3.998010763346851e-15,
+      "curl_norm": 4.604619896324068e-15,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    }
+  ]
+}

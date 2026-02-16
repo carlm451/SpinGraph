@@ -1,0 +1,99 @@
+{
+  "lattice_name": "square",
+  "size_label": "XS",
+  "nx": 4,
+  "ny": 4,
+  "boundary": "open",
+  "face_strategy": "none",
+  "n_vertices": 16,
+  "n_edges": 24,
+  "n_faces": 0,
+  "coordination_dist": {
+    "2": 4,
+    "3": 8,
+    "4": 4
+  },
+  "beta_0": 1,
+  "beta_1": 9,
+  "beta_2": 0,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.5857864376269051,
+  "L1_spectral_gap": 0.5857864376269045,
+  "compute_time_seconds": 0.0010390281677246094,
+  "harmonic_validation": [
+    {
+      "mode_index": 0,
+      "divergence_norm": 5.967549612523991e-16,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 1,
+      "divergence_norm": 1.094697108631583e-15,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 2,
+      "divergence_norm": 3.159280884547406e-16,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 3,
+      "divergence_norm": 8.95604597237161e-16,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 4,
+      "divergence_norm": 6.913876130555753e-16,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 5,
+      "divergence_norm": 7.227195000045098e-16,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 6,
+      "divergence_norm": 1.3664959364801693e-15,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 7,
+      "divergence_norm": 6.269494980580153e-16,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 8,
+      "divergence_norm": 1.6314223507865584e-15,
+      "curl_norm": 0.0,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    }
+  ]
+}

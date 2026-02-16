@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASI Lattice Zoo: Worked Incidence &amp; S-Matrix Examples</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams',
+    tagSide: 'right',
+    macros: {
+      bm: ['{\\boldsymbol{#1}}', 1],
+      R: '{\\mathbb{R}}',
+      Z: '{\\mathbb{Z}}',
+      ker: '\\operatorname{ker}',
+      im: '\\operatorname{im}',
+      rank: '\\operatorname{rank}',
+      diag: '\\operatorname{diag}',
+      tr: '\\operatorname{tr}',
+      div: '\\operatorname{div}',
+      grad: '\\operatorname{grad}',
+      spec: '\\operatorname{spec}'
+    }
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root {
+  --tdl-color: #1a5276;
+  --nisoli-color: #922b21;
+  --highlight-bg: #fef9e7;
+  --key-result-bg: #eaf2f8;
+  --example-bg: #f4f6f6;
+  --border-color: #d5d8dc;
+  --link-color: #2471a3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.7;
+  color: #2c3e50;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  background: #fdfdfd;
+}
+h1 {
+  font-size: 1.9rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+.authors {
+  text-align: center;
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+h2 {
+  font-size: 1.45rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--border-color);
+  color: #1a1a2e;
+}
+h3 {
+  font-size: 1.15rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  color: #2c3e50;
+}
+h4 {
+  font-size: 1.0rem;
+  margin-top: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+}
+p { margin-bottom: 1rem; }
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav#toc {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+nav#toc h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.8rem;
+  border: none;
+  padding: 0;
+}
+nav#toc ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+nav#toc li {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+.key-result {
+  background: var(--key-result-bg);
+  border-left: 4px solid var(--tdl-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.key-result .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tdl-color);
+  margin-bottom: 0.4rem;
+}
+.example {
+  background: var(--example-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.example .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #27ae60;
+  margin-bottom: 0.4rem;
+}
+.convention {
+  background: #fdf2e9;
+  border-left: 4px solid #e67e22;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.convention .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #e67e22;
+  margin-bottom: 0.3rem;
+}
+.footnote {
+  font-size: 0.85rem;
+  color: #555;
+  border-top: 1px solid #ccc;
+  margin-top: 1.5rem;
+  padding-top: 0.5rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #f2f3f4;
+  font-weight: bold;
+  color: #2c3e50;
+}
+tr:nth-child(even) { background: #fafafa; }
+.tdl-label { color: var(--tdl-color); font-weight: bold; }
+.nisoli-label { color: var(--nisoli-color); font-weight: bold; }
+.matrix-block {
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+.diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.diagram svg {
+  max-width: 100%;
+}
+.diagram .caption {
+  font-size: 0.88rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+.eqref { color: var(--link-color); }
+@media print {
+  body { max-width: 100%; padding: 1rem; }
+  .key-result, .example, .convention { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+
+<h1>ASI Lattice Zoo:<br>Worked Incidence &amp; S-Matrix Examples</h1>
+<p class="subtitle">Explicit boundary operators, spectra, ice configurations, and S matrices for five Morrison&ndash;Nisoli lattices</p>
+<p class="authors">SpinIceTDL Project &mdash; Companion to <em>TDL &harr; Spin Ice Correspondence</em></p>
+
+
+<nav id="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#sec1">Introduction &amp; Conventions</a></li>
+  <li><a href="#sec2">Square Lattice (3&times;3 periodic)</a></li>
+  <li><a href="#sec3">Tetris Lattice (2&times;1 periodic)</a></li>
+  <li><a href="#sec4">Kagome Lattice (2&times;2 periodic)</a></li>
+  <li><a href="#sec5">Shakti Lattice (1&times;1 periodic)</a></li>
+  <li><a href="#sec6">Santa Fe Lattice (1&times;2 periodic)</a></li>
+  <li><a href="#sec7">Comparative Summary</a></li>
+  <li><a href="#sec8">References</a></li>
+</ol>
+</nav>
+
+
+<h2 id="sec1">1. Introduction &amp; Conventions</h2>
+
+<p>
+This document provides <strong>fully worked examples</strong> of the incidence matrices $B_1$, $B_2$, the Hodge 1-Laplacian $L_1$, ice-rule configurations, and Nisoli's antisymmetrized $S$ matrix for five lattices from the Morrison&ndash;Nelson&ndash;Nisoli lattice zoo. Each lattice is built at its <em>minimum valid periodic tiling size</em> &mdash; the smallest number of unit cells that produces a valid torus embedding with no multi-edges or self-loops.
+</p>
+
+<p>
+<strong>Why minimum sizes?</strong> The standard "XS" lattice size (4&times;4 unit cells) produces matrices far too large for explicit display:
+</p>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>XS (4&times;4) $B_1$ dims</th><th>Entries</th><th>Min periodic $B_1$ dims</th><th>Entries</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>16x32</td><td>512</td><td>9&times;18</td><td>162</td></tr>
+<tr><td>Kagome</td><td>48x96</td><td>4,608</td><td>12&times;24</td><td>288</td></tr>
+<tr><td>Shakti</td><td>256x384</td><td>98,304</td><td>16&times;24</td><td>384</td></tr>
+<tr><td>Tetris</td><td>128x192</td><td>24,576</td><td>16&times;24</td><td>384</td></tr>
+<tr><td>Santa Fe</td><td>96x144</td><td>13,824</td><td>12&times;18</td><td>216</td></tr>
+</tbody>
+</table>
+
+<p>
+All periodic examples have $\beta_1 = 2$ (torus topology), confirming correct topological structure at every size.
+</p>
+
+<div class="convention">
+<div class="label">Conventions</div>
+<p><strong>Edge orientation:</strong> Edges are stored in canonical form $(u, v)$ with $u < v$ (lower global index to higher). $B_1[v, e] = +1$ (head), $B_1[u, e] = -1$ (tail).</p>
+<p><strong>Face orientation:</strong> Face boundary cycles are ordered counterclockwise (CCW). For face $f$ traversing edge $e$ from $u \to v$: $B_2[e, f] = +1$ if $u < v$ (matches canonical direction), $B_2[e, f] = -1$ if $u > v$.</p>
+<p><strong>S matrix:</strong> Nisoli's antisymmetrized interaction matrix, computed from a spin configuration $\bm{\sigma} \in \{\pm 1\}^{n_1}$ via:</p>
+$$
+S = \tfrac{1}{2}\big(|B_1|\, D_{\sigma}\, B_1^T - B_1\, D_{\sigma}\, |B_1|^T\big)
+$$
+<p>where $|B_1|$ is the element-wise absolute value and $D_{\sigma} = \diag(\bm{\sigma})$.</p>
+<p><strong>Ice rule (mixed coordination):</strong> At each vertex $v$ with coordination $z_v$, the charge $Q_v = (B_1 \bm{\sigma})_v$ satisfies $|Q_v| = z_v \bmod 2$. Even-$z$ vertices have $Q_v = 0$; odd-$z$ vertices have $|Q_v| = 1$.</p>
+</div>
+
+
+<h2 id="sec2">2. Square Lattice (3&times;3 Periodic)</h2>
+
+<p>
+The square lattice is the simplest ASI topology: all vertices have coordination $z = 4$, with geometric frustration only. The 3&times;3 periodic tiling on a torus gives matrices small enough for complete display while capturing the essential structure.
+</p>
+
+<h3>2.1 Lattice Setup</h3>
+
+<p>
+<strong>Unit cell:</strong> 1 vertex, 2 edges (horizontal, vertical), 1 square face. Lattice vectors $\mathbf{a}_1 = (1, 0)$, $\mathbf{a}_2 = (0, 1)$.
+</p>
+
+<p>
+<strong>Vertices:</strong> 9 vertices on a $3 \times 3$ grid, labeled $v_0, \ldots, v_8$ in row-major order. Global index: $v_k$ at cell $(\lfloor k/3 \rfloor, k \bmod 3)$, position $(\lfloor k/3 \rfloor,\; k \bmod 3)$.
+</p>
+
+$$
+\begin{array}{ccccc}
+v_6 & - & v_7 & - & v_8 \\
+| & & | & & | \\
+v_3 & - & v_4 & - & v_5 \\
+| & & | & & | \\
+v_0 & - & v_1 & - & v_2
+\end{array}
+$$
+
+<p><strong>Periodic boundary conditions:</strong> Right wraps to left ($v_2 \sim v_0$, $v_5 \sim v_3$, $v_8 \sim v_6$) and top wraps to bottom ($v_6 \sim v_0$, $v_7 \sim v_1$, $v_8 \sim v_2$). Topologically a <strong>torus</strong> $T^2$.</p>
+
+<p><strong>Edges:</strong> 18 edges &mdash; 9 horizontal ($e_0$&ndash;$e_8$) and 9 vertical ($e_9$&ndash;$e_{17}$). Six wrap around the periodic boundaries (marked W).</p>
+
+<table>
+<thead>
+<tr><th>Edge</th><th>Tail</th><th>Head</th><th>Type</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>$e_{0}$</td><td>$v_{0}$</td><td>$v_{3}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{1}$</td><td>$v_{0}$</td><td>$v_{1}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{2}$</td><td>$v_{1}$</td><td>$v_{4}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{3}$</td><td>$v_{1}$</td><td>$v_{2}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{4}$</td><td>$v_{2}$</td><td>$v_{5}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{5}$</td><td>$v_{0}$</td><td>$v_{2}$</td><td>H</td><td>Wrap</td></tr>
+<tr><td>$e_{6}$</td><td>$v_{3}$</td><td>$v_{6}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{7}$</td><td>$v_{3}$</td><td>$v_{4}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{8}$</td><td>$v_{4}$</td><td>$v_{7}$</td><td>H</td><td></td></tr>
+<tr><td>$e_{9}$</td><td>$v_{4}$</td><td>$v_{5}$</td><td>V</td><td></td></tr>
+<tr><td>$e_{10}$</td><td>$v_{5}$</td><td>$v_{8}$</td><td>V</td><td></td></tr>
+<tr><td>$e_{11}$</td><td>$v_{3}$</td><td>$v_{5}$</td><td>V</td><td>Wrap</td></tr>
+<tr><td>$e_{12}$</td><td>$v_{0}$</td><td>$v_{6}$</td><td>V</td><td>Wrap</td></tr>
+<tr><td>$e_{13}$</td><td>$v_{6}$</td><td>$v_{7}$</td><td>V</td><td></td></tr>
+<tr><td>$e_{14}$</td><td>$v_{1}$</td><td>$v_{7}$</td><td>V</td><td>Wrap</td></tr>
+<tr><td>$e_{15}$</td><td>$v_{7}$</td><td>$v_{8}$</td><td>V</td><td></td></tr>
+<tr><td>$e_{16}$</td><td>$v_{2}$</td><td>$v_{8}$</td><td>V</td><td>Wrap</td></tr>
+<tr><td>$e_{17}$</td><td>$v_{6}$</td><td>$v_{8}$</td><td>V</td><td>Wrap</td></tr>
+</tbody>
+</table>
+
+<p><strong>Faces:</strong> 9 square faces, each oriented counterclockwise.</p>
+
+<table>
+<thead>
+<tr><th>Face</th><th>Vertices (CCW)</th><th>Sides</th></tr>
+</thead>
+<tbody>
+<tr><td>$f_{0}$</td><td>$v_{0}$, $v_{3}$, $v_{4}$, $v_{1}$</td><td>4</td></tr>
+<tr><td>$f_{1}$</td><td>$v_{1}$, $v_{4}$, $v_{5}$, $v_{2}$</td><td>4</td></tr>
+<tr><td>$f_{2}$</td><td>$v_{2}$, $v_{5}$, $v_{3}$, $v_{0}$</td><td>4</td></tr>
+<tr><td>$f_{3}$</td><td>$v_{3}$, $v_{6}$, $v_{7}$, $v_{4}$</td><td>4</td></tr>
+<tr><td>$f_{4}$</td><td>$v_{4}$, $v_{7}$, $v_{8}$, $v_{5}$</td><td>4</td></tr>
+<tr><td>$f_{5}$</td><td>$v_{5}$, $v_{8}$, $v_{6}$, $v_{3}$</td><td>4</td></tr>
+<tr><td>$f_{6}$</td><td>$v_{6}$, $v_{0}$, $v_{1}$, $v_{7}$</td><td>4</td></tr>
+<tr><td>$f_{7}$</td><td>$v_{7}$, $v_{1}$, $v_{2}$, $v_{8}$</td><td>4</td></tr>
+<tr><td>$f_{8}$</td><td>$v_{8}$, $v_{2}$, $v_{0}$, $v_{6}$</td><td>4</td></tr>
+</tbody>
+</table>
+
+<p><strong>Counts:</strong> $n_0 = 9$, $n_1 = 18$, $n_2 = 9$. Coordination: all $z = 4$.</p>
+
+<h3>2.2 Incidence Matrix $B_1$ (9&times;18)</h3>
+
+<p>
+$[B_1]_{v,e} = +1$ if $v$ is the head of $e$, $-1$ if the tail. Each column has exactly one $+1$ and one $-1$. Each row has $z_v = 4$ nonzero entries.
+</p>
+
+<div class="matrix-block">
+$$
+B_1 = \left(\begin{array}{rrrrrrrrrrrrrrrrrr}
+-1 & -1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & -1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & -1 & -1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & -1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & -1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 1
+\end{array}\right)
+$$
+</div>
+
+<h3>2.3 Incidence Matrix $B_2$ (18&times;9)</h3>
+
+<p>
+For each face $f$ with CCW boundary cycle, $[B_2]_{e,f} = +1$ if edge $e$ is traversed in its canonical direction, $-1$ if against. Each column (face) has exactly 4 nonzeros (one per boundary edge). Each row (edge) appears in exactly 2 faces on the torus.
+</p>
+
+<div class="matrix-block">
+$$
+B_2 = \left(\begin{array}{rrrrrrrrr}
+1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+-1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & -1 \\
+0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 & 0 \\
+1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 1 \\
+0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 1
+\end{array}\right)
+$$
+</div>
+
+<h3>2.4 Chain Complex Verification: $B_1 B_2 = 0$</h3>
+
+<p>
+The chain complex property requires $B_1 B_2 = 0$. We verify on face $f_0$, whose column in $B_2$ has nonzeros at the four boundary edges of the face.
+</p>
+
+<p>Face $f_0$ has boundary edges: 
+$+e_{0}$, $-e_{1}$, $-e_{2}$, $+e_{7}$.</p>
+
+<p>
+For each vertex $v$, the product $(B_1 B_2)_{v, f_0}$ sums $[B_1]_{v,e} \cdot [B_2]_{e, f_0}$ over the four boundary edges. At each vertex incident to the face, one edge enters and one exits, so the sum is zero. At vertices not on the face boundary, all terms are zero. Thus $B_1 B_2 = 0$. &check;
+</p>
+
+<p><strong>Computational verification:</strong> $\max|B_1 B_2| < 10^{-12}$. &check;</p>
+
+
+<h3>2.5 Graph Laplacian $L_0 = B_1 B_1^T$</h3>
+
+<p>
+On the periodic $3 \times 3$ square lattice, every vertex has degree $z = 4$. The graph Laplacian is $L_0 = 4I_9 - A$, where $A$ is the adjacency matrix. Its eigenvalues for the torus are:
+</p>
+
+$$
+\lambda_{jk} = 2(2 - \cos(2\pi j/3) - \cos(2\pi k/3)), \quad j,k \in \{0,1,2\}
+$$
+
+<p>giving the spectrum:</p>
+$$
+\spec(L_0) = \{0,\; \underbrace{3, 3, 3, 3}_{4},\; \underbrace{6, 6, 6, 6}_{4}\}
+$$
+
+<p>Spectral gap: $\Delta_0 = 3.0$. $\beta_0 = 1$ (one zero eigenvalue, graph is connected). &check;</p>
+
+<h3>2.6 Betti Numbers and Euler Characteristic</h3>
+
+<p><strong>Expected Betti numbers</strong> for the torus $T^2$: $\beta_0 = 1$, $\beta_1 = 2$, $\beta_2 = 1$.</p>
+
+<p><strong>Euler characteristic:</strong></p>
+$$
+\chi = n_0 - n_1 + n_2 = 9 - 18 + 9 = 0
+$$
+$$
+\chi = \beta_0 - \beta_1 + \beta_2 = 1 - 2 + 1 = 0 \;\checkmark
+$$
+
+<p><strong>Rank check:</strong></p>
+$$
+\beta_1 = n_1 - \rank(B_1) - \rank(B_2) = 18 - 8 - 8 = 2 \;\checkmark
+$$
+
+<p><strong>Ice manifold dimension:</strong></p>
+$$
+\dim(\ker B_1) = n_1 - \rank(B_1) = 18 - 8 = 10
+$$
+<p>which splits as $\rank(B_2) + \beta_1 = 8 + 2 = 10$. &check;</p>
+
+<h3>2.7 Hodge 1-Laplacian and Its Spectrum</h3>
+
+<p>The full Hodge 1-Laplacian $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$ is $18 \times 18$.</p>
+
+$$
+\spec(L_1) = \{\underbrace{0, 0}_{2},\; \underbrace{3, 3, 3, 3, 3, 3, 3, 3}_{8},\; \underbrace{6, 6, 6, 6, 6, 6, 6, 6}_{8}\}
+$$
+
+<p>The spectral gap is $\Delta_1 = 3.0$. The $\beta_1 = 2$ zero eigenvalues correspond to the harmonic subspace.</p>
+
+<p><strong>$L_1^{\text{down}}$ spectrum</strong> (gradient eigenvalues from $B_1^T B_1$):</p>
+$$
+\spec(L_1^{\text{down}}) = \{\underbrace{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}_{10},\; \underbrace{3, 3, 3, 3}_{4},\; \underbrace{6, 6, 6, 6}_{4}\}
+$$
+
+<p><strong>$L_1^{\text{up}}$ spectrum</strong> (curl eigenvalues from $B_2 B_2^T$):</p>
+$$
+\spec(L_1^{\text{up}}) = \{\underbrace{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}_{10},\; \underbrace{3, 3, 3, 3}_{4},\; \underbrace{6, 6, 6, 6}_{4}\}
+$$
+
+<h3>2.8 Harmonic Modes</h3>
+
+<p>
+The two harmonic eigenvectors $\mathbf{h}_1, \mathbf{h}_2 \in \ker(L_1)$ correspond to the two non-contractible cycles on the torus. For the square lattice, these are uniform flows in the horizontal and vertical winding directions:
+</p>
+
+
+$$
+\mathbf{h}_1 = \begin{pmatrix}0 \\ 0.3333 \\ 0 \\ 0.3333 \\ 0 \\ -0.3333 \\ 0 \\ 0.3333 \\ 0 \\ 0.3333 \\ 0 \\ -0.3333 \\ 0 \\ 0.3333 \\ 0 \\ 0.3333 \\ 0 \\ -0.3333\end{pmatrix}, \quad
+\mathbf{h}_2 = \begin{pmatrix}-0.3333 \\ 0 \\ -0.3333 \\ 0 \\ -0.3333 \\ 0 \\ -0.3333 \\ 0 \\ -0.3333 \\ 0 \\ -0.3333 \\ 0 \\ 0.3333 \\ 0 \\ 0.3333 \\ 0 \\ 0.3333 \\ 0\end{pmatrix}
+$$
+
+
+<p><strong>Verification:</strong></p>
+<ul>
+<li>$\|B_1 \mathbf{h}_1\| = 2.1e-16$ (divergence-free) &check;</li>
+<li>$\|B_2^T \mathbf{h}_1\| = 2.3e-16$ (curl-free) &check;</li>
+<li>$\|L_1 \mathbf{h}_1\| = 6.4e-16 \approx 0$ &check;</li>
+<li>$\|B_1 \mathbf{h}_2\| = 7.9e-17$ &check;</li>
+<li>$\|B_2^T \mathbf{h}_2\| = 7.9e-17$ &check;</li>
+<li>$\|L_1 \mathbf{h}_2\| = 4.1e-16 \approx 0$ &check;</li>
+</ul>
+
+<p>These modes are topologically protected &mdash; no polynomial filter $p(L_1)$ with $p(0) \neq 0$ can attenuate them.</p>
+
+<h3>2.9 Ice-Rule Configuration</h3>
+
+<p>
+A valid ice configuration $\bm{\sigma} \in \{\pm 1\}^{18}$ found via Eulerian circuit orientation:
+</p>
+
+$$
+\bm{\sigma} = (-1, -1, -1, +1, +1, +1, -1, +1, +1, -1, -1, -1, +1, -1, -1, -1, +1, +1)^T
+$$
+
+<p><strong>Charge verification:</strong> $\mathbf{Q} = B_1 \bm{\sigma} = (0, 0, 0, 0, 0, 0, 0, 0, 0)^T$.</p>
+
+<p>All charges are zero ($z = 4$ is even everywhere), confirming $\bm{\sigma} \in \ker(B_1)$. &check;</p>
+
+<h3>2.10 Monopole Excitation</h3>
+
+<p>
+Flip edge $e_0$ (from $v_{0}$ to $v_{3}$): set $\sigma_{e_0} \to -\sigma_{e_0}$.
+</p>
+
+<p><strong>New charges:</strong> $\mathbf{Q}' = (-2, 0, 0, 2, 0, 0, 0, 0, 0)^T$.</p>
+
+<p>A <strong>monopole&ndash;antimonopole pair</strong>: $Q_{v_0} = -2$, $Q_{v_3} = +2$. All other vertices remain neutral. &check;</p>
+
+<p><strong>Energy:</strong> $\mathcal{H}[\bm{\sigma}'] = \frac{\epsilon}{2}\|\mathbf{Q}'\|^2 = \frac{\epsilon}{2}\sum_v Q_v^2$.</p>
+
+
+<h3>2.11 Nisoli's $S$ Matrix</h3>
+
+<p>
+For the ice configuration above, the $S$ matrix is $S = \frac{1}{2}(|B_1| D_\sigma B_1^T - B_1 D_\sigma |B_1|^T)$.
+</p>
+
+<p>$S$ is $9 \times 9$, antisymmetric ($S_{vv'} = -S_{v'v}$), with $S_{vv} = 0$.</p>
+
+<div class="matrix-block">
+$$
+S = \left(\begin{array}{rrrrrrrrr}
+0 & -1 & 1 & -1 & 0 & 0 & 1 & 0 & 0 \\
+1 & 0 & 1 & 0 & -1 & 0 & 0 & -1 & 0 \\
+-1 & -1 & 0 & 0 & 0 & 1 & 0 & 0 & 1 \\
+1 & 0 & 0 & 0 & 1 & -1 & -1 & 0 & 0 \\
+0 & 1 & 0 & -1 & 0 & -1 & 0 & 1 & 0 \\
+0 & 0 & -1 & 1 & 1 & 0 & 0 & 0 & -1 \\
+-1 & 0 & 0 & 1 & 0 & 0 & 0 & -1 & 1 \\
+0 & 1 & 0 & 0 & -1 & 0 & 1 & 0 & -1 \\
+0 & 0 & -1 & 0 & 0 & 1 & -1 & 1 & 0
+\end{array}\right)
+$$
+</div>
+
+<p><strong>Entry-by-entry verification</strong> for edge $e_0$ connecting $v_{0}$ (tail) and $v_{3}$ (head), with $\sigma_{e_0} = -1$:</p>
+$$
+S_{v_{0},\, v_{3}} = -[B_1]_{v_{0}, e_0} \cdot \sigma_{e_0} = -(-1)(-1) = -1
+$$
+<p>The antisymmetry $S_{v_{3},\, v_{0}} = +1 = -S_{v_{0},\, v_{3}}$ holds. &check;</p>
+
+<h3>2.12 Line Graph and $L_1^{\text{down}}$</h3>
+
+<p>
+The line graph $L(G)$ has 18 vertices (one per edge of $G$). Two vertices of $L(G)$ are adjacent iff the corresponding edges share an endpoint. Since every vertex has $z = 4$, each contributes a $K_4$ clique, giving $\sum_v \binom{z_v}{2} = 9 \times 6 = 54$ edges in $L(G)$.
+</p>
+
+<p>By the line-graph dual identity: $L_1^{\text{down}} = B_1^T B_1 = 2I_{18} - A_{L(G)}$, so every vertex with $z > 2$ generates frustrated $K_4$ cliques in $L(G)$. &check;</p>
+
+<h3>2.13 Pauling Entropy</h3>
+
+<p>The Pauling approximation for ice-rule-satisfying states on a lattice with uniform $z = 4$:</p>
+$$
+\varepsilon_{\text{Pauling}} = 2^{n_1} \prod_v \frac{\binom{z_v}{z_v/2}}{2^{z_v}} = 2^{18} \cdot \left(\frac{\binom{4}{2}}{2^4}\right)^9 = 262144 \cdot \left(\frac{3}{8}\right)^9 \approx 38.44
+$$
+
+<p>Pauling entropy per vertex: $s_{\text{P}} = \frac{1}{N_v} \ln \varepsilon \approx \frac{\ln(38.44)}{9} \approx 0.406$, close to the exact Lieb result $s_{\text{Lieb}} = \frac{3}{2}\ln(4/3) \approx 0.431$ (finite-size deviation expected).</p>
+
+<h3>2.14 Open Boundary Conditions</h3>
+
+<p>
+Removing the 6 periodic wrap-around edges (3 horizontal + 3 vertical) converts the torus to a planar square patch. Some faces that depended on wrap edges are also lost.
+</p>
+
+<table>
+<thead>
+<tr><th>Property</th><th>Periodic</th><th>Open</th></tr>
+</thead>
+<tbody>
+<tr><td>$n_0$</td><td>9</td><td>9</td></tr>
+<tr><td>$n_1$</td><td>18</td><td>12</td></tr>
+<tr><td>$n_2$</td><td>9</td><td>4</td></tr>
+<tr><td>$\beta_0$</td><td>1</td><td>1</td></tr>
+<tr><td>$\beta_1$</td><td>2</td><td>0</td></tr>
+<tr><td>$\beta_2$</td><td>1</td><td>0</td></tr>
+<tr><td>$\chi$</td><td>0</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>
+With open BCs: $\beta_1 = 0$ &mdash; the two winding modes are lost because the torus handle cycles no longer close. The Euler characteristic changes from 0 (torus) to 1 (disk). Boundary vertices now have reduced coordination ($z = 2$ or $z = 3$).
+</p>
+
+
+<h2 id="sec3">3. Tetris Lattice (2&times;1 Periodic)</h2>
+
+<p>
+The tetris lattice is <strong>maximally vertex-frustrated</strong>: every minimal loop contains a $z = 2$ bridge vertex, making it impossible to satisfy the ice rule at all vertices simultaneously. It features a "sliding phase" &mdash; ordered along one direction, disordered along the other.
+</p>
+
+<h3>3.1 Lattice Setup</h3>
+
+<p>
+<strong>Unit cell:</strong> $\mathbf{a}_1 = (2, 0)$, $\mathbf{a}_2 = (0, 4)$, containing 8 vertices. The cell spans two backbone rows ($y=0, 2$) and two staircase rows ($y=1, 3$).
+</p>
+
+<p>
+<strong>Vertex layout (one unit cell):</strong>
+</p>
+$$
+\begin{array}{ccccc}
+v_6(0,3) & -- & v_7(1,3) & & \text{staircase, z=3} \\
+| & & | & & \\
+v_4(0,2) & -- & v_5(1,2) & & \text{backbone, z=2/z=4} \\
+| & & | & & \\
+v_2(0,1) & -- & v_3(1,1) & & \text{staircase, z=3} \\
+| & & | & & \\
+v_0(0,0) & -- & v_1(1,0) & & \text{backbone, z=4/z=2}
+\end{array}
+$$
+
+<p>
+<strong>Bridge stagger:</strong> On backbone row 0, the $z=2$ bridge is at $v_1$ (right). On backbone row 2, the $z=2$ bridge is at $v_4$ (left). This stagger ensures every hexagonal loop is frustrated.
+</p>
+
+<p>
+<strong>Tiling:</strong> 2&times;1 (2 cells in $x$, 1 in $y$). A 1&times;1 tiling fails because 4 horizontal edge pairs collapse to multi-edges under periodic wrapping.
+</p>
+
+<p><strong>Counts:</strong> $n_0 = 16$, $n_1 = 24$, $n_2 = 8$.</p>
+
+<p><strong>Coordination distribution:</strong> $z=4 \times 4$, $z=3 \times 8$, $z=2 \times 4$.</p>
+
+<p><strong>Edges:</strong> 24 edges.</p>
+
+<table>
+<thead>
+<tr><th>Edge</th><th>Tail</th><th>Head</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>$e_{0}$</td><td>$v_{0}$</td><td>$v_{1}$</td><td></td></tr>
+<tr><td>$e_{1}$</td><td>$v_{1}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{2}$</td><td>$v_{2}$</td><td>$v_{3}$</td><td></td></tr>
+<tr><td>$e_{3}$</td><td>$v_{3}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{4}$</td><td>$v_{4}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{5}$</td><td>$v_{5}$</td><td>$v_{12}$</td><td></td></tr>
+<tr><td>$e_{6}$</td><td>$v_{6}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{7}$</td><td>$v_{7}$</td><td>$v_{14}$</td><td></td></tr>
+<tr><td>$e_{8}$</td><td>$v_{0}$</td><td>$v_{2}$</td><td></td></tr>
+<tr><td>$e_{9}$</td><td>$v_{3}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{10}$</td><td>$v_{5}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{11}$</td><td>$v_{0}$</td><td>$v_{6}$</td><td></td></tr>
+<tr><td>$e_{12}$</td><td>$v_{8}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{13}$</td><td>$v_{0}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{14}$</td><td>$v_{10}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{15}$</td><td>$v_{2}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{16}$</td><td>$v_{12}$</td><td>$v_{13}$</td><td></td></tr>
+<tr><td>$e_{17}$</td><td>$v_{4}$</td><td>$v_{13}$</td><td></td></tr>
+<tr><td>$e_{18}$</td><td>$v_{14}$</td><td>$v_{15}$</td><td></td></tr>
+<tr><td>$e_{19}$</td><td>$v_{6}$</td><td>$v_{15}$</td><td></td></tr>
+<tr><td>$e_{20}$</td><td>$v_{8}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{21}$</td><td>$v_{11}$</td><td>$v_{13}$</td><td></td></tr>
+<tr><td>$e_{22}$</td><td>$v_{13}$</td><td>$v_{15}$</td><td></td></tr>
+<tr><td>$e_{23}$</td><td>$v_{8}$</td><td>$v_{14}$</td><td></td></tr>
+</tbody>
+</table>
+
+<p><strong>Faces:</strong> 8 hexagonal faces (each with exactly one $z=2$ vertex).</p>
+
+<table>
+<thead>
+<tr><th>Face</th><th>Vertices (CCW)</th><th>Sides</th></tr>
+</thead>
+<tbody>
+<tr><td>$f_{0}$</td><td>$v_{0}$, $v_{1}$, $v_{8}$, $v_{10}$, $v_{3}$, $v_{2}$</td><td>6</td></tr>
+<tr><td>$f_{1}$</td><td>$v_{2}$, $v_{3}$, $v_{5}$, $v_{4}$, $v_{13}$, $v_{11}$</td><td>6</td></tr>
+<tr><td>$f_{2}$</td><td>$v_{5}$, $v_{7}$, $v_{6}$, $v_{15}$, $v_{13}$, $v_{4}$</td><td>6</td></tr>
+<tr><td>$f_{3}$</td><td>$v_{7}$, $v_{6}$, $v_{0}$, $v_{1}$, $v_{8}$, $v_{14}$</td><td>6</td></tr>
+<tr><td>$f_{4}$</td><td>$v_{8}$, $v_{9}$, $v_{0}$, $v_{2}$, $v_{11}$, $v_{10}$</td><td>6</td></tr>
+<tr><td>$f_{5}$</td><td>$v_{10}$, $v_{11}$, $v_{13}$, $v_{12}$, $v_{5}$, $v_{3}$</td><td>6</td></tr>
+<tr><td>$f_{6}$</td><td>$v_{13}$, $v_{15}$, $v_{14}$, $v_{7}$, $v_{5}$, $v_{12}$</td><td>6</td></tr>
+<tr><td>$f_{7}$</td><td>$v_{15}$, $v_{14}$, $v_{8}$, $v_{9}$, $v_{0}$, $v_{6}$</td><td>6</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 Incidence Matrix $B_1$ (16&times;24)</h3>
+
+<p>
+Each column has exactly one $+1$ and one $-1$. Rows for $z=4$ vertices have 4 nonzeros, $z=3$ have 3, $z=2$ have 2.
+</p>
+
+<div class="matrix-block">
+$$
+B_1 = \left(\begin{array}{rrrrrrrrrrrrrrrrrrrrrrrr}
+-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & -1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 1 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>3.3 Incidence Matrix $B_2$ (24&times;8)</h3>
+
+<p>
+Each column (hexagonal face) has 6 nonzero entries. Each row (edge) appears in at most 2 faces.
+</p>
+
+<div class="matrix-block">
+$$
+B_2 = \left(\begin{array}{rrrrrrrr}
+1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+-1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 \\
+0 & 0 & -1 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & -1 & 0 \\
+-1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & -1 & 0 & 0 & -1 \\
+0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 \\
+0 & -1 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 \\
+0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & -1 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 \\
+1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & -1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & -1
+\end{array}\right)
+$$
+</div>
+
+<h3>3.4 Chain Complex Verification</h3>
+
+<p>$\max|B_1 B_2| < 10^{-12}$, confirming $B_1 B_2 = 0$. &check;</p>
+
+<p>Verification on face $f_0$. Boundary edges: 
+$+e_{0}$, $+e_{1}$, $-e_{2}$, $-e_{3}$, $-e_{8}$, $+e_{20}$.</p>
+<p>For each vertex on the face boundary, one edge enters and one exits, giving a net sum of zero. &check;</p>
+
+<h3>3.5 Graph Laplacian $L_0$</h3>
+
+$$
+\spec(L_0) = \{0,\; 0.6277,\; 1,\; 1.4384,\; \underbrace{2, 2, 2, 2}_{4},\; \underbrace{3, 3}_{2},\; 4,\; \underbrace{5, 5, 5}_{3},\; 5.5616,\; 6.3723\}
+$$
+<p>Spectral gap: $\Delta_0 = 0.627719$. Note the smaller gap compared to the square lattice ($\Delta_0 = 3.0$), reflecting the mixed coordination and frustration.</p>
+
+<h3>3.6 Betti Numbers and Euler Characteristic</h3>
+
+$$
+\chi = n_0 - n_1 + n_2 = 16 - 24 + 8 = 0
+$$
+$$
+\chi = \beta_0 - \beta_1 + \beta_2 = 1 - 2 + 1 = 0 \;\checkmark
+$$
+
+<p>$\beta_1 = n_1 - \rank(B_1) - \rank(B_2) = 24 - 15 - 7 = 2$ &check;</p>
+
+<h3>3.7 Hodge 1-Laplacian Spectrum</h3>
+
+$$
+\spec(L_1) = \{\underbrace{0, 0}_{2},\; 0.6277,\; 1,\; 1.4384,\; \underbrace{2, 2, 2, 2}_{4},\; \underbrace{3, 3}_{2},\; \underbrace{4, 4, 4}_{3},\; \underbrace{5, 5, 5}_{3},\; 5.5616,\; \underbrace{6, 6}_{2},\; 6.3723,\; 8,\; \underbrace{10, 10}_{2}\}
+$$
+
+<p>Spectral gap: $\Delta_1 = 0.627719$. The two zero eigenvalues confirm $\beta_1 = 2$.</p>
+
+<h3>3.8 Harmonic Modes</h3>
+
+
+$$
+\mathbf{h}_1 = \begin{pmatrix}-0.2339 \\ -0.2339 \\ -0.2897 \\ -0.1781 \\ -0.2339 \\ -0.2339 \\ -0.1781 \\ -0.2897 \\ -0.1116 \\ -0.1116 \\ -0.1116 \\ 0.1116 \\ -0.2339 \\ 0.2339 \\ -0.2897 \\ 0.1781 \\ -0.2339 \\ 0.2339 \\ -0.1781 \\ 0.2897 \\ -0.1116 \\ -0.1116 \\ -0.1116 \\ 0.1116\end{pmatrix}, \quad
+\mathbf{h}_2 = \begin{pmatrix}-0.0882 \\ -0.0882 \\ 0.0597 \\ -0.2362 \\ -0.0882 \\ -0.0882 \\ -0.2362 \\ 0.0597 \\ 0.2959 \\ 0.2959 \\ 0.2959 \\ -0.2959 \\ -0.0882 \\ 0.0882 \\ 0.0597 \\ 0.2362 \\ -0.0882 \\ 0.0882 \\ -0.2362 \\ -0.0597 \\ 0.2959 \\ 0.2959 \\ 0.2959 \\ -0.2959\end{pmatrix}
+$$
+
+<p><strong>Verification:</strong></p>
+<ul>
+<li>$\|L_1 \mathbf{h}_1\| = 2.3e-15 \approx 0$ &check;</li>
+<li>$\|L_1 \mathbf{h}_2\| = 2.7e-15 \approx 0$ &check;</li>
+<li>$\|B_1 \mathbf{h}_1\| = 1.2e-15$ (divergence-free) &check;</li>
+<li>$\|B_2^T \mathbf{h}_1\| = 4.9e-16$ (curl-free) &check;</li>
+</ul>
+
+<p>
+Unlike the square lattice where harmonics are uniform horizontal/vertical flows, the tetris harmonics have <em>non-uniform amplitudes</em> reflecting the mixed coordination. Bridge edges ($z=2$) carry different harmonic weight than crossroad edges ($z=4$).
+</p>
+
+<h3>3.9 Ice-Rule Configuration</h3>
+
+$$
+\bm{\sigma} = (-1, -1, -1, +1, +1, -1, -1, +1, -1, -1, +1, +1, -1, +1, +1, -1, -1, -1, +1, +1, +1, +1, -1, -1)^T
+$$
+
+<p><strong>Charges:</strong> $\mathbf{Q} = B_1 \bm{\sigma} = (0, 0, 1, -1, 0, 0, 1, -1, 0, 0, 1, -1, 0, 0, -1, 1)^T$.</p>
+
+
+<p>
+Ice rule check: $z=4$ vertices ($v_0, v_5, v_8, v_{13}$) have $Q_v = 0$. $z=3$ vertices have $|Q_v| = 1$. $z=2$ vertices have $Q_v = 0$. All satisfy $|Q_v| = z_v \bmod 2$. &check;
+</p>
+
+<h3>3.10 Monopole Excitation</h3>
+
+
+<p>Flipping edge $e_0$ (from $v_{0}$ to $v_{1}$):</p>
+<p><strong>New charges:</strong> $\mathbf{Q}' = (-2, 2, 1, -1, 0, 0, 1, -1, 0, 0, 1, -1, 0, 0, -1, 1)^T$.</p>
+
+<p>Changed vertices: $v_{0}$: $Q = 0 \to -2$; $v_{1}$: $Q = 0 \to 2$. &check;</p>
+
+<h3>3.11 Nisoli's $S$ Matrix</h3>
+
+<p>The $16 \times 16$ antisymmetric $S$ matrix for the ice configuration above:</p>
+
+<div class="matrix-block">
+$$
+S = \left(\begin{array}{rrrrrrrrrrrrrrrr}
+0 & -1 & -1 & 0 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 1 & -1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 & -1 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 & -1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0
+\end{array}\right)
+$$
+</div>
+
+<p><strong>Properties verified:</strong> $S_{vv} = 0$ &forall; $v$; $S_{vv'} = -S_{v'v}$ (antisymmetric); $S_{vv'} = 0$ when $v, v'$ are not neighbors. &check;</p>
+
+<p><strong>Key observation:</strong> For mixed-$z$ lattices, the $S$ matrix entries are $\pm 1$ for adjacent vertices connected by one edge, and 0 otherwise (even though vertices have different coordination numbers). The entry $S_{vv'} = +1$ means the spin on edge $(v, v')$ points from $v$ to $v'$.</p>
+
+
+<h3>3.12 Line Graph and Frustration</h3>
+
+<p>
+The line graph $L(G)$ has 24 vertices. At each $z=4$ vertex, a $K_4$ clique contributes $\binom{4}{2} = 6$ line-graph edges with frustrating odd cycles. At $z=3$ vertices, a $K_3$ triangle contributes 3 edges. At $z=2$ vertices, a single edge contributes 1 line-graph edge (no frustration from $K_2$). Total line-graph edges: $4 \times 6 + 8 \times 3 + 4 \times 1 = 52$.
+</p>
+
+<p>Since all $z \geq 3$ vertices generate frustrated cliques, the line graph is <em>not</em> bipartite &mdash; confirming universal frustration in $L_1^{\text{down}}$ per the line-graph dual theorem. &check;</p>
+
+<h3>3.13 Pauling Entropy</h3>
+
+$$
+\varepsilon_{\text{Pauling}} = 2^{24} \prod_v \frac{\text{ice fraction}(z_v)}{1} \approx 2075.94
+$$
+
+<p>Much larger than the square lattice (38.44) despite the same number of edges (24 vs 18), because the mixed coordination with $z=2$ and $z=3$ vertices imposes weaker constraints than uniform $z=4$.</p>
+
+<h3>3.14 Open Boundary Conditions</h3>
+
+<table>
+<thead>
+<tr><th>Property</th><th>Periodic</th><th>Open</th></tr>
+</thead>
+<tbody>
+<tr><td>$n_0$</td><td>16</td><td>16</td></tr>
+<tr><td>$n_1$</td><td>24</td><td>18</td></tr>
+<tr><td>$n_2$</td><td>8</td><td>3</td></tr>
+<tr><td>$\beta_0$</td><td>1</td><td>1</td></tr>
+<tr><td>$\beta_1$</td><td>2</td><td>0</td></tr>
+<tr><td>$\beta_2$</td><td>1</td><td>0</td></tr>
+<tr><td>$\chi$</td><td>0</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>Open BCs: 6 edges removed (periodic wraps), 5 faces lost. $\beta_1 = 0$ &mdash; harmonic protection completely vanishes without periodic topology. &check;</p>
+
+
+<h2 id="sec4">4. Kagome Lattice (2&times;2 Periodic)</h2>
+
+<p>
+The kagome lattice (trihexagonal tiling) has uniform $z = 4$ coordination with corner-sharing triangles and hexagonal voids. It exhibits <strong>geometric frustration</strong> &mdash; the Ising antiferromagnet on kagome has an extensive ground-state degeneracy with characteristic flat bands in the spin-wave spectrum.
+</p>
+
+<h3>4.1 Lattice Setup</h3>
+
+<p>
+<strong>Unit cell:</strong> $\mathbf{a}_1 = (2, 0)$, $\mathbf{a}_2 = (1, \sqrt{3})$. Three vertices per cell at positions $v_0 = (0, 0)$, $v_1 = (1, 0)$, $v_2 = (0.5, \sqrt{3}/2)$, forming an upward triangle. 6 edges per cell, 3 faces per cell (up-triangle, down-triangle, hexagon).
+</p>
+
+<p>
+<strong>Tiling:</strong> 2&times;2 periodic ($n_0 = 12$, $n_1 = 24$, $n_2 = 12$). A 1&times;1 tiling collapses cross-cell edges to duplicates.
+</p>
+
+<p><strong>Coordination:</strong> All $z = 4$ ($\times 12$ vertices).</p>
+
+<p><strong>Edges:</strong> 24 edges.</p>
+
+<table>
+<thead>
+<tr><th>Edge</th><th>Tail</th><th>Head</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>$e_{0}$</td><td>$v_{0}$</td><td>$v_{1}$</td><td></td></tr>
+<tr><td>$e_{1}$</td><td>$v_{1}$</td><td>$v_{2}$</td><td></td></tr>
+<tr><td>$e_{2}$</td><td>$v_{0}$</td><td>$v_{2}$</td><td></td></tr>
+<tr><td>$e_{3}$</td><td>$v_{1}$</td><td>$v_{6}$</td><td></td></tr>
+<tr><td>$e_{4}$</td><td>$v_{2}$</td><td>$v_{3}$</td><td></td></tr>
+<tr><td>$e_{5}$</td><td>$v_{2}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{6}$</td><td>$v_{3}$</td><td>$v_{4}$</td><td></td></tr>
+<tr><td>$e_{7}$</td><td>$v_{4}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{8}$</td><td>$v_{3}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{9}$</td><td>$v_{4}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{10}$</td><td>$v_{0}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{11}$</td><td>$v_{5}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{12}$</td><td>$v_{6}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{13}$</td><td>$v_{7}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{14}$</td><td>$v_{6}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{15}$</td><td>$v_{0}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{16}$</td><td>$v_{8}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{17}$</td><td>$v_{4}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{18}$</td><td>$v_{9}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{19}$</td><td>$v_{10}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{20}$</td><td>$v_{9}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{21}$</td><td>$v_{3}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{22}$</td><td>$v_{6}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{23}$</td><td>$v_{1}$</td><td>$v_{11}$</td><td></td></tr>
+</tbody>
+</table>
+
+<p><strong>Faces:</strong> 12 faces &mdash; 4 upward triangles (3 sides), 4 downward triangles (3 sides), 4 hexagons (6 sides).</p>
+
+<table>
+<thead>
+<tr><th>Face</th><th>Vertices (CCW)</th><th>Sides</th></tr>
+</thead>
+<tbody>
+<tr><td>$f_{0}$</td><td>$v_{0}$, $v_{1}$, $v_{2}$</td><td>3</td></tr>
+<tr><td>$f_{1}$</td><td>$v_{1}$, $v_{6}$, $v_{11}$</td><td>3</td></tr>
+<tr><td>$f_{2}$</td><td>$v_{1}$, $v_{6}$, $v_{8}$, $v_{4}$, $v_{3}$, $v_{2}$</td><td>6</td></tr>
+<tr><td>$f_{3}$</td><td>$v_{3}$, $v_{4}$, $v_{5}$</td><td>3</td></tr>
+<tr><td>$f_{4}$</td><td>$v_{4}$, $v_{9}$, $v_{8}$</td><td>3</td></tr>
+<tr><td>$f_{5}$</td><td>$v_{4}$, $v_{9}$, $v_{11}$, $v_{1}$, $v_{0}$, $v_{5}$</td><td>6</td></tr>
+<tr><td>$f_{6}$</td><td>$v_{6}$, $v_{7}$, $v_{8}$</td><td>3</td></tr>
+<tr><td>$f_{7}$</td><td>$v_{7}$, $v_{0}$, $v_{5}$</td><td>3</td></tr>
+<tr><td>$f_{8}$</td><td>$v_{7}$, $v_{0}$, $v_{2}$, $v_{10}$, $v_{9}$, $v_{8}$</td><td>6</td></tr>
+<tr><td>$f_{9}$</td><td>$v_{9}$, $v_{10}$, $v_{11}$</td><td>3</td></tr>
+<tr><td>$f_{10}$</td><td>$v_{10}$, $v_{3}$, $v_{2}$</td><td>3</td></tr>
+<tr><td>$f_{11}$</td><td>$v_{10}$, $v_{3}$, $v_{5}$, $v_{7}$, $v_{6}$, $v_{11}$</td><td>6</td></tr>
+</tbody>
+</table>
+
+<h3>4.2 Incidence Matrix $B_1$ (12&times;24)</h3>
+
+<div class="matrix-block">
+$$
+B_1 = \left(\begin{array}{rrrrrrrrrrrrrrrrrrrrrrrr}
+-1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\
+0 & 1 & 1 & 0 & -1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & -1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & -1 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 1 & 1
+\end{array}\right)
+$$
+</div>
+
+<h3>4.3 Incidence Matrix $B_2$ (24&times;12)</h3>
+
+<p>
+Triangle faces have 3 boundary edges each; hexagonal faces have 6.
+</p>
+
+<div class="matrix-block">
+$$
+B_2 = \left(\begin{array}{rrrrrrrrrrrr}
+1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 \\
+0 & 0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & -1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & -1 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & -1 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & -1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>4.4 Chain Complex Verification</h3>
+
+<p>$\max|B_1 B_2| < 10^{-12}$. &check;</p>
+
+<h3>4.5 Betti Numbers and Euler Characteristic</h3>
+
+$$
+\chi = 12 - 24 + 12 = 0
+$$
+$$
+\beta_0 = 1,\; \beta_1 = 2,\; \beta_2 = 1 \quad \Rightarrow \quad 1 - 2 + 1 = 0 \;\checkmark
+$$
+
+<p>$\beta_1 = 24 - 11 - 11 = 2$. &check;</p>
+
+<h3>4.6 Spectra and Harmonic Modes</h3>
+
+<p><strong>$L_0$ spectrum:</strong></p>
+$$
+\spec(L_0) = \{0,\; \underbrace{2, 2, 2}_{3},\; \underbrace{4, 4, 4}_{3},\; \underbrace{6, 6, 6, 6, 6}_{5}\}
+$$
+<p>Spectral gap: $\Delta_0 = 2.0$.</p>
+
+<p><strong>$L_1$ spectrum:</strong></p>
+$$
+\spec(L_1) = \{\underbrace{0, 0}_{2},\; \underbrace{2, 2, 2}_{3},\; \underbrace{2.4384, 2.4384, 2.4384}_{3},\; \underbrace{3, 3, 3, 3}_{4},\; \underbrace{4, 4, 4}_{3},\; \underbrace{6, 6, 6, 6, 6}_{5},\; \underbrace{6.5616, 6.5616, 6.5616}_{3},\; 9\}
+$$
+<p>Spectral gap: $\Delta_1 = 2.0$.</p>
+
+
+<p><strong>Harmonic modes:</strong></p>
+$$
+\mathbf{h}_1 = \begin{pmatrix}-0.0013 \\ 0.2507 \\ 0.2493 \\ -0.0013 \\ 0.2493 \\ 0.2507 \\ -0.0013 \\ 0.2507 \\ 0.2493 \\ -0.0013 \\ -0.2493 \\ 0.2507 \\ -0.0013 \\ 0.2507 \\ 0.2493 \\ 0.0013 \\ 0.2493 \\ -0.2507 \\ -0.0013 \\ 0.2507 \\ 0.2493 \\ 0.0013 \\ -0.2493 \\ -0.2507\end{pmatrix}, \quad
+\mathbf{h}_2 = \begin{pmatrix}0.2887 \\ -0.1432 \\ 0.1455 \\ 0.2887 \\ 0.1455 \\ -0.1432 \\ 0.2887 \\ -0.1432 \\ 0.1455 \\ 0.2887 \\ -0.1455 \\ -0.1432 \\ 0.2887 \\ -0.1432 \\ 0.1455 \\ -0.2887 \\ 0.1455 \\ 0.1432 \\ 0.2887 \\ -0.1432 \\ 0.1455 \\ -0.2887 \\ -0.1455 \\ 0.1432\end{pmatrix}
+$$
+
+<p>
+Verification: $\|L_1 \mathbf{h}_1\| = 2.0e-15$, $\|L_1 \mathbf{h}_2\| = 3.5e-15$. Both divergence-free and curl-free. &check;
+</p>
+
+<h3>4.7 Ice Configuration and $S$ Matrix</h3>
+
+$$
+\bm{\sigma} = (-1, -1, +1, +1, +1, -1, -1, -1, +1, -1, -1, -1, +1, +1, -1, +1, +1, +1, -1, -1, +1, +1, +1, -1)^T
+$$
+
+<p><strong>Charges:</strong> $\mathbf{Q} = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)^T$. All zero ($z = 4$ everywhere). &check;</p>
+
+<div class="matrix-block">
+$$
+S = \left(\begin{array}{rrrrrrrrrrrr}
+0 & -1 & 1 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 0 & -1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & -1 \\
+-1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+0 & 0 & -1 & 0 & -1 & 1 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 & 1 & -1 & 0 & 0 \\
+1 & 0 & 0 & -1 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 1 \\
+-1 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & -1 & 0 & 1 & -1 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & -1 & 0 & -1 & 1 \\
+0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & -1 \\
+0 & 1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & -1 & 1 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>4.8 Open Boundary Conditions</h3>
+
+<table>
+<thead>
+<tr><th>Property</th><th>Periodic</th><th>Open</th></tr>
+</thead>
+<tbody>
+<tr><td>$n_0$</td><td>12</td><td>12</td></tr>
+<tr><td>$n_1$</td><td>24</td><td>17</td></tr>
+<tr><td>$n_2$</td><td>12</td><td>6</td></tr>
+<tr><td>$\beta_0, \beta_1, \beta_2$</td><td>1, 2, 1</td><td>1, 0, 0</td></tr>
+<tr><td>$\chi$</td><td>0</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>7 wrap edges removed, 6 faces lost. $\beta_1: 2 \to 0$. &check;</p>
+
+
+<h2 id="sec5">5. Shakti Lattice (1&times;1 Periodic)</h2>
+
+<p>
+The shakti lattice has <strong>maximal vertex frustration</strong> with extensive ground-state degeneracy and topological order. It consists of a square grid of $z=4$ corner vertices, with each plaquette containing two bars (subdivided edges, $z=3$ midpoints) connected by a $z=2$ bridge. Bars alternate between horizontal and vertical pairs in a checkerboard pattern.
+</p>
+
+<h3>5.1 Lattice Setup</h3>
+
+<p>
+<strong>Unit cell:</strong> $\mathbf{a}_1 = (2, 0)$, $\mathbf{a}_2 = (0, 2)$. 16 vertices per cell.
+</p>
+
+<p><strong>Vertex types:</strong></p>
+<ul>
+<li>$z=4$ corners: $v_0, v_1, v_2, v_3$ ($\times 4$)</li>
+<li>$z=3$ bar midpoints: $v_4, v_5, v_7, v_8, v_{10}, v_{11}, v_{13}, v_{14}$ ($\times 8$)</li>
+<li>$z=2$ bridges: $v_6, v_9, v_{12}, v_{15}$ ($\times 4$)</li>
+</ul>
+
+<p>
+<strong>Tiling:</strong> 1&times;1 periodic is valid because all 24 edges connect distinct vertices under periodic wrapping ($n_0 = 16$, $n_1 = 24$, $n_2 = 8$).
+</p>
+
+<p><strong>Faces:</strong> 8 hexagonal faces, each visiting 2 corner ($z=4$), 3 bar midpoint ($z=3$), and 1 bridge ($z=2$) vertex.</p>
+
+<table>
+<thead>
+<tr><th>Edge</th><th>Tail</th><th>Head</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>$e_{0}$</td><td>$v_{0}$</td><td>$v_{4}$</td><td></td></tr>
+<tr><td>$e_{1}$</td><td>$v_{1}$</td><td>$v_{4}$</td><td></td></tr>
+<tr><td>$e_{2}$</td><td>$v_{2}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{3}$</td><td>$v_{3}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{4}$</td><td>$v_{4}$</td><td>$v_{6}$</td><td></td></tr>
+<tr><td>$e_{5}$</td><td>$v_{5}$</td><td>$v_{6}$</td><td></td></tr>
+<tr><td>$e_{6}$</td><td>$v_{1}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{7}$</td><td>$v_{3}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{8}$</td><td>$v_{0}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{9}$</td><td>$v_{2}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{10}$</td><td>$v_{7}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{11}$</td><td>$v_{8}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{12}$</td><td>$v_{2}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{13}$</td><td>$v_{0}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{14}$</td><td>$v_{3}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{15}$</td><td>$v_{1}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{16}$</td><td>$v_{10}$</td><td>$v_{12}$</td><td></td></tr>
+<tr><td>$e_{17}$</td><td>$v_{11}$</td><td>$v_{12}$</td><td></td></tr>
+<tr><td>$e_{18}$</td><td>$v_{3}$</td><td>$v_{13}$</td><td></td></tr>
+<tr><td>$e_{19}$</td><td>$v_{2}$</td><td>$v_{13}$</td><td></td></tr>
+<tr><td>$e_{20}$</td><td>$v_{1}$</td><td>$v_{14}$</td><td></td></tr>
+<tr><td>$e_{21}$</td><td>$v_{0}$</td><td>$v_{14}$</td><td></td></tr>
+<tr><td>$e_{22}$</td><td>$v_{13}$</td><td>$v_{15}$</td><td></td></tr>
+<tr><td>$e_{23}$</td><td>$v_{14}$</td><td>$v_{15}$</td><td></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+<tr><th>Face</th><th>Vertices (CCW)</th><th>Sides</th></tr>
+</thead>
+<tbody>
+<tr><td>$f_{0}$</td><td>$v_{0}$, $v_{4}$, $v_{6}$, $v_{5}$, $v_{2}$, $v_{8}$</td><td>6</td></tr>
+<tr><td>$f_{1}$</td><td>$v_{0}$, $v_{8}$, $v_{9}$, $v_{7}$, $v_{1}$, $v_{14}$</td><td>6</td></tr>
+<tr><td>$f_{2}$</td><td>$v_{0}$, $v_{14}$, $v_{15}$, $v_{13}$, $v_{2}$, $v_{10}$</td><td>6</td></tr>
+<tr><td>$f_{3}$</td><td>$v_{0}$, $v_{10}$, $v_{12}$, $v_{11}$, $v_{1}$, $v_{4}$</td><td>6</td></tr>
+<tr><td>$f_{4}$</td><td>$v_{3}$, $v_{13}$, $v_{15}$, $v_{14}$, $v_{1}$, $v_{11}$</td><td>6</td></tr>
+<tr><td>$f_{5}$</td><td>$v_{3}$, $v_{11}$, $v_{12}$, $v_{10}$, $v_{2}$, $v_{5}$</td><td>6</td></tr>
+<tr><td>$f_{6}$</td><td>$v_{3}$, $v_{5}$, $v_{6}$, $v_{4}$, $v_{1}$, $v_{7}$</td><td>6</td></tr>
+<tr><td>$f_{7}$</td><td>$v_{3}$, $v_{7}$, $v_{9}$, $v_{8}$, $v_{2}$, $v_{13}$</td><td>6</td></tr>
+</tbody>
+</table>
+
+<h3>5.2 Incidence Matrix $B_1$ (16&times;24)</h3>
+
+<div class="matrix-block">
+$$
+B_1 = \left(\begin{array}{rrrrrrrrrrrrrrrrrrrrrrrr}
+-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & -1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1
+\end{array}\right)
+$$
+</div>
+
+<h3>5.3 Incidence Matrix $B_2$ (24&times;8)</h3>
+
+<div class="matrix-block">
+$$
+B_2 = \left(\begin{array}{rrrrrrrr}
+1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & -1 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & 1 \\
+-1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\
+0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & -1 \\
+0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & -1 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 \\
+0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 \\
+0 & 0 & -1 & 0 & 0 & 0 & 0 & 1 \\
+0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & -1 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & -1 & 0 & 0 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>5.4 Chain Complex Verification</h3>
+
+<p>$\max|B_1 B_2| < 10^{-12}$. &check;</p>
+
+<h3>5.5 Betti Numbers and Euler Characteristic</h3>
+
+$$
+\chi = 16 - 24 + 8 = 0
+$$
+$$
+\beta_0 = 1,\; \beta_1 = 2,\; \beta_2 = 1 \quad \Rightarrow \quad 1 - 2 + 1 = 0 \;\checkmark
+$$
+
+<p>$\beta_1 = 24 - 15 - 7 = 2$. &check;</p>
+
+<h3>5.6 Spectra and Harmonic Modes</h3>
+
+<p><strong>$L_0$ spectrum:</strong></p>
+$$
+\spec(L_0) = \{0,\; \underbrace{1, 1, 1}_{3},\; \underbrace{1.4384, 1.4384}_{2},\; 2.4384,\; \underbrace{3, 3}_{2},\; \underbrace{4, 4, 4, 4}_{4},\; \underbrace{5.5616, 5.5616}_{2},\; 6.5616\}
+$$
+<p>Spectral gap: $\Delta_0 = 1.0$.</p>
+
+<p><strong>$L_1$ spectrum:</strong></p>
+$$
+\spec(L_1) = \{\underbrace{0, 0}_{2},\; \underbrace{1, 1, 1}_{3},\; \underbrace{1.4384, 1.4384}_{2},\; 2.4384,\; \underbrace{3, 3}_{2},\; \underbrace{4, 4, 4, 4, 4, 4}_{6},\; \underbrace{5.5616, 5.5616}_{2},\; 6.5616,\; \underbrace{8, 8, 8, 8, 8}_{5}\}
+$$
+<p>Spectral gap: $\Delta_1 = 1.0$.</p>
+
+
+<p><strong>Harmonic modes:</strong></p>
+$$
+\mathbf{h}_1 = \begin{pmatrix}-0.3209 \\ 0.2776 \\ -0.2776 \\ 0.3209 \\ -0.0433 \\ 0.0433 \\ -0.1647 \\ -0.0348 \\ 0.0348 \\ 0.1647 \\ -0.1995 \\ 0.1995 \\ -0.1647 \\ -0.0348 \\ 0.0348 \\ 0.1647 \\ -0.1995 \\ 0.1995 \\ -0.3209 \\ 0.2776 \\ -0.2776 \\ 0.3209 \\ -0.0433 \\ 0.0433\end{pmatrix}, \quad
+\mathbf{h}_2 = \begin{pmatrix}0.0348 \\ 0.1647 \\ -0.1647 \\ -0.0348 \\ 0.1995 \\ -0.1995 \\ 0.2776 \\ -0.3209 \\ 0.3209 \\ -0.2776 \\ -0.0433 \\ 0.0433 \\ 0.2776 \\ -0.3209 \\ 0.3209 \\ -0.2776 \\ -0.0433 \\ 0.0433 \\ 0.0348 \\ 0.1647 \\ -0.1647 \\ -0.0348 \\ 0.1995 \\ -0.1995\end{pmatrix}
+$$
+
+<p>
+Verification: $\|L_1 \mathbf{h}_1\| = 4.3e-15$, $\|L_1 \mathbf{h}_2\| = 2.3e-15$. &check;
+</p>
+
+<div class="key-result">
+<div class="label">Shakti harmonic structure</div>
+<p>
+The shakti's harmonic modes show a distinctive pattern: they have <em>non-zero</em> amplitude on bridge edges ($z=2$), reflecting the topological role bridges play in mediating frustration. The amplitudes are not uniform &mdash; they reflect the mixed-coordination structure of the underlying lattice. In the TDL context, this means the "protected channel" carries signals that are modulated by the lattice's frustration architecture.
+</p>
+</div>
+
+<h3>5.7 Ice Configuration and $S$ Matrix</h3>
+
+$$
+\bm{\sigma} = (-1, +1, +1, -1, -1, +1, -1, +1, +1, -1, -1, +1, +1, -1, -1, +1, -1, +1, +1, -1, -1, +1, -1, +1)^T
+$$
+
+<p><strong>Charges:</strong> $\mathbf{Q} = (0, 0, 0, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0, 1, -1, 0)^T$.</p>
+
+<p>Ice rule: $z=4$ corners have $Q = 0$, $z=3$ midpoints have $|Q| = 1$, $z=2$ bridges have $Q = 0$. &check;</p>
+
+<div class="matrix-block">
+$$
+S = \left(\begin{array}{rrrrrrrrrrrrrrrr}
+0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 \\
+1 & -1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & -1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\
+-1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>5.8 Open Boundary Conditions</h3>
+
+<table>
+<thead>
+<tr><th>Property</th><th>Periodic</th><th>Open</th></tr>
+</thead>
+<tbody>
+<tr><td>$n_0$</td><td>16</td><td>16</td></tr>
+<tr><td>$n_1$</td><td>24</td><td>17</td></tr>
+<tr><td>$n_2$</td><td>8</td><td>2</td></tr>
+<tr><td>$\beta_0, \beta_1, \beta_2$</td><td>1, 2, 1</td><td>1, 0, 0</td></tr>
+<tr><td>$\chi$</td><td>0</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>7 wrap edges removed, 6 faces lost. $\beta_1: 2 \to 0$. &check;</p>
+
+
+<h2 id="sec6">6. Santa Fe Lattice (1&times;2 Periodic)</h2>
+
+<p>
+The Santa Fe lattice exhibits <strong>both geometric and vertex frustration</strong>, distinguished by its mixed-direction bridge placement: one horizontal and one vertical bridge per 2&times;2 unit cell. Its low-energy states feature polymer-like strings of unhappy vertices.
+</p>
+
+<h3>6.1 Lattice Setup</h3>
+
+<p>
+<strong>Unit cell:</strong> $\mathbf{a}_1 = (2, 0)$, $\mathbf{a}_2 = (0, 2)$. 6 vertices per cell.
+</p>
+
+<p><strong>Vertex layout (one unit cell):</strong></p>
+$$
+\begin{array}{ccc}
+v_2(0,1) & ---- & v_3(1,1) \\
+| & & | \\
+v_5(0,0.5) & & | \\
+| & & | \\
+v_0(0,0) & -v_4- & v_1(1,0)
+\end{array}
+$$
+
+<p>Bridge $v_4$ subdivides the bottom horizontal edge; bridge $v_5$ subdivides the left vertical edge. The right vertical ($v_1$&ndash;$v_3$) and top horizontal ($v_2$&ndash;$v_3$) are direct (no bridge).</p>
+
+<p><strong>Coordination:</strong> $z=4$ ($v_0, v_1$) $\times 4$, $z=3$ ($v_2, v_3$) $\times 4$, $z=2$ ($v_4, v_5$) $\times 4$.</p>
+
+<p>
+<strong>Tiling:</strong> 1&times;2 periodic ($n_0 = 12$, $n_1 = 18$, $n_2 = 6$). A 1&times;1 tiling fails because one cross-cell edge duplicates an intra-cell edge.
+</p>
+
+<p><strong>Faces:</strong> 6 faces of mixed type: hexagons (6 sides), pentagons (5 sides), and heptagons (7 sides) &mdash; reflecting the mixed-direction bridge placement that distinguishes Santa Fe from other lattices.</p>
+
+<table>
+<thead>
+<tr><th>Edge</th><th>Tail</th><th>Head</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>$e_{0}$</td><td>$v_{0}$</td><td>$v_{4}$</td><td></td></tr>
+<tr><td>$e_{1}$</td><td>$v_{1}$</td><td>$v_{4}$</td><td></td></tr>
+<tr><td>$e_{2}$</td><td>$v_{0}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{3}$</td><td>$v_{2}$</td><td>$v_{5}$</td><td></td></tr>
+<tr><td>$e_{4}$</td><td>$v_{1}$</td><td>$v_{3}$</td><td></td></tr>
+<tr><td>$e_{5}$</td><td>$v_{2}$</td><td>$v_{3}$</td><td></td></tr>
+<tr><td>$e_{6}$</td><td>$v_{0}$</td><td>$v_{1}$</td><td></td></tr>
+<tr><td>$e_{7}$</td><td>$v_{0}$</td><td>$v_{8}$</td><td></td></tr>
+<tr><td>$e_{8}$</td><td>$v_{1}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{9}$</td><td>$v_{6}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{10}$</td><td>$v_{7}$</td><td>$v_{10}$</td><td></td></tr>
+<tr><td>$e_{11}$</td><td>$v_{6}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{12}$</td><td>$v_{8}$</td><td>$v_{11}$</td><td></td></tr>
+<tr><td>$e_{13}$</td><td>$v_{7}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{14}$</td><td>$v_{8}$</td><td>$v_{9}$</td><td></td></tr>
+<tr><td>$e_{15}$</td><td>$v_{6}$</td><td>$v_{7}$</td><td></td></tr>
+<tr><td>$e_{16}$</td><td>$v_{2}$</td><td>$v_{6}$</td><td></td></tr>
+<tr><td>$e_{17}$</td><td>$v_{3}$</td><td>$v_{7}$</td><td></td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+<tr><th>Face</th><th>Vertices (CCW)</th><th>Sides</th></tr>
+</thead>
+<tbody>
+<tr><td>$f_{0}$</td><td>$v_{0}$, $v_{5}$, $v_{2}$, $v_{3}$, $v_{1}$, $v_{4}$</td><td>6</td></tr>
+<tr><td>$f_{1}$</td><td>$v_{2}$, $v_{6}$, $v_{10}$, $v_{7}$, $v_{3}$</td><td>5</td></tr>
+<tr><td>$f_{2}$</td><td>$v_{1}$, $v_{3}$, $v_{7}$, $v_{6}$, $v_{2}$, $v_{5}$, $v_{0}$</td><td>7</td></tr>
+<tr><td>$f_{3}$</td><td>$v_{6}$, $v_{11}$, $v_{8}$, $v_{9}$, $v_{7}$, $v_{10}$</td><td>6</td></tr>
+<tr><td>$f_{4}$</td><td>$v_{8}$, $v_{0}$, $v_{4}$, $v_{1}$, $v_{9}$</td><td>5</td></tr>
+<tr><td>$f_{5}$</td><td>$v_{7}$, $v_{9}$, $v_{1}$, $v_{0}$, $v_{8}$, $v_{11}$, $v_{6}$</td><td>7</td></tr>
+</tbody>
+</table>
+
+<h3>6.2 Incidence Matrix $B_1$ (12&times;18)</h3>
+
+<div class="matrix-block">
+$$
+B_1 = \left(\begin{array}{rrrrrrrrrrrrrrrrrr}
+-1 & 0 & -1 & 0 & 0 & 0 & -1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & -1 & 0 & 0 & -1 & 0 & 1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 \\
+1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & -1 & 0 & 0 & 0 & -1 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & -1 & 0 & 1 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & -1 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>6.3 Incidence Matrix $B_2$ (18&times;6)</h3>
+
+<div class="matrix-block">
+$$
+B_2 = \left(\begin{array}{rrrrrr}
+-1 & 0 & 0 & 0 & 1 & 0 \\
+1 & 0 & 0 & 0 & -1 & 0 \\
+1 & 0 & -1 & 0 & 0 & 0 \\
+-1 & 0 & 1 & 0 & 0 & 0 \\
+-1 & 0 & 1 & 0 & 0 & 0 \\
+1 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & -1 \\
+0 & 0 & 0 & 0 & -1 & 1 \\
+0 & 0 & 0 & 0 & 1 & -1 \\
+0 & 1 & 0 & -1 & 0 & 0 \\
+0 & -1 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & -1 \\
+0 & 0 & 0 & -1 & 0 & 1 \\
+0 & 0 & 0 & -1 & 0 & 1 \\
+0 & 0 & 0 & 1 & -1 & 0 \\
+0 & 0 & -1 & 0 & 0 & 1 \\
+0 & 1 & -1 & 0 & 0 & 0 \\
+0 & -1 & 1 & 0 & 0 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>6.4 Chain Complex Verification</h3>
+
+<p>$\max|B_1 B_2| < 10^{-12}$. &check;</p>
+
+<h3>6.5 Betti Numbers and Euler Characteristic</h3>
+
+$$
+\chi = 12 - 18 + 6 = 0
+$$
+$$
+\beta_0 = 1,\; \beta_1 = 2,\; \beta_2 = 1 \quad \Rightarrow \quad 1 - 2 + 1 = 0 \;\checkmark
+$$
+
+<p>$\beta_1 = 18 - 11 - 5 = 2$. &check;</p>
+
+<h3>6.6 Spectra and Harmonic Modes</h3>
+
+<p><strong>$L_0$ spectrum:</strong></p>
+$$
+\spec(L_0) = \{0,\; 0.8189,\; 1.2057,\; 1.4259,\; 2,\; 2.3042,\; 3.5909,\; 3.7246,\; 4.3820,\; 4.6379,\; 5.6982,\; 6.2116\}
+$$
+<p>Spectral gap: $\Delta_0 = 0.818923$.</p>
+
+<p><strong>$L_1$ spectrum:</strong></p>
+$$
+\spec(L_1) = \{\underbrace{0, 0}_{2},\; 0.8189,\; 1.2057,\; 1.4259,\; 2,\; 2.3042,\; 3.5909,\; 3.7246,\; 4,\; 4.3820,\; 4.3944,\; 4.6379,\; 5.6982,\; 6.2116,\; 7,\; 9,\; 11.6056\}
+$$
+<p>Spectral gap: $\Delta_1 = 0.818923$.</p>
+
+<div class="key-result">
+<div class="label">Spectral gap comparison</div>
+<p>
+The Santa Fe lattice has the smallest spectral gap among the all-$z=4$ lattices ($\Delta_1 = 0.8189$ vs. square $\Delta_1 = 3.0$ and kagome $\Delta_1 = 2.0$). This means non-harmonic components decay <em>more slowly</em> on Santa Fe, making the relative advantage of the harmonic protection channel even more important for deep networks.
+</p>
+</div>
+
+
+<p><strong>Harmonic modes:</strong></p>
+$$
+\mathbf{h}_1 = \begin{pmatrix}0.0607 \\ -0.0607 \\ -0.2038 \\ 0.2038 \\ -0.4175 \\ 0.1117 \\ -0.1724 \\ 0.3155 \\ 0.3058 \\ 0.0607 \\ -0.0607 \\ -0.2038 \\ 0.2038 \\ -0.4175 \\ 0.1117 \\ -0.1724 \\ -0.3155 \\ -0.3058\end{pmatrix}, \quad
+\mathbf{h}_2 = \begin{pmatrix}0.2521 \\ -0.2521 \\ 0.1602 \\ -0.1602 \\ 0.0284 \\ 0.2120 \\ -0.4641 \\ 0.0518 \\ -0.2404 \\ 0.2521 \\ -0.2521 \\ 0.1602 \\ -0.1602 \\ 0.0284 \\ 0.2120 \\ -0.4641 \\ -0.0518 \\ 0.2404\end{pmatrix}
+$$
+
+<p>
+Verification: $\|L_1 \mathbf{h}_1\| = 1.6e-15$, $\|L_1 \mathbf{h}_2\| = 2.4e-15$. &check;
+</p>
+
+<h3>6.7 Ice Configuration and $S$ Matrix</h3>
+
+$$
+\bm{\sigma} = (-1, +1, -1, +1, +1, -1, +1, +1, -1, -1, +1, -1, +1, +1, -1, +1, -1, +1)^T
+$$
+
+<p><strong>Charges:</strong> $\mathbf{Q} = (0, 0, 1, -1, 0, 0, 0, 0, 1, -1, 0, 0)^T$.</p>
+
+<p>Ice rule: $z=4$ vertices have $Q = 0$, $z=3$ have $|Q| = 1$, $z=2$ have $Q = 0$. &check;</p>
+
+<div class="matrix-block">
+$$
+S = \left(\begin{array}{rrrrrrrrrrrr}
+0 & 1 & 0 & 0 & -1 & -1 & 0 & 0 & 1 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & -1 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & -1 \\
+0 & 0 & 0 & -1 & 0 & 0 & -1 & 0 & 0 & 1 & 1 & 0 \\
+-1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 1 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & -1 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & -1 & 0 & 0 & 0
+\end{array}\right)
+$$
+</div>
+
+<h3>6.8 Open Boundary Conditions</h3>
+
+<table>
+<thead>
+<tr><th>Property</th><th>Periodic</th><th>Open</th></tr>
+</thead>
+<tbody>
+<tr><td>$n_0$</td><td>12</td><td>12</td></tr>
+<tr><td>$n_1$</td><td>18</td><td>14</td></tr>
+<tr><td>$n_2$</td><td>6</td><td>3</td></tr>
+<tr><td>$\beta_0, \beta_1, \beta_2$</td><td>1, 2, 1</td><td>1, 0, 0</td></tr>
+<tr><td>$\chi$</td><td>0</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>4 wrap edges removed, 3 faces lost. $\beta_1: 2 \to 0$. &check;</p>
+
+
+<h2 id="sec7">7. Comparative Summary</h2>
+
+<h3>7.1 Minimum Periodic Tilings</h3>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>Min Size</th><th>$n_0$</th><th>$n_1$</th><th>$n_2$</th><th>$B_1$ dims</th><th>Why this minimum</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>3&times;3</td><td>9</td><td>18</td><td>9</td><td>9&times;18</td><td>1&times;1 = self-loops; 2&times;2 too small for pedagogy</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>12</td><td>24</td><td>12</td><td>12&times;24</td><td>1&times;1 collapses cross-cell edges</td></tr>
+<tr><td>Shakti</td><td>1&times;1</td><td>16</td><td>24</td><td>8</td><td>16&times;24</td><td>All 24 edges unique under wrapping</td></tr>
+<tr><td>Tetris</td><td>2&times;1</td><td>16</td><td>24</td><td>8</td><td>16&times;24</td><td>1&times;1: 4 horizontal pairs become multi-edges</td></tr>
+<tr><td>Santa Fe</td><td>1&times;2</td><td>12</td><td>18</td><td>6</td><td>12&times;18</td><td>1&times;1: one cross-cell edge duplicates intra-cell</td></tr>
+</tbody>
+</table>
+
+<h3>7.2 Topological Properties (Periodic)</h3>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>$\beta_0$</th><th>$\beta_1$</th><th>$\beta_2$</th><th>$\chi$</th><th>$\Delta_0$</th><th>$\Delta_1$</th><th>Pauling $\varepsilon$</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>1</td><td>2</td><td>1</td><td>0</td><td>3.0000</td><td>3.0000</td><td>38.44</td></tr>
+<tr><td>Kagome</td><td>1</td><td>2</td><td>1</td><td>0</td><td>2.0000</td><td>2.0000</td><td>129.75</td></tr>
+<tr><td>Shakti</td><td>1</td><td>2</td><td>1</td><td>0</td><td>1.0000</td><td>1.0000</td><td>2075.94</td></tr>
+<tr><td>Tetris</td><td>1</td><td>2</td><td>1</td><td>0</td><td>0.6277</td><td>0.6277</td><td>2075.94</td></tr>
+<tr><td>Santa Fe</td><td>1</td><td>2</td><td>1</td><td>0</td><td>0.8189</td><td>0.8189</td><td>102.52</td></tr>
+</tbody>
+</table>
+
+<div class="key-result">
+<div class="label">Key finding</div>
+<p>
+All five periodic lattices have $\beta_1 = 2$ at minimum size, confirming the torus topology contributes exactly two harmonic modes (horizontal and vertical winding). The spectral gaps vary significantly: the square lattice has the largest ($\Delta_1 = 3.0$), while Santa Fe and tetris have the smallest ($\Delta_1 \approx 0.6$&ndash;$0.8$). The smaller spectral gaps mean non-harmonic signals decay more slowly on frustrated lattices, but the harmonic signals are equally protected ($L_1 \mathbf{h} = 0$) regardless of the gap.
+</p>
+</div>
+
+<h3>7.3 Coordination Structure</h3>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>$z=2$</th><th>$z=3$</th><th>$z=4$</th><th>$\langle z \rangle$</th><th>Frustration Type</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>0</td><td>0</td><td>9</td><td>4.0</td><td>Geometric only</td></tr>
+<tr><td>Kagome</td><td>0</td><td>0</td><td>12</td><td>4.0</td><td>Geometric</td></tr>
+<tr><td>Shakti</td><td>4</td><td>8</td><td>4</td><td>3.0</td><td>Vertex-frustrated, maximal</td></tr>
+<tr><td>Tetris</td><td>4</td><td>8</td><td>4</td><td>3.0</td><td>Vertex-frustrated, maximal</td></tr>
+<tr><td>Santa Fe</td><td>4</td><td>4</td><td>4</td><td>3.0</td><td>Both geometric &amp; vertex</td></tr>
+</tbody>
+</table>
+
+<h3>7.4 Open Boundary Comparison</h3>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>Periodic $n_1$</th><th>Open $n_1$</th><th>Edges removed</th><th>Periodic $\beta_1$</th><th>Open $\beta_1$</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>18</td><td>12</td><td>6</td><td>2</td><td>0</td></tr>
+<tr><td>Kagome</td><td>24</td><td>17</td><td>7</td><td>2</td><td>0</td></tr>
+<tr><td>Shakti</td><td>24</td><td>17</td><td>7</td><td>2</td><td>0</td></tr>
+<tr><td>Tetris</td><td>24</td><td>18</td><td>6</td><td>2</td><td>0</td></tr>
+<tr><td>Santa Fe</td><td>18</td><td>14</td><td>4</td><td>2</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p>
+In all cases, $\beta_1$ drops from 2 (periodic/torus) to 0 (open/disk). This universal pattern confirms that the harmonic subspace is fundamentally a <strong>topological</strong> property of the embedding surface: the torus provides two non-contractible cycles, while the disk has none. For the oversmoothing application, this means periodic boundary conditions are essential to maintain the protected channel.
+</p>
+
+<h3>7.5 Scaling to XS (4&times;4)</h3>
+
+<p>
+At the standard XS (4&times;4 unit cell) size, the matrices grow substantially:
+</p>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>$n_0$</th><th>$n_1$</th><th>$n_2$</th><th>$B_1$ dims</th><th>$B_1$ entries</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>16</td><td>32</td><td>16</td><td>16x32</td><td>512</td></tr>
+<tr><td>Kagome</td><td>48</td><td>96</td><td>48</td><td>48x96</td><td>4,608</td></tr>
+<tr><td>Shakti</td><td>256</td><td>384</td><td>128</td><td>256x384</td><td>98,304</td></tr>
+<tr><td>Tetris</td><td>128</td><td>192</td><td>64</td><td>128x192</td><td>24,576</td></tr>
+<tr><td>Santa Fe</td><td>96</td><td>144</td><td>48</td><td>96x144</td><td>13,824</td></tr>
+</tbody>
+</table>
+
+<p>
+The shakti lattice at 4&times;4 produces a 256&times;384 $B_1$ matrix with 98,304 entries &mdash; clearly impractical for explicit display. This justifies our choice of minimum valid periodic tilings for this document.
+</p>
+
+
+<h2 id="sec8">8. References</h2>
+
+<ol>
+<li>M. J. Morrison, T. R. Nelson, and C. Nisoli, &ldquo;Unhappy vertices in artificial spin ice: new degeneracies from vertex frustration,&rdquo; <em>New J. Phys.</em> <strong>15</strong>, 045009 (2013).</li>
+<li>C. Nisoli, &ldquo;The concept of spin ice graphs and a field theory for their charges,&rdquo; <em>AIP Advances</em> <strong>10</strong>, 115303 (2020).</li>
+<li>Y. Lao <em>et al.</em>, &ldquo;Classical topological order in the kinetics of artificial spin ice,&rdquo; <em>Nature Physics</em> <strong>14</strong>, 723&ndash;727 (2018).</li>
+<li>Z. Yang, E. Isufi, and G. Leus, &ldquo;Simplicial Convolutional Neural Networks,&rdquo; <em>IEEE TSP</em> (2022).</li>
+<li>Q. Li, Z. Han, and X.-M. Wu, &ldquo;Deeper insights into graph convolutional networks for semi-supervised learning,&rdquo; <em>AAAI</em> (2018).</li>
+<li>B. Rusch <em>et al.</em>, &ldquo;A survey on oversmoothing in graph neural networks,&rdquo; arXiv:2303.10993 (2023).</li>
+<li>O. Duranthon and L. Zdeborov&aacute;, &ldquo;Optimal message-passing on graphs with community structure,&rdquo; <em>Phys. Rev. X</em> (2025).</li>
+</ol>
+
+<div class="footnote">
+<p>
+All numerical results were computed using the SpinIceTDL codebase with <code>scripts/compute_worked_examples.py</code>. Matrix entries, eigenvalues, and Betti numbers are verified programmatically against the chain complex property ($B_1 B_2 = 0$), Euler characteristic consistency, and harmonic vector conditions ($L_1 \mathbf{h} = 0$, $B_1 \mathbf{h} = 0$, $B_2^T \mathbf{h} = 0$).
+</p>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDL ↔ Spin Ice Mathematical Correspondence</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams',
+    tagSide: 'right',
+    macros: {
+      bm: ['{\\boldsymbol{#1}}', 1],
+      R: '{\\mathbb{R}}',
+      Z: '{\\mathbb{Z}}',
+      ker: '\\operatorname{ker}',
+      im: '\\operatorname{im}',
+      rank: '\\operatorname{rank}',
+      diag: '\\operatorname{diag}',
+      tr: '\\operatorname{tr}',
+      div: '\\operatorname{div}',
+      grad: '\\operatorname{grad}'
+    }
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root {
+  --tdl-color: #1a5276;
+  --nisoli-color: #922b21;
+  --highlight-bg: #fef9e7;
+  --key-result-bg: #eaf2f8;
+  --example-bg: #f4f6f6;
+  --border-color: #d5d8dc;
+  --link-color: #2471a3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.7;
+  color: #2c3e50;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  background: #fdfdfd;
+}
+h1 {
+  font-size: 1.9rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+.authors {
+  text-align: center;
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+h2 {
+  font-size: 1.45rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--border-color);
+  color: #1a1a2e;
+}
+h3 {
+  font-size: 1.15rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  color: #2c3e50;
+}
+h4 {
+  font-size: 1.0rem;
+  margin-top: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+}
+p { margin-bottom: 1rem; }
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Table of Contents */
+nav#toc {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+nav#toc h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.8rem;
+  border: none;
+  padding: 0;
+}
+nav#toc ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+nav#toc li {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+/* Correspondence highlight boxes */
+.key-result {
+  background: var(--key-result-bg);
+  border-left: 4px solid var(--tdl-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.key-result .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tdl-color);
+  margin-bottom: 0.4rem;
+}
+
+/* Worked examples */
+.example {
+  background: var(--example-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.example .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #27ae60;
+  margin-bottom: 0.4rem;
+}
+
+/* Convention/warning boxes */
+.convention {
+  background: #fdf2e9;
+  border-left: 4px solid #e67e22;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.convention .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #e67e22;
+  margin-bottom: 0.3rem;
+}
+.footnote {
+  font-size: 0.85rem;
+  color: #555;
+  border-top: 1px solid #ccc;
+  margin-top: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #f2f3f4;
+  font-weight: bold;
+  color: #2c3e50;
+}
+tr:nth-child(even) { background: #fafafa; }
+.tdl-label { color: var(--tdl-color); font-weight: bold; }
+.nisoli-label { color: var(--nisoli-color); font-weight: bold; }
+
+/* Matrix display */
+.matrix-block {
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+/* SVG diagram containers */
+.diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.diagram svg {
+  max-width: 100%;
+}
+.diagram .caption {
+  font-size: 0.88rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* Equation references */
+.eqref { color: var(--link-color); }
+
+/* Print styles */
+@media print {
+  body { max-width: 100%; padding: 1rem; }
+  .key-result, .example, .convention { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<h1>Topological Deep Learning &harr; Spin Ice:<br>A Mathematical Correspondence</h1>
+<p class="subtitle">Exact mappings between simplicial complex TDL and Nisoli's charge framework for artificial spin ice</p>
+<p class="authors">SpinIceTDL Project &mdash; Reference Document v2.0</p>
+
+<nav id="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#sec1">Introduction &amp; Motivation</a></li>
+  <li><a href="#sec2">Notation &amp; Setup</a></li>
+  <li><a href="#sec3">The $S_{vv'}$ Matrix as Incidence &times; Spin Configuration</a></li>
+  <li><a href="#sec4">Topological Charge = Divergence of 1-Cochain</a></li>
+  <li><a href="#sec5">Ice Manifold, $\ker(B_1)$, and the Hodge Decomposition</a></li>
+  <li><a href="#sec6">Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</a></li>
+  <li><a href="#sec7">Entropic Field Theory and the Graph Laplacian</a></li>
+  <li><a href="#sec8">Line Graph Dual, Degeneracy, and the Bethe Permanent</a></li>
+  <li><a href="#sec9">Worked Example &mdash; 3&times;3 Periodic Square Lattice</a></li>
+  <li><a href="#sec10">Master Correspondence Table</a></li>
+  <li><a href="#sec11">Summary of Established Results</a></li>
+</ol>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec1">1. Introduction &amp; Motivation</h2>
+
+<p>
+This document establishes the precise mathematical correspondence between two bodies of theory that, at first glance, belong to entirely different fields:
+</p>
+
+<ul style="margin-bottom:1rem;">
+<li><strong style="color:var(--tdl-color)">Topological Deep Learning (TDL)</strong> &mdash; the framework of simplicial complexes, boundary operators, Hodge Laplacians, and cochains that generalizes graph neural networks to higher-order structures (Hajij et al. 2023, Papillon et al. 2024).</li>
+<li><strong style="color:var(--nisoli-color)">Artificial Spin Ice (ASI) graph theory</strong> &mdash; Nisoli's charge framework (2020) for frustrated lattice systems, which describes spin configurations, topological charges, ice rules, and entropic interactions using the combinatorial Laplacian and its pseudoinverse.</li>
+</ul>
+
+<p>
+The connection between these frameworks is <strong>structural, not analogical</strong>: the same operator &mdash; the graph Laplacian $L_0$ and its edge-level counterpart the Hodge 1-Laplacian $L_1$ &mdash; governs both the entropic interactions between topological charges in spin ice <em>and</em> the message-passing dynamics in GNNs. Understanding this bridge precisely may reveal new design principles for graph neural network architectures drawn from the rich structure of frustrated lattice physics.
+</p>
+
+<p>
+The ice manifold (the degenerate ground-state manifold of a frustrated spin ice) is structurally governed by $\ker(B_1)$ &mdash; either as the ice manifold itself (for even-degree vertices) or as the space of fluctuations within it (for odd-degree vertices). The dimension of this space, its combinatorial density (Pauling entropy), and its spectral structure all vary across lattice types in ways that ASI physics has characterized in detail. This document establishes the precise mathematical identities that make these quantities accessible to TDL and GNN analysis. The question of <em>how</em> this structure can best be exploited in machine learning remains an active direction of investigation.
+</p>
+
+<p>
+This document provides <strong>full step-by-step derivations</strong> for every correspondence, at textbook level, self-contained. Each key result is stated as a boxed theorem, followed by a complete proof and a worked example on a small graph. The final section works through the entire computation on a $3 \times 3$ periodic square lattice, producing every matrix and eigenvalue explicitly.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec2">2. Notation &amp; Setup</h2>
+
+<h3>2.1 The Graph</h3>
+
+<p>
+We work with a <strong>connected</strong> simple undirected graph $G = (V, E)$ with $n_0 = |V|$ vertices and $n_1 = |E|$ edges. A graph is <em>connected</em> if there is a path of edges between every pair of vertices &mdash; it is "one piece," with no isolated subgraphs. Equivalently, the zeroth Betti number $\beta_0$ (which counts the number of independent connected components) equals 1. All ASI lattices we consider are connected; they are planar (or toroidal under periodic boundary conditions) with vertex coordination numbers $z_v \in \{2, 3, 4\}$.
+</p>
+
+<p>
+(Why $\beta_0 = 1$ matters: the graph Laplacian $L_0$ always has $\beta_0$ zero eigenvalues, one per connected component. For a connected graph, the only zero eigenvector of $L_0$ is the constant vector $\mathbf{1}$, and several dimension formulas simplify &mdash; for instance $\rank(B_1) = n_0 - \beta_0 = n_0 - 1$.)
+</p>
+
+<p>
+To define incidence matrices and boundary operators, we equip each edge with a <strong>reference orientation</strong>. For edge $e$ connecting vertices $u$ and $v$, we arbitrarily designate one vertex as the <em>tail</em> (source) and the other as the <em>head</em> (target). The physics does not depend on this choice &mdash; changing the orientation of an edge negates the corresponding column of $B_1$ and the corresponding component of any 1-cochain, leaving all observable quantities invariant.
+</p>
+
+<div class="convention">
+<div class="label">Convention (Reference Orientation)</div>
+For lattices on $\Z^2$, we orient horizontal edges left&rarr;right and vertical edges bottom&rarr;top. For edges not aligned with axes, we orient from the vertex with smaller index to the vertex with larger index.
+</div>
+
+<h3>2.2 Simplicial Complex</h3>
+
+<p>
+A simplicial complex $X$ built on $G$ extends the graph to include higher-dimensional cells:
+</p>
+<ul style="margin-bottom:1rem;">
+<li><strong>0-simplices (vertices):</strong> the $n_0$ vertices of $G$</li>
+<li><strong>1-simplices (edges):</strong> the $n_1$ oriented edges of $G$</li>
+<li><strong>2-simplices (faces):</strong> $n_2$ oriented filled polygonal faces (e.g., triangles, squares)</li>
+</ul>
+
+<p>
+The vertices and edges are given by the graph, but the <strong>faces are a modeling choice</strong>. A graph alone has no 2-cells; we must decide which cycles to "fill in." The natural candidate set comes from the ASI lattice structure itself: Morrison, Nelson &amp; Nisoli (2013, &sect;3.1) define a <strong>minimal loop</strong> as "a continuous, closed chain of islands [edges] that does not contain vertices in its interior." Equivalently, these are the faces of the planar embedding &mdash; the smallest polygonal regions bounded by edges of the lattice with no internal structure.
+</p>
+
+<p>
+These minimal loops are the fundamental objects in ASI frustration theory: Morrison et al. prove that a lattice is vertex-frustrated if and only if it contains minimal loops with an odd number of intersections (vertices where edges cross through rather than terminate). They play a dual role for us:
+</p>
+<ul style="margin-bottom:1rem;">
+<li><strong>In ASI physics:</strong> the minimal loops determine frustration, ground-state degeneracy, and the topology of unhappy-vertex configurations.</li>
+<li><strong>In TDL:</strong> each minimal loop is a candidate 2-cell (face). Filling a minimal loop as a face makes its boundary cycle trivial in homology (it becomes $\partial f$ for a face $f$), removing one dimension from $\beta_1$.</li>
+</ul>
+
+<p>
+The specific polygon types vary across the lattice zoo: squares for the square lattice, triangles for kagome, and mixed polygons (squares, triangles, hexagons, etc.) for the mixed-coordination lattices (shakti, tetris, pinwheel, santa fe). Given the set of all minimal loops, we consider two bracketing strategies, distinguished by their effect on $\beta_1$.
+</p>
+
+<p>
+The <strong>first Betti number $\beta_1$</strong> counts the number of independent cycles in the complex that are not the boundary of any filled face &mdash; informally, "holes that haven't been filled in." Here <em>independent</em> means no cycle in the set can be expressed as a combination (symmetric difference) of the others; a set of independent cycles forms a basis for the <strong>cycle space</strong> of the graph. For example, a square lattice has many closed loops, but most can be built by combining smaller loops around individual squares &mdash; the independent ones are those that cannot be decomposed further. Just as $\beta_0$ counts connected components (&sect;2.1), $\beta_1$ counts these independent loop-shaped features in the topology. Its precise definition in terms of the boundary operators $B_1$ and $B_2$ is developed in &sect;5.5, and its connection to ice-manifold degeneracy and edge-signal capacity is the subject of &sect;8. For now, the key intuition is: <em>filling a face kills a cycle</em>, so more faces means smaller $\beta_1$.
+</p>
+
+<table>
+<thead>
+<tr><th>Strategy</th><th>$n_2$</th><th>$L_1^{\text{up}}$</th><th>Effect on $\beta_1$</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Fill all faces</strong></td>
+  <td>Maximal (all minimal polygons)</td>
+  <td>Nonzero &mdash; curl modes are filtered out</td>
+  <td><strong>Minimal $\beta_1$</strong>: most independent cycles become boundaries of faces, hence trivial in homology</td>
+</tr>
+<tr>
+  <td><strong>Fill no faces</strong></td>
+  <td>$n_2 = 0$</td>
+  <td>$L_1^{\text{up}} = B_2 B_2^T = 0$ &mdash; no upper Laplacian</td>
+  <td><strong>Maximal $\beta_1$</strong>: every independent cycle is homologically nontrivial, so $\beta_1 = n_1 - n_0 + 1$</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+These two choices bracket the range of $\beta_1$ for any given graph. Intermediate strategies (filling some faces but not others) give intermediate values. Since $\beta_1$ is tied to ice-manifold structure and edge-signal capacity (&sect;8), the face-filling strategy is a tunable parameter in our framework &mdash; not merely a bookkeeping choice.
+</p>
+
+<p>
+<strong>Boundary conditions also have a dramatic effect on $\beta_1$.</strong> Consider a concrete example: the 3&times;3 square lattice ($n_0 = 9$, $n_1 = 18$). With <em>periodic</em> boundary conditions (opposite edges identified), the lattice lives on a torus; with <em>open</em> boundary conditions, it is a planar patch. The topological consequences are stark:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Property</th>
+  <th>Periodic (torus)</th>
+  <th>Open (planar patch)</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>$n_0$ (vertices)</td><td>9</td><td>9</td></tr>
+<tr><td>$n_1$ (edges)</td><td>18</td><td>12</td></tr>
+<tr><td>$n_2$ (faces, all filled)</td><td>9</td><td>4</td></tr>
+<tr><td>Euler char. $\chi = n_0 - n_1 + n_2$</td><td>$9 - 18 + 9 = 0$ (torus)</td><td>$9 - 12 + 4 = 1$ (disk)</td></tr>
+<tr><td>$\beta_0$</td><td>1</td><td>1</td></tr>
+<tr><td>$\beta_2$</td><td>1 (torus has one global 2-cycle)</td><td>0 (planar, no enclosed void)</td></tr>
+<tr><td><strong>$\beta_1$ (all faces filled)</strong></td><td><strong>2</strong></td><td><strong>0</strong></td></tr>
+<tr><td><strong>$\beta_1$ (no faces filled)</strong></td><td><strong>10</strong></td><td><strong>4</strong></td></tr>
+</tbody>
+</table>
+
+<p>
+The periodic case is especially instructive. On the 3&times;3 torus, one can trace 3 distinct horizontal winding loops (one along each row of vertices) and 3 distinct vertical winding loops (one along each column). Yet $\beta_1 = 2$, not 6 &mdash; why? Because any two horizontal loops <em>differ by the boundary of the faces between them</em>: if rows 1 and 2 are separated by a strip of square faces, the circulation around those faces equals the difference of the two row loops. So all 3 horizontal loops are homologous &mdash; they represent the same element of $H_1$. Similarly, the 3 vertical loops collapse to a single class. The result is exactly <strong>2 independent winding modes</strong>: one horizontal, one vertical. These are the topologically protected degrees of freedom that cannot be created or destroyed by local operations (face circulations), and they correspond to the two generators of $H_1(\mathbb{T}^2) \cong \mathbb{Z}^2$ for the torus.
+</p>
+
+<p>
+In the open case, every cycle on the planar patch bounds a region of faces, so with all faces filled, $\beta_1 = 0$ &mdash; there is no topological protection at all. This makes boundary conditions a critical experimental parameter: <strong>periodic BCs guarantee a nonzero $\beta_1$ floor</strong> (at least 2 for a torus), while open BCs can drive $\beta_1$ to zero even on frustrated lattices. All results in &sect;9 use periodic BCs for this reason.<sup><a href="#fn1" id="fnref1">1</a></sup>
+</p>
+
+<div class="convention">
+<div class="label">Convention (Face-Filling)</div>
+Throughout this document, derivations hold for <em>any</em> choice of $n_2$. Where a specific choice matters (e.g., in the worked example of &sect;9), we state it explicitly. The spectral catalog of Stage 1 will compute $\beta_1$ under both strategies for every lattice in the zoo.
+</div>
+
+<h3>2.3 Notation Correspondence Table</h3>
+
+<table>
+<thead>
+<tr>
+  <th>Object</th>
+  <th class="tdl-label">TDL Notation</th>
+  <th class="nisoli-label">Nisoli Notation</th>
+  <th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Undirected graph</td>
+  <td>$G = (V, E)$</td>
+  <td>$G$ with $N_v$ vertices, $N_l$ edges</td>
+  <td>$n_0 = N_v$, $n_1 = N_l$</td>
+</tr>
+<tr>
+  <td>Adjacency matrix</td>
+  <td>$A$ or $A_{0,\text{down}}$</td>
+  <td>$A_{vv'}$</td>
+  <td>Symmetric, binary for simple graphs</td>
+</tr>
+<tr>
+  <td>Degree / coordination</td>
+  <td>$\deg(v)$, degree matrix $D$</td>
+  <td>$z_v$ (coordination number)</td>
+  <td>$D_{vv} = z_v = \sum_{v'} A_{vv'}$</td>
+</tr>
+<tr>
+  <td>Signed incidence matrix</td>
+  <td>$B_1$ &ensp;($n_0 \times n_1$)</td>
+  <td>(implicit in $S_{vv'}$ definition)</td>
+  <td>$[B_1]_{v,e} = \pm 1$</td>
+</tr>
+<tr>
+  <td>Edge-face incidence</td>
+  <td>$B_2$ &ensp;($n_1 \times n_2$)</td>
+  <td>(not used by Nisoli)</td>
+  <td>Needed for Hodge decomposition</td>
+</tr>
+<tr>
+  <td>Edge signal / 1-cochain</td>
+  <td>$\mathbf{f} \in C^1(X;\R)$</td>
+  <td>$\sigma_l$ or $S_l$ (spin on edge $l$)</td>
+  <td>$\sigma_e \in \{+1, -1\}$ for Ising spins</td>
+</tr>
+<tr>
+  <td>Vertex signal / 0-cochain</td>
+  <td>$\mathbf{h} \in C^0(X;\R)$</td>
+  <td>$\varphi_v$ (entropic field), $q_v$ (charge)</td>
+  <td></td>
+</tr>
+<tr>
+  <td>Graph Laplacian</td>
+  <td>$L_0 = B_1 B_1^T$</td>
+  <td>$\hat{L}_{vv'} = z_v \delta_{vv'} - A_{vv'}$</td>
+  <td>Identical operators; $L_0 = D - A$</td>
+</tr>
+<tr>
+  <td>Lower Hodge Laplacian</td>
+  <td>$L_1^{\text{down}} = B_1^T B_1$</td>
+  <td>(appears as $\sigma^T L_1^{\text{down}} \sigma$ in energy)</td>
+  <td>Acts on edge space $\R^{n_1}$</td>
+</tr>
+<tr>
+  <td>Upper Hodge Laplacian</td>
+  <td>$L_1^{\text{up}} = B_2 B_2^T$</td>
+  <td>(not used by Nisoli)</td>
+  <td>Requires 2-cells</td>
+</tr>
+<tr>
+  <td>Full Hodge 1-Laplacian</td>
+  <td>$L_1 = L_1^{\text{down}} + L_1^{\text{up}}$</td>
+  <td>&mdash;</td>
+  <td>Central object for oversmoothing analysis</td>
+</tr>
+<tr>
+  <td>Directed adjacency</td>
+  <td>&mdash;</td>
+  <td>$A^{\text{dir}}_{vv'}$ (1 if spin on edge $v \to v'$)</td>
+  <td>Configuration-dependent</td>
+</tr>
+<tr>
+  <td>Antisymmetric spin matrix</td>
+  <td>&mdash;</td>
+  <td>$S_{vv'} = A^{\text{dir}}_{vv'} - A^{\text{dir}}_{v'v}$</td>
+  <td>Key Nisoli object; see &sect;3</td>
+</tr>
+<tr>
+  <td>Topological charge</td>
+  <td>$(B_1 \bm{\sigma})_v$</td>
+  <td>$Q_v[S] = \sum_{v'} S_{v'v}$</td>
+  <td>See &sect;4 for sign convention</td>
+</tr>
+<tr>
+  <td>Ice manifold</td>
+  <td>$\ker(B_1)$</td>
+  <td>$\mathcal{I} = \{\sigma : Q_v = 0\;\forall v\}$</td>
+  <td>See &sect;5</td>
+</tr>
+<tr>
+  <td>Harmonic subspace</td>
+  <td>$\ker(L_1)$, dimension $= \beta_1$</td>
+  <td>Topological winding modes of ice</td>
+  <td>Protected channel; see &sect;5</td>
+</tr>
+<tr>
+  <td>Pseudoinverse of Laplacian</td>
+  <td>$L_0^+$</td>
+  <td>$\hat{L}^{-1}$ (on constant-free subspace)</td>
+  <td>Charge interaction kernel; see &sect;7</td>
+</tr>
+<tr>
+  <td>Screening parameter</td>
+  <td>&mdash;</td>
+  <td>$\xi^{-2} = T/\epsilon$ (inverse correlation length$^2$)</td>
+  <td>Controls interaction range; see &sect;7</td>
+</tr>
+</tbody>
+</table>
+
+<h3>2.4 Boundary Operators: Explicit Definitions</h3>
+
+<p>
+The <strong>vertex-edge incidence matrix</strong> $B_1$ has dimensions $n_0 \times n_1$. For edge $e$ oriented from vertex $u$ (tail) to vertex $v$ (head):
+</p>
+
+$$\begin{equation}
+[B_1]_{w,e} = \begin{cases} +1 & \text{if } w = v \text{ (head of } e\text{)} \\ -1 & \text{if } w = u \text{ (tail of } e\text{)} \\ 0 & \text{otherwise} \end{cases}
+\label{eq:B1def}
+\end{equation}$$
+
+<p>
+The <strong>edge-face incidence matrix</strong> $B_2$ has dimensions $n_1 \times n_2$. For face $f$ with boundary cycle $(e_1, e_2, \ldots, e_k)$ traversed in the orientation of $f$:
+</p>
+
+$$\begin{equation}
+[B_2]_{e,f} = \begin{cases} +1 & \text{if } e \text{ appears in } \partial f \text{ with consistent orientation} \\ -1 & \text{if } e \text{ appears in } \partial f \text{ with opposite orientation} \\ 0 & \text{if } e \notin \partial f \end{cases}
+\label{eq:B2def}
+\end{equation}$$
+
+<p>
+The fundamental chain complex property is:
+</p>
+
+$$\begin{equation}
+B_1 B_2 = 0
+\label{eq:chain}
+\end{equation}$$
+
+<p>
+This says "the boundary of a boundary is zero." Equivalently: the divergence of a curl is zero, or: the column space of $B_2$ lies in the null space of $B_1$. This is the discrete analogue of $\nabla \cdot (\nabla \times \mathbf{F}) = 0$.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec3">3. The $S_{vv'}$ Matrix as Incidence &times; Spin Configuration</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+Key Correspondence #1: Nisoli's antisymmetric spin matrix $S_{vv'}$ is reconstructable from the TDL incidence matrix $B_1$ and the spin configuration $\bm{\sigma}$.
+</p>
+
+<h3>3.1 Nisoli's Definition</h3>
+
+<p>
+In Nisoli (2020), a spin configuration on a graph assigns to each edge a direction: one of the two possible orientations of that edge. This is encoded in the <em>directed adjacency matrix</em>:
+</p>
+
+$$\begin{equation}
+A^{\text{dir}}_{vv'} = \begin{cases} 1 & \text{if there is an edge from } v \text{ to } v' \text{ (spin points } v \to v') \\ 0 & \text{otherwise} \end{cases}
+\label{eq:Adir}
+\end{equation}$$
+
+<p>
+Note that for each undirected edge $\{v, v'\}$, exactly one of $A^{\text{dir}}_{vv'}$ and $A^{\text{dir}}_{v'v}$ is 1 (the spin points one way). Nisoli defines the antisymmetric matrix:
+</p>
+
+$$\begin{equation}
+S_{vv'} = A^{\text{dir}}_{vv'} - A^{\text{dir}}_{v'v}
+\label{eq:Sdef}
+\end{equation}$$
+
+<p>
+This matrix satisfies $S_{vv'} \in \{-1, 0, +1\}$, with $S_{vv'} = -S_{v'v}$ and $S_{vv'} = 0$ whenever $v$ and $v'$ are not adjacent. For adjacent vertices: $S_{vv'} = +1$ means the spin on edge $\{v,v'\}$ points from $v$ to $v'$.
+</p>
+
+<h3>3.2 TDL Representation of Spin Configurations</h3>
+
+<p>
+In TDL, we encode the same information differently. Each edge $e$ has a fixed <strong>reference orientation</strong> encoded in $B_1$. A spin configuration is a vector $\bm{\sigma} \in \{+1, -1\}^{n_1}$ where:
+</p>
+
+$$\begin{equation}
+\sigma_e = \begin{cases} +1 & \text{if the spin aligns with the reference orientation of } e \\ -1 & \text{if the spin opposes the reference orientation of } e \end{cases}
+\label{eq:sigmadef}
+\end{equation}$$
+
+<h3>3.3 Derivation of the Correspondence</h3>
+
+<p>
+We now derive the exact relationship between $S_{vv'}$ and $B_1, \bm{\sigma}$.
+</p>
+
+<p>
+<strong>Setup.</strong> Consider an edge $e$ connecting vertices $u$ (tail) and $v$ (head) in the reference orientation. Then from $\eqref{eq:B1def}$:
+</p>
+$$
+[B_1]_{v,e} = +1, \quad [B_1]_{u,e} = -1
+$$
+
+<p>
+<strong>Case 1: $\sigma_e = +1$</strong> (spin aligns with reference, points from $u$ to $v$).
+</p>
+<p>
+The spin points $u \to v$, so $A^{\text{dir}}_{uv} = 1$ and $A^{\text{dir}}_{vu} = 0$. Therefore:
+</p>
+$$
+S_{uv} = A^{\text{dir}}_{uv} - A^{\text{dir}}_{vu} = 1 - 0 = +1
+$$
+$$
+S_{vu} = A^{\text{dir}}_{vu} - A^{\text{dir}}_{uv} = 0 - 1 = -1
+$$
+
+<p>
+<strong>Case 2: $\sigma_e = -1$</strong> (spin opposes reference, points from $v$ to $u$).
+</p>
+<p>
+The spin points $v \to u$, so $A^{\text{dir}}_{vu} = 1$ and $A^{\text{dir}}_{uv} = 0$. Therefore:
+</p>
+$$
+S_{uv} = 0 - 1 = -1, \quad S_{vu} = 1 - 0 = +1
+$$
+
+<p>
+<strong>Synthesis.</strong> In both cases, for edge $e$ from $u$ (tail) to $v$ (head) with spin $\sigma_e$:
+</p>
+$$
+S_{uv} = +\sigma_e, \quad S_{vu} = -\sigma_e
+$$
+
+<p>
+Now express this using $B_1$. Since $[B_1]_{u,e} = -1$ and $[B_1]_{v,e} = +1$:
+</p>
+$$
+S_{uv} = \sigma_e = -(-1) \cdot \sigma_e = -[B_1]_{u,e} \cdot \sigma_e
+$$
+$$
+S_{vu} = -\sigma_e = -(+1) \cdot \sigma_e = -[B_1]_{v,e} \cdot \sigma_e
+$$
+
+<p>
+In general, for any pair of vertices $w, w'$ that share edge $e$:
+</p>
+
+$$\begin{equation}
+S_{ww'} = -[B_1]_{w,e}\, \sigma_e
+\label{eq:Selement}
+\end{equation}$$
+
+<p>
+If $w$ and $w'$ share no edge, $S_{ww'} = 0$. If they share edge $e$ (unique for simple graphs), equation $\eqref{eq:Selement}$ gives the entry.
+</p>
+
+<p>
+<strong>Verification of antisymmetry.</strong> Since edge $e$ connects $w$ and $w'$, we have $[B_1]_{w,e} + [B_1]_{w',e} = 0$ (the column of $B_1$ for edge $e$ has exactly one $+1$ and one $-1$). Therefore:
+</p>
+$$
+S_{ww'} + S_{w'w} = -[B_1]_{w,e}\,\sigma_e - [B_1]_{w',e}\,\sigma_e = -\sigma_e([B_1]_{w,e} + [B_1]_{w',e}) = 0 \; \checkmark
+$$
+
+<h3>3.4 Matrix Form</h3>
+
+<p>
+We seek a clean matrix expression for $S$ in terms of $B_1$ and $\bm{\sigma}$. A natural first attempt is the product $B_1\,\diag(\bm{\sigma})\,B_1^T$, but this fails: for any diagonal matrix $D_\sigma$, the product $B_1 D_\sigma B_1^T$ is <strong>symmetric</strong> (since $(B D B^T)^T = B D^T B^T = B D B^T$), while $S$ is <strong>antisymmetric</strong>. A symmetric matrix can never equal an antisymmetric one.
+</p>
+
+<p>
+The fix is to use the <strong>unsigned incidence matrix</strong> $|B_1|$ (entry-wise absolute value) on one side. Where $B_1$ encodes both adjacency <em>and</em> orientation (head/tail signs), $|B_1|$ retains only adjacency: $[|B_1|]_{v,e} = 1$ if vertex $v$ is an endpoint of edge $e$, and 0 otherwise. Pairing signed $B_1$ with unsigned $|B_1|$ breaks the symmetry. Define $M = |B_1|\,\diag(\bm{\sigma})\,B_1^T$. Its transpose is:
+</p>
+$$
+M^T = (|B_1|\,D_\sigma\,B_1^T)^T = B_1\,D_\sigma^T\,|B_1|^T = B_1\,D_\sigma\,|B_1|^T \neq M
+$$
+<p>
+so $M$ is not symmetric. Its <strong>antisymmetric part</strong> (skew-symmetrization) gives exactly $S$:
+</p>
+
+$$\begin{equation}
+\boxed{S = \operatorname{skew}\!\Big(|B_1|\,\diag(\bm{\sigma})\,B_1^T\Big) = \frac{1}{2}\Big(|B_1|\,D_\sigma\,B_1^T \;-\; B_1\,D_\sigma\,|B_1|^T\Big)}
+\label{eq:Smatrix}
+\end{equation}$$
+
+<p>
+This is automatically antisymmetric ($S^T = -S$) and has zero diagonal, so no ad hoc corrections are needed.
+</p>
+
+<h4>Proof of $\eqref{eq:Smatrix}$</h4>
+
+<p>
+For adjacent vertices $w, w'$ sharing edge $e$ (with $w = u$ as tail, $w' = v$ as head in the reference orientation), compute the $(w, w')$ entry of each term:
+</p>
+$$
+[|B_1|\,D_\sigma\,B_1^T]_{uv} = |[B_1]_{u,e}|\,\sigma_e\,[B_1]_{v,e} = (1)\,\sigma_e\,(+1) = +\sigma_e
+$$
+$$
+[B_1\,D_\sigma\,|B_1|^T]_{uv} = [B_1]_{u,e}\,\sigma_e\,|[B_1]_{v,e}| = (-1)\,\sigma_e\,(1) = -\sigma_e
+$$
+<p>
+Therefore $S_{uv} = \tfrac{1}{2}(\sigma_e - (-\sigma_e)) = \sigma_e$. This matches the element-wise result from $\eqref{eq:Selement}$: $S_{uv} = -[B_1]_{u,e}\,\sigma_e = -(-1)\sigma_e = \sigma_e$. &check;
+</p>
+<p>
+The diagonal vanishes automatically: the two terms contribute identical diagonal entries (both equal $\sum_{e \ni v} [B_1]_{v,e}\,\sigma_e = Q_v$), which cancel in the subtraction. &check;
+</p>
+<p>
+For non-adjacent $w, w'$: no shared edge, so both terms are zero. &check; $\;\square$
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 1 &mdash; $S_{vv'}$ from TDL Operators</div>
+<p>
+Nisoli's antisymmetric spin matrix $S$ is determined by the TDL incidence matrix $B_1$ and the spin 1-cochain $\bm{\sigma}$ via:
+</p>
+<p><strong>Element-wise</strong> (the fundamental formula):</p>
+$$
+S_{ww'} = -[B_1]_{w,e}\, \sigma_e \quad \text{where } e \text{ is the unique edge connecting } w \text{ and } w'
+$$
+<p><strong>Matrix form</strong> (skew-symmetrization, no corrections needed):</p>
+$$
+S = \frac{1}{2}\Big(|B_1|\,\diag(\bm{\sigma})\,B_1^T \;-\; B_1\,\diag(\bm{\sigma})\,|B_1|^T\Big)
+$$
+</div>
+
+<h3>3.5 Worked Example: Triangle Graph</h3>
+
+<div class="example">
+<div class="label">Example 3.1 &mdash; Triangle Graph ($K_3$)</div>
+
+<div class="diagram">
+<svg width="260" height="240" viewBox="-10 -10 280 260">
+  <!-- Edges -->
+  <line x1="130" y1="20" x2="20" y2="220" stroke="#888" stroke-width="2"/>
+  <line x1="130" y1="20" x2="240" y2="220" stroke="#888" stroke-width="2"/>
+  <line x1="20" y1="220" x2="240" y2="220" stroke="#888" stroke-width="2"/>
+  <!-- Arrow markers for orientation -->
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#2471a3"/>
+    </marker>
+  </defs>
+  <!-- Reference orientations (blue arrows) -->
+  <line x1="25" y1="210" x2="225" y2="210" stroke="#2471a3" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="30" y1="215" x2="125" y2="30" stroke="#2471a3" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="135" y1="30" x2="232" y2="210" stroke="#2471a3" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- Vertices -->
+  <circle cx="130" cy="20" r="8" fill="var(--tdl-color)"/>
+  <circle cx="20" cy="220" r="8" fill="var(--tdl-color)"/>
+  <circle cx="240" cy="220" r="8" fill="var(--tdl-color)"/>
+  <!-- Labels -->
+  <text x="130" y="8" text-anchor="middle" font-size="14" font-weight="bold">$v_2$</text>
+  <text x="8" y="245" text-anchor="middle" font-size="14" font-weight="bold">$v_0$</text>
+  <text x="252" y="245" text-anchor="middle" font-size="14" font-weight="bold">$v_1$</text>
+  <!-- Edge labels -->
+  <text x="125" y="240" text-anchor="middle" font-size="13" fill="#2471a3">$e_0$</text>
+  <text x="58" y="110" text-anchor="middle" font-size="13" fill="#2471a3">$e_1$</text>
+  <text x="200" y="110" text-anchor="middle" font-size="13" fill="#2471a3">$e_2$</text>
+</svg>
+<div class="caption">Figure 3.1: Triangle graph $K_3$ with reference orientations (blue arrows). $e_0: v_0 \to v_1$, $e_1: v_0 \to v_2$, $e_2: v_2 \to v_1$.</div>
+</div>
+
+<p>
+<strong>Graph:</strong> $n_0 = 3$ vertices $\{v_0, v_1, v_2\}$, $n_1 = 3$ edges. Reference orientations: $e_0: v_0 \to v_1$, $e_1: v_0 \to v_2$, $e_2: v_2 \to v_1$.
+</p>
+
+<p><strong>Incidence matrix $B_1$</strong> (3&times;3):</p>
+$$
+B_1 = \begin{pmatrix} -1 & -1 & 0 \\ +1 & 0 & +1 \\ 0 & +1 & -1 \end{pmatrix}
+\quad
+\begin{array}{l} \leftarrow v_0 \\ \leftarrow v_1 \\ \leftarrow v_2 \end{array}
+$$
+<p>
+Columns are edges $e_0, e_1, e_2$. For $e_0$ ($v_0 \to v_1$): tail $v_0$ gets $-1$, head $v_1$ gets $+1$. Similarly for the others.
+</p>
+
+<p><strong>Spin configuration:</strong> Choose $\bm{\sigma} = (+1, +1, -1)^T$, meaning:</p>
+<ul>
+<li>$e_0$: spin aligns with reference ($v_0 \to v_1$) &check;</li>
+<li>$e_1$: spin aligns with reference ($v_0 \to v_2$) &check;</li>
+<li>$e_2$: spin opposes reference, so points $v_1 \to v_2$ (opposite of $v_2 \to v_1$)</li>
+</ul>
+<p>This means all spins point away from $v_0$: a "source" configuration at $v_0$.</p>
+
+<p><strong>Compute $S_{vv'}$ via equation $\eqref{eq:Selement}$:</strong></p>
+<ul>
+<li>$S_{v_0 v_1}$: edge $e_0$, $[B_1]_{v_0, e_0} = -1$, $\sigma_{e_0} = +1$. $S_{v_0 v_1} = -(-1)(+1) = +1$. &check; (Spin points $v_0 \to v_1$.)</li>
+<li>$S_{v_0 v_2}$: edge $e_1$, $[B_1]_{v_0, e_1} = -1$, $\sigma_{e_1} = +1$. $S_{v_0 v_2} = -(-1)(+1) = +1$. &check; (Spin points $v_0 \to v_2$.)</li>
+<li>$S_{v_2 v_1}$: edge $e_2$, $[B_1]_{v_2, e_2} = -1$, $\sigma_{e_2} = -1$. $S_{v_2 v_1} = -(-1)(-1) = -1$. This means spin points $v_1 \to v_2$. &check;</li>
+</ul>
+
+<p><strong>Full $S$ matrix</strong> (using antisymmetry $S_{v_1 v_2} = -S_{v_2 v_1} = +1$):</p>
+$$
+S = \begin{pmatrix} 0 & +1 & +1 \\ -1 & 0 & +1 \\ -1 & -1 & 0 \end{pmatrix}
+$$
+<p>Antisymmetric: $S^T = -S$. &check; All three spins flow away from $v_0$ and toward $v_2$, consistent with $Q_{v_0} = -2$ (source) and $Q_{v_2} = +2$ (sink).</p>
+
+<h4>Verification via the matrix formula $\eqref{eq:Smatrix}$</h4>
+
+<p>We now compute $S = \tfrac{1}{2}(|B_1|\,D_\sigma\,B_1^T - B_1\,D_\sigma\,|B_1|^T)$ piece by piece.</p>
+
+<p><strong>Step 1: The pieces.</strong></p>
+$$
+B_1 = \begin{pmatrix} -1 & -1 & 0 \\ +1 & 0 & +1 \\ 0 & +1 & -1 \end{pmatrix}, \qquad
+|B_1| = \begin{pmatrix} 1 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 1 \end{pmatrix}, \qquad
+D_\sigma = \diag(\bm{\sigma}) = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & -1 \end{pmatrix}
+$$
+
+<p><strong>Step 2: Compute $D_\sigma\,B_1^T$</strong> (multiply each row $e$ of $B_1^T$ by $\sigma_e$; row 2 gets negated).</p>
+$$
+B_1^T = \begin{pmatrix} -1 & +1 & 0 \\ -1 & 0 & +1 \\ 0 & +1 & -1 \end{pmatrix}, \qquad
+D_\sigma\,B_1^T = \begin{pmatrix} -1 & +1 & 0 \\ -1 & 0 & +1 \\ 0 & -1 & +1 \end{pmatrix}
+$$
+
+<p><strong>Step 3: Compute $M = |B_1|\,D_\sigma\,B_1^T$.</strong></p>
+$$
+M = \begin{pmatrix} 1 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 1 \end{pmatrix}
+\begin{pmatrix} -1 & +1 & 0 \\ -1 & 0 & +1 \\ 0 & -1 & +1 \end{pmatrix}
+$$
+<p>Row-by-row:</p>
+<ul>
+<li>$M_{00} = (1)(-1)+(1)(-1)+(0)(0) = -2$</li>
+<li>$M_{01} = (1)(1)+(1)(0)+(0)(-1) = 1$</li>
+<li>$M_{02} = (1)(0)+(1)(1)+(0)(1) = 1$</li>
+<li>$M_{10} = (1)(-1)+(0)(-1)+(1)(0) = -1$</li>
+<li>$M_{11} = (1)(1)+(0)(0)+(1)(-1) = 0$</li>
+<li>$M_{12} = (1)(0)+(0)(1)+(1)(1) = 1$</li>
+<li>$M_{20} = (0)(-1)+(1)(-1)+(1)(0) = -1$</li>
+<li>$M_{21} = (0)(1)+(1)(0)+(1)(-1) = -1$</li>
+<li>$M_{22} = (0)(0)+(1)(1)+(1)(1) = 2$</li>
+</ul>
+$$
+M = |B_1|\,D_\sigma\,B_1^T = \begin{pmatrix} -2 & 1 & 1 \\ -1 & 0 & 1 \\ -1 & -1 & 2 \end{pmatrix}
+$$
+
+<p><strong>Step 4: Transpose to get $M^T = B_1\,D_\sigma\,|B_1|^T$.</strong></p>
+$$
+M^T = \begin{pmatrix} -2 & -1 & -1 \\ 1 & 0 & -1 \\ 1 & 1 & 2 \end{pmatrix}
+$$
+
+<p><strong>Step 5: $S = \tfrac{1}{2}(M - M^T)$.</strong></p>
+$$
+M - M^T = \begin{pmatrix} -2-(-2) & 1-(-1) & 1-(-1) \\ -1-1 & 0-0 & 1-(-1) \\ -1-1 & -1-1 & 2-2 \end{pmatrix}
+= \begin{pmatrix} 0 & 2 & 2 \\ -2 & 0 & 2 \\ -2 & -2 & 0 \end{pmatrix}
+$$
+$$
+\boxed{S = \frac{1}{2}(M - M^T) = \begin{pmatrix} 0 & +1 & +1 \\ -1 & 0 & +1 \\ -1 & -1 & 0 \end{pmatrix}} \;\checkmark
+$$
+
+<p>This matches the element-wise computation exactly. Note how the diagonal of $M$ holds $(-2, 0, 2) = (Q_{v_0}, Q_{v_1}, Q_{v_2})$ &mdash; the topological charges &mdash; but the subtraction $M - M^T$ cancels these automatically, producing zeros on the diagonal of $S$ without any ad hoc correction.</p>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec4">4. Topological Charge = Divergence of 1-Cochain</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+Key Correspondence #2: Nisoli's topological charge $Q_v$ is the image of the spin 1-cochain under the boundary operator $B_1$.
+</p>
+
+<h3>4.1 Nisoli's Charge Definition</h3>
+
+<p>
+Nisoli (2020, Eq. 1) defines the topological charge at vertex $v$ as:
+</p>
+
+$$\begin{equation}
+Q_v[S] = \sum_{v'} S_{v'v}
+\label{eq:Qdef_nisoli}
+\end{equation}$$
+
+<p>
+This sums the column of $S$ corresponding to $v$. Recall $S_{v'v} = +1$ if the spin on edge $\{v', v\}$ points from $v'$ to $v$ (into $v$), and $S_{v'v} = -1$ if it points from $v$ to $v'$ (out of $v$). Therefore:
+</p>
+
+$$
+Q_v = \#(\text{spins into } v) - \#(\text{spins out of } v)
+$$
+
+<p>
+Nisoli also defines a divergence (Eq. 2):
+</p>
+
+$$\begin{equation}
+\div[S]_v = \sum_{v'} S_{vv'} = -\sum_{v'} S_{v'v} = -Q_v
+\label{eq:div_nisoli}
+\end{equation}$$
+
+<p>
+where the sign flip uses antisymmetry $S_{vv'} = -S_{v'v}$.
+</p>
+
+<div class="convention">
+<div class="label">Convention Alert &mdash; Sign of Divergence</div>
+Nisoli's divergence $\div[S]_v = \sum_{v'} S_{vv'}$ counts <em>outflow</em>: spins leaving $v$ contribute $+1$. His charge $Q_v = -\div[S]_v$ counts <em>inflow</em>. The TDL operator $B_1 \bm{\sigma}$ computes the algebraic boundary, which (as we show below) equals $Q_v$. Our convention throughout this document: <strong>$Q_v = (B_1 \bm{\sigma})_v$</strong>.
+</div>
+
+<h3>4.2 Derivation</h3>
+
+<p>
+We prove that $(B_1 \bm{\sigma})_v = Q_v$ by expanding the matrix-vector product.
+</p>
+
+<p>
+<strong>Step 1.</strong> By definition of matrix-vector multiplication:
+</p>
+
+$$\begin{equation}
+(B_1 \bm{\sigma})_v = \sum_{e=1}^{n_1} [B_1]_{v,e}\, \sigma_e
+\label{eq:B1sigma}
+\end{equation}$$
+
+<p>
+<strong>Step 2.</strong> Split the sum by the role of $v$ in edge $e$:
+</p>
+
+$$
+(B_1 \bm{\sigma})_v = \sum_{\substack{e:\\ v = \text{head}(e)}} (+1) \cdot \sigma_e + \sum_{\substack{e:\\ v = \text{tail}(e)}} (-1) \cdot \sigma_e + \sum_{\substack{e:\\ v \notin e}} 0 \cdot \sigma_e
+$$
+
+$$\begin{equation}
+= \sum_{\substack{e:\\ v = \text{head}(e)}} \sigma_e - \sum_{\substack{e:\\ v = \text{tail}(e)}} \sigma_e
+\label{eq:B1sigma_expanded}
+\end{equation}$$
+
+<p>
+<strong>Step 3.</strong> Interpret each term physically. Consider an edge $e$ with $v = \text{head}(e)$:
+</p>
+<ul>
+<li>If $\sigma_e = +1$: spin aligns with reference, points <em>into</em> $v$. Contributes $+1$ to the first sum.</li>
+<li>If $\sigma_e = -1$: spin opposes reference, points <em>out of</em> $v$. Contributes $-1$ to the first sum.</li>
+</ul>
+
+<p>
+Now consider an edge $e$ with $v = \text{tail}(e)$:
+</p>
+<ul>
+<li>If $\sigma_e = +1$: spin aligns with reference, points <em>away from</em> $v$. Contributes $-1$ to the second sum (with the minus sign: $-\sigma_e = -1$).</li>
+<li>If $\sigma_e = -1$: spin opposes reference, points <em>into</em> $v$. Contributes $+1$ to the expression (since $-\sigma_e = +1$).</li>
+</ul>
+
+<p>
+<strong>Step 4.</strong> Collecting: each edge incident to $v$ contributes $+1$ if its spin points into $v$, and $-1$ if its spin points out of $v$, regardless of whether $v$ is the head or tail in the reference orientation. Therefore:
+</p>
+
+$$\begin{equation}
+(B_1 \bm{\sigma})_v = \#(\text{spins into } v) - \#(\text{spins out of } v) = Q_v
+\label{eq:QeqB1sigma}
+\end{equation}$$
+
+<div class="key-result">
+<div class="label">Key Result 2 &mdash; Charge as Boundary</div>
+$$
+\boxed{Q_v = (B_1\, \bm{\sigma})_v = \sum_{e} [B_1]_{v,e}\, \sigma_e}
+$$
+<p>
+The topological charge vector is the image of the spin configuration under the incidence matrix: $\mathbf{Q} = B_1 \bm{\sigma}$. The ice rule $Q_v = 0\;\forall v$ is equivalent to $\bm{\sigma} \in \ker(B_1)$.
+</p>
+</div>
+
+<h3>4.3 Relationship to Nisoli's Divergence</h3>
+
+<p>
+From &sect;3, we showed $S_{v'v} = -[B_1]_{v',e}\,\sigma_e$ for the edge $e$ connecting $v$ and $v'$. Therefore:
+</p>
+
+$$
+Q_v^{\text{Nisoli}} = \sum_{v'} S_{v'v} = -\sum_{v'} [B_1]_{v',e}\,\sigma_e
+$$
+
+<p>
+But for each edge $e$ incident to $v$, the other endpoint $v'$ satisfies $[B_1]_{v',e} = -[B_1]_{v,e}$ (columns of $B_1$ sum to zero). So:
+</p>
+
+$$
+Q_v^{\text{Nisoli}} = -\sum_{e \ni v} (-[B_1]_{v,e})\,\sigma_e = \sum_{e \ni v} [B_1]_{v,e}\,\sigma_e = (B_1\bm{\sigma})_v \quad \checkmark
+$$
+
+<h3>4.4 Connection to the $M$ Matrix of &sect;3</h3>
+
+<p>
+The matrix $M = |B_1|\,D_\sigma\,B_1^T$ from equation $\eqref{eq:Smatrix}$ encodes <em>both</em> of Nisoli's fundamental objects simultaneously. Its diagonal entries are exactly the topological charges:
+</p>
+
+$$
+M_{vv} = \sum_e |[B_1]_{v,e}|\,\sigma_e\,[B_1]_{v,e} = \sum_{e \ni v} [B_1]_{v,e}\,\sigma_e = (B_1\bm{\sigma})_v = Q_v
+$$
+
+<p>
+(The absolute value factor $|[B_1]_{v,e}|$ merely selects edges incident to $v$, contributing 1 for each; the signed factor $[B_1]_{v,e}$ then provides the $\pm 1$ weight.)
+</p>
+
+<p>In summary, a single matrix $M$ contains both Nisoli quantities:</p>
+
+<table style="max-width:550px; margin: 0.8rem auto;">
+<tbody>
+<tr><td><strong>Antisymmetric part:</strong></td><td>$\operatorname{skew}(M) = S$</td><td>(spin matrix, &sect;3)</td></tr>
+<tr><td><strong>Diagonal:</strong></td><td>$\diag(M) = \mathbf{Q}$</td><td>(charge vector, &sect;4)</td></tr>
+</tbody>
+</table>
+
+<p>
+This was visible in the triangle example: $\diag(M) = (-2, 0, +2) = (Q_{v_0}, Q_{v_1}, Q_{v_2})$, and $\operatorname{skew}(M) = S$. The skew-symmetrization that extracts $S$ discards the charges; the diagonal extraction that gives $\mathbf{Q}$ discards the spin connectivity. The two are complementary projections of the same underlying object.
+</p>
+
+<h3>4.5 Worked Example: Triangle Graph (continued)</h3>
+
+<div class="example">
+<div class="label">Example 4.1 &mdash; Charge Computation on $K_3$</div>
+<p>
+Using the triangle graph from Example 3.1 with $\bm{\sigma} = (+1, +1, -1)^T$:
+</p>
+$$
+B_1 \bm{\sigma} = \begin{pmatrix} -1 & -1 & 0 \\ +1 & 0 & +1 \\ 0 & +1 & -1 \end{pmatrix} \begin{pmatrix} +1 \\ +1 \\ -1 \end{pmatrix} = \begin{pmatrix} -1-1+0 \\ +1+0-1 \\ 0+1+1 \end{pmatrix} = \begin{pmatrix} -2 \\ 0 \\ +2 \end{pmatrix}
+$$
+<p>
+Interpretation:
+</p>
+<ul>
+<li>$Q_{v_0} = -2$: both spins point <em>away</em> from $v_0$ (net outflow of 2). This is a <strong>negative monopole</strong> (source).</li>
+<li>$Q_{v_1} = 0$: one spin in ($e_0$: $v_0 \to v_1$), one spin out ($e_2$ reversed: $v_1 \to v_2$). <strong>Ice rule satisfied</strong>.</li>
+<li>$Q_{v_2} = +2$: both spins point <em>into</em> $v_2$ ($e_1$: $v_0 \to v_2$ and $e_2$ reversed: $v_1 \to v_2$). This is a <strong>positive monopole</strong> (sink).</li>
+</ul>
+<p>
+Note: $\sum_v Q_v = -2 + 0 + 2 = 0$. This always holds since $\mathbf{1}^T B_1 = \mathbf{0}^T$ (each column of $B_1$ sums to zero), so $\mathbf{1}^T \mathbf{Q} = \mathbf{1}^T B_1 \bm{\sigma} = 0$. Total charge is conserved. &check;
+</p>
+<p>
+For the ice rule to hold on $K_3$, we would need $B_1 \bm{\sigma} = 0$. Since $\ker(B_1)$ for $K_3$ with $n_0 = 3, n_1 = 3, \beta_0 = 1$ has dimension $n_1 - n_0 + \beta_0 = 3 - 3 + 1 = 1$, there is a 1-dimensional ice manifold. A basis vector is $\bm{\sigma}_{\text{ice}} = (+1, -1, +1)^T$ (a circulation around the triangle).
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec5">5. Ice Manifold, $\ker(B_1)$, and the Hodge Decomposition</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+Key Correspondence #3: The ice manifold decomposes via the Hodge theorem into curl and harmonic components, with the harmonic dimension equal to $\beta_1$.
+</p>
+
+<h3>5.1 The Ice Manifold &mdash; General Definition</h3>
+
+<p>
+The <strong>ice rule</strong> at vertex $v$ requires that the topological charge $|Q_v|$ be minimized. Since $Q_v = \#(\text{in}) - \#(\text{out})$ and there are $z_v$ edges incident to $v$, parity dictates:
+</p>
+
+$$\begin{equation}
+|Q_v|_{\min} = z_v \bmod 2 = \begin{cases} 0 & \text{if } z_v \text{ is even} \\ 1 & \text{if } z_v \text{ is odd} \end{cases}
+\label{eq:Qmin}
+\end{equation}$$
+
+<p>
+The <strong>ice manifold</strong> is the set of spin configurations minimizing $|Q_v|$ at every vertex:
+</p>
+
+$$\begin{equation}
+\mathcal{I} = \bigl\{\bm{\sigma} \in \{+1,-1\}^{n_1} : |Q_v| = z_v \bmod 2 \;\;\forall v\bigr\}
+\label{eq:ice_manifold}
+\end{equation}$$
+
+<div class="convention">
+<div class="label">Even vs. Odd Degree Vertices</div>
+<p>
+<strong>Even degree</strong> ($z_v = 2, 4, \ldots$): The ice rule requires $Q_v = 0$ exactly &mdash; equal numbers of spins in and out. This is the "clean" case where ice configurations are divergence-free.
+</p>
+<p>
+<strong>Odd degree</strong> ($z_v = 3, 5, \ldots$): Perfect balance is impossible. The best achievable is $Q_v = \pm 1$, an unavoidable residual charge of magnitude 1. As Nisoli (2020) emphasizes, these residual charges are <em>topologically mandated</em> by parity, not excitations &mdash; they are intrinsic to the ice manifold on odd-coordination lattices.
+</p>
+<p>
+In the lattice zoo: the <strong>square lattice</strong> (all $z = 4$) has only even-degree vertices. The <strong>kagome</strong> (all $z = 3$), and the mixed-coordination lattices (<strong>shakti, tetris, pinwheel, santa fe</strong>, etc.) all contain odd-degree vertices.
+</p>
+</div>
+
+<h4>Case 1: All vertices even-degree</h4>
+
+<p>
+When every vertex has even degree, the ice rule is $Q_v = 0$ for all $v$, and:
+</p>
+
+$$\begin{equation}
+\mathcal{I}_{\text{even}} = \{+1,-1\}^{n_1} \cap \ker(B_1)
+\label{eq:ice_even}
+\end{equation}$$
+
+<p>
+The continuous relaxation is simply $\ker(B_1)$, the space of divergence-free edge flows. This is the case treated in the remainder of this section.
+</p>
+
+<h4>Case 2: Some vertices odd-degree (affine structure)</h4>
+
+<p>
+When odd-degree vertices are present, ice configurations have $B_1 \bm{\sigma} = \mathbf{q}$ where $\mathbf{q}$ is a <strong>residual charge vector</strong> with $q_v = \pm 1$ at odd-degree vertices and $q_v = 0$ at even-degree vertices. The specific sign pattern of the residual charges defines a <strong>charge sector</strong>. Within each sector, the ice configurations form an <strong>affine coset</strong> of $\ker(B_1)$:
+</p>
+
+$$\begin{equation}
+\mathcal{I}_{\mathbf{q}} = \{\bm{\sigma} : B_1 \bm{\sigma} = \mathbf{q}\} = \bm{\sigma}_0 + \ker(B_1)
+\label{eq:ice_affine}
+\end{equation}$$
+
+<p>
+where $\bm{\sigma}_0$ is any particular configuration in the sector. The full ice manifold is a union over charge sectors:
+</p>
+$$
+\mathcal{I} = \bigcup_{\mathbf{q} \in \mathcal{Q}_{\min}} \mathcal{I}_{\mathbf{q}}
+$$
+<p>
+where $\mathcal{Q}_{\min} = \{\mathbf{q} \in \Z^{n_0} : |q_v| = z_v \bmod 2\;\forall v,\;\; \sum_v q_v = 0\}$. (Charge conservation $\sum_v q_v = 0$ is always enforced since $\mathbf{1}^T B_1 = \mathbf{0}^T$.)
+</p>
+
+<p>
+<strong>The critical point:</strong> Although ice configurations in the odd-degree case do not lie in $\ker(B_1)$, the <em>difference</em> between any two configurations in the same charge sector does:
+</p>
+$$
+\bm{\sigma}_1, \bm{\sigma}_2 \in \mathcal{I}_{\mathbf{q}} \;\implies\; \bm{\sigma}_1 - \bm{\sigma}_2 \in \ker(B_1)
+$$
+<p>
+So <strong>fluctuations within the ice manifold</strong> are always divergence-free, and the Hodge decomposition applies to these fluctuations. The subspace $\ker(B_1)$ is the "tangent space" to the ice manifold regardless of the charge sector.
+</p>
+
+<h3>5.2 The Divergence-Free Subspace $\ker(B_1)$</h3>
+
+<p>
+Whether or not odd-degree vertices are present, the space of divergence-free edge flows is:
+</p>
+
+$$\begin{equation}
+\ker(B_1) = \{\mathbf{f} \in \R^{n_1} : B_1 \mathbf{f} = \mathbf{0}\}
+\label{eq:kerB1}
+\end{equation}$$
+
+<p>
+This is always a linear subspace, with dimension:
+</p>
+
+$$\begin{equation}
+\dim(\ker B_1) = n_1 - \rank(B_1) = n_1 - (n_0 - \beta_0)
+\label{eq:dim_kerB1}
+\end{equation}$$
+
+<p>
+where $\beta_0$ is the number of connected components (= 1 for connected graphs). So $\dim(\ker B_1) = n_1 - n_0 + 1$. For even-degree graphs, this is the ice manifold directly. For odd-degree graphs, it is the space of ice-manifold fluctuations and the common translate of all charge sectors.
+</p>
+
+<h3>5.3 The Hodge Decomposition Theorem</h3>
+
+<p>
+The <strong>Hodge decomposition</strong> for the edge space $\R^{n_1}$ of a simplicial complex $X$ with boundary operators $B_1$ ($n_0 \times n_1$) and $B_2$ ($n_1 \times n_2$) states:
+</p>
+
+$$\begin{equation}
+\boxed{\R^{n_1} = \im(B_1^T) \;\oplus\; \im(B_2) \;\oplus\; \ker(L_1)}
+\label{eq:hodge}
+\end{equation}$$
+
+<p>
+where the three subspaces are mutually orthogonal and:
+</p>
+<ul>
+<li>$\im(B_1^T)$: <strong>gradient</strong> signals &mdash; edge signals that are discrete gradients of vertex potentials</li>
+<li>$\im(B_2)$: <strong>curl</strong> signals &mdash; edge signals that are boundaries of face signals</li>
+<li>$\ker(L_1)$: <strong>harmonic</strong> signals &mdash; simultaneously divergence-free and curl-free</li>
+</ul>
+
+<p>
+<strong>Proof sketch.</strong> Since $L_1 = B_1^T B_1 + B_2 B_2^T$, we have $\ker(L_1) = \ker(B_1) \cap \ker(B_2^T)$ (because $L_1 \mathbf{f} = 0 \Leftrightarrow \mathbf{f}^T L_1 \mathbf{f} = \|B_1\mathbf{f}\|^2 + \|B_2^T\mathbf{f}\|^2 = 0 \Leftrightarrow B_1\mathbf{f} = 0$ and $B_2^T\mathbf{f} = 0$). The three subspaces are orthogonal because:
+</p>
+<ul>
+<li>$\im(B_1^T) \perp \im(B_2)$: For $\mathbf{u} = B_1^T \mathbf{x}$ and $\mathbf{v} = B_2 \mathbf{y}$, $\langle \mathbf{u}, \mathbf{v}\rangle = \mathbf{x}^T B_1 B_2 \mathbf{y} = \mathbf{x}^T \cdot \mathbf{0} \cdot \mathbf{y} = 0$ by $\eqref{eq:chain}$.</li>
+<li>$\im(B_1^T) \perp \ker(L_1)$: Harmonic signals are in $\ker(B_1) = \im(B_1^T)^\perp$.</li>
+<li>$\im(B_2) \perp \ker(L_1)$: Harmonic signals are in $\ker(B_2^T) = \im(B_2)^\perp$.</li>
+</ul>
+
+<p>
+Completeness follows from a dimension count: $\dim(\im B_1^T) + \dim(\im B_2) + \dim(\ker L_1) = (n_0 - \beta_0) + (n_2 - \beta_2) + \beta_1 = n_1$ (using the definitions of Betti numbers).
+</p>
+
+<h3>5.4 The Divergence-Free Subspace Splits</h3>
+
+<p>
+The divergence-free subspace $\ker(B_1)$ &mdash; which is the ice manifold for even-degree graphs, and the fluctuation space for odd-degree graphs (&sect;5.1) &mdash; contains no gradient signals (except zero). The Hodge decomposition restricted to $\ker(B_1)$ gives:
+</p>
+
+$$\begin{equation}
+\boxed{\ker(B_1) = \im(B_2) \;\oplus\; \ker(L_1)}
+\label{eq:ice_hodge}
+\end{equation}$$
+
+<p>
+<strong>Proof.</strong> We need to show $\ker(B_1) = \im(B_2) \oplus \ker(L_1)$.
+</p>
+<p>
+$(\supseteq)$: $\im(B_2) \subseteq \ker(B_1)$ because $B_1 B_2 = 0$. $\ker(L_1) \subseteq \ker(B_1)$ because harmonic signals are divergence-free. Both subspaces are orthogonal (shown above).
+</p>
+<p>
+$(\subseteq)$: Take any $\mathbf{f} \in \ker(B_1)$. By the full Hodge decomposition, $\mathbf{f} = \mathbf{f}_{\text{grad}} + \mathbf{f}_{\text{curl}} + \mathbf{f}_{\text{harm}}$. Then $0 = B_1 \mathbf{f} = B_1 \mathbf{f}_{\text{grad}}$ (since $B_1 \mathbf{f}_{\text{curl}} = B_1 B_2 \mathbf{y} = 0$ and $B_1 \mathbf{f}_{\text{harm}} = 0$). But $\mathbf{f}_{\text{grad}} = B_1^T \mathbf{x}$, so $B_1 B_1^T \mathbf{x} = L_0 \mathbf{x} = 0$, meaning $\mathbf{x}$ is constant (for connected graphs). Thus $\mathbf{f}_{\text{grad}} = B_1^T (\text{const}) = \mathbf{0}$. So $\mathbf{f} = \mathbf{f}_{\text{curl}} + \mathbf{f}_{\text{harm}} \in \im(B_2) \oplus \ker(L_1)$. $\square$
+</p>
+
+<h3>5.5 Dimensions and Betti Numbers</h3>
+
+<p>
+The dimensions of the three Hodge components define the <strong>Betti numbers</strong>:
+</p>
+
+$$\begin{equation}
+\beta_0 = \dim(\ker L_0), \quad \beta_1 = \dim(\ker L_1), \quad \beta_2 = \dim(\ker L_2)
+\label{eq:betti_def}
+\end{equation}$$
+
+<p>
+where $L_2 = B_2^T B_2 + B_3 B_3^T$ (with $B_3 = 0$ for 2-dimensional complexes, so $L_2 = B_2^T B_2$).
+</p>
+
+<p>The fundamental dimension identities:</p>
+
+$$\begin{align}
+\dim(\im B_1^T) &= \rank(B_1) = n_0 - \beta_0 \label{eq:rankB1} \\
+\dim(\im B_2) &= \rank(B_2) = n_2 - \beta_2 \label{eq:rankB2} \\
+\dim(\ker L_1) &= \beta_1 = n_1 - \rank(B_1) - \rank(B_2) \label{eq:beta1}
+\end{align}$$
+
+<p>The <strong>Euler characteristic</strong> provides a consistency check:</p>
+
+$$\begin{equation}
+\boxed{\beta_0 - \beta_1 + \beta_2 = n_0 - n_1 + n_2}
+\label{eq:euler}
+\end{equation}$$
+
+<p>And the ice manifold dimension is:</p>
+
+$$\begin{equation}
+\dim(\ker B_1) = \rank(B_2) + \beta_1 = (n_2 - \beta_2) + \beta_1
+\label{eq:ice_dim}
+\end{equation}$$
+
+<h3>5.6 Physical Interpretation</h3>
+
+<table>
+<thead>
+<tr><th>Component</th><th>Subspace</th><th>Dimension</th><th>Physical Meaning (Spin Ice)</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Curl</strong></td>
+  <td>$\im(B_2)$</td>
+  <td>$n_2 - \beta_2$</td>
+  <td>Circulations around individual faces. "Locally trivial" ice configurations that can be decomposed into independent loop currents around filled faces. Altered by local spin flips around a single plaquette.</td>
+</tr>
+<tr>
+  <td><strong>Harmonic</strong></td>
+  <td>$\ker(L_1)$</td>
+  <td>$\beta_1$</td>
+  <td><strong>Topologically nontrivial</strong> ice configurations. Winding modes around non-contractible cycles (e.g., around a torus handle). Cannot be created or destroyed by any local spin flip. These are the <em>topologically protected degrees of freedom</em>.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<strong>Example:</strong> On a torus (periodic square lattice), $\beta_1 = 2$. The two harmonic modes correspond to net circulation around the two independent non-contractible loops of the torus (horizontal and vertical winding numbers). No sequence of local plaquette flips can change these winding numbers.
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 3 &mdash; Hodge Decomposition of Divergence-Free Subspace</div>
+$$
+\ker(B_1) = \im(B_2) \oplus \ker(L_1)
+$$
+<p>
+The divergence-free subspace decomposes into locally trivial circulations ($\im B_2$, dimension $n_2 - \beta_2$) and topologically protected winding modes ($\ker L_1$, dimension $\beta_1$). For <strong>even-degree graphs</strong>, this is the ice manifold directly. For <strong>odd-degree graphs</strong>, this is the space of fluctuations within each charge sector of the ice manifold. In both cases, the number of topologically protected modes equals $\beta_1 = n_1 - n_0 + \beta_0 - n_2 + \beta_2$.
+</p>
+<p>
+<strong>Face-filling dependence.</strong> The left-hand side $\ker(B_1)$ depends only on the graph &mdash; it is independent of $B_2$. Its dimension is always $n_1 - n_0 + \beta_0$. But the <em>decomposition</em> of this fixed space into the two summands depends on which faces are filled, because $B_2$ determines which cycles become boundaries (curl) and which remain topologically nontrivial (harmonic). Filling more faces enlarges $\im(B_2)$ at the expense of $\ker(L_1)$:
+</p>
+<ul style="margin-top:0.3em">
+  <li><strong>All faces filled:</strong> $\im(B_2)$ is maximal, $\beta_1$ is minimal &mdash; most of $\ker(B_1)$ consists of face circulations.</li>
+  <li><strong>No faces filled:</strong> $B_2 = 0$, so $\im(B_2) = \{\mathbf{0}\}$ and $\ker(L_1) = \ker(B_1)$ entirely &mdash; $\beta_1$ equals $\dim(\ker B_1) = n_1 - n_0 + \beta_0$.</li>
+</ul>
+<p>
+The total space $\ker(B_1)$ is the same in both cases; only its internal partition between "topologically trivial" and "topologically protected" shifts (see &sect;2.2).
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec6">6. Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+Key Correspondence #4: The dumbbell Hamiltonian of spin ice is a quadratic form in the lower Hodge Laplacian.
+</p>
+
+<h3>6.1 The Dumbbell Hamiltonian</h3>
+
+<p>
+In the dumbbell model of spin ice (Castelnovo et al. 2008, adapted by Nisoli 2020), the energy of a spin configuration is determined by the topological charges at vertices. The <strong>nearest-neighbor charge Hamiltonian</strong> is:
+</p>
+
+$$\begin{equation}
+\mathcal{H}[\bm{\sigma}] = \frac{\epsilon}{2} \sum_{v} Q_v^2
+\label{eq:hamiltonian_charge}
+\end{equation}$$
+
+<p>
+where $\epsilon > 0$ is the energy scale (related to the magnetic coupling) and $Q_v = (B_1 \bm{\sigma})_v$ from Key Result 2.
+</p>
+
+<h3>6.2 Derivation: Hamiltonian as Quadratic Form</h3>
+
+<p>
+<strong>Step 1.</strong> Write the sum of squared charges as a squared norm:
+</p>
+
+$$
+\sum_v Q_v^2 = \|\mathbf{Q}\|^2 = \|B_1 \bm{\sigma}\|^2 = (B_1 \bm{\sigma})^T (B_1 \bm{\sigma})
+$$
+
+<p>
+<strong>Step 2.</strong> Rearrange:
+</p>
+
+$$
+(B_1 \bm{\sigma})^T (B_1 \bm{\sigma}) = \bm{\sigma}^T B_1^T B_1\, \bm{\sigma} = \bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}
+$$
+
+<p>
+where $L_1^{\text{down}} = B_1^T B_1$ is the <strong>lower Hodge 1-Laplacian</strong>.
+</p>
+
+<p>
+<strong>Step 3.</strong> Therefore:
+</p>
+
+$$\begin{equation}
+\boxed{\mathcal{H}[\bm{\sigma}] = \frac{\epsilon}{2}\, \bm{\sigma}^T L_1^{\text{down}}\, \bm{\sigma} = \frac{\epsilon}{2} \|B_1 \bm{\sigma}\|^2}
+\label{eq:H_quadratic}
+\end{equation}$$
+
+<div class="key-result">
+<div class="label">Key Result 4 &mdash; Hamiltonian as $L_1^{\text{down}}$ Quadratic Form</div>
+$$
+\mathcal{H}[\bm{\sigma}] = \frac{\epsilon}{2}\, \bm{\sigma}^T L_1^{\text{down}}\, \bm{\sigma}
+$$
+<p>
+The spin ice energy is a quadratic form in the lower Hodge Laplacian. This is exact, not an approximation. It connects the statistical mechanics of spin ice directly to the spectral theory of $L_1^{\text{down}}$.
+</p>
+</div>
+
+<h3>6.3 Spectral Consequences</h3>
+
+<p>
+Let $\{\lambda_i, \mathbf{u}_i\}_{i=1}^{n_1}$ be the eigenvalues and orthonormal eigenvectors of $L_1^{\text{down}}$. Expanding $\bm{\sigma}$ in this eigenbasis:
+</p>
+
+$$
+\bm{\sigma} = \sum_i c_i \mathbf{u}_i, \quad c_i = \mathbf{u}_i^T \bm{\sigma}
+$$
+
+<p>
+The Hamiltonian becomes:
+</p>
+
+$$\begin{equation}
+\mathcal{H} = \frac{\epsilon}{2} \sum_i \lambda_i\, c_i^2
+\label{eq:H_spectral}
+\end{equation}$$
+
+<p>
+This reveals the complete energetic structure:
+</p>
+
+<table>
+<thead>
+<tr><th>Eigenvalue $\lambda_i$</th><th>Mode type</th><th>Energy contribution</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>$\lambda_i = 0$</td>
+  <td>$\mathbf{u}_i \in \ker(B_1)$ (divergence-free)</td>
+  <td><strong>Zero</strong> &mdash; charge-free modes</td>
+</tr>
+<tr>
+  <td>$\lambda_i > 0$</td>
+  <td>$\mathbf{u}_i \in \im(B_1^T)$ (gradient modes)</td>
+  <td>$\frac{\epsilon}{2}\lambda_i c_i^2 > 0$ &mdash; excited (charged) modes</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<strong>Ground state manifold = $\ker(L_1^{\text{down}}) = \ker(B_1)$:</strong> Configurations with zero energy are exactly the divergence-free configurations ($B_1 \bm{\sigma} = 0$). For <strong>even-degree graphs</strong>, these are the ice-rule configurations. For <strong>odd-degree graphs</strong>, zero energy is unachievable by Ising spins (since $|Q_v| \geq 1$ at odd-degree vertices); the ice manifold instead minimizes $\mathcal{H}$ at the value $\mathcal{H}_{\min} = \frac{\epsilon}{2}\sum_v (z_v \bmod 2)$, which counts the number of odd-degree vertices.
+</p>
+
+<p>
+<strong>Spectral gap $\Delta$:</strong> The smallest nonzero eigenvalue of $L_1^{\text{down}}$ sets the minimum energy cost of a monopole excitation (above the ground state):
+</p>
+
+$$\begin{equation}
+E_{\text{min monopole}} = \frac{\epsilon}{2}\, \Delta \cdot \min_{c_i \neq 0} c_i^2
+\label{eq:gap}
+\end{equation}$$
+
+<p>
+For Ising spins with integer charges, $\Delta$ directly controls the monopole gap. Lattices with larger spectral gaps have more robust ice rules.
+</p>
+
+<h3>6.4 Nisoli's Interaction Matrix</h3>
+
+<p>
+Nisoli expresses the energy in terms of vertex charges:
+</p>
+
+$$\begin{equation}
+\mathcal{H} = \frac{\epsilon}{2}\, \mathbf{Q}^T \mathbf{Q} = \frac{\epsilon}{2}\, \mathbf{Q}^T \mathbb{1}\, \mathbf{Q}
+\label{eq:H_nisoli_nn}
+\end{equation}$$
+
+<p>
+This is the <em>nearest-neighbor</em> (on-site) charge interaction. Nisoli extends this to long-range interactions via the graph Green's function (see &sect;7), but the nearest-neighbor version already establishes the $L_1^{\text{down}}$ connection. Note the chain of equalities:
+</p>
+
+$$
+\frac{\epsilon}{2} \sum_v Q_v^2
+= \frac{\epsilon}{2} \|B_1 \bm{\sigma}\|^2
+= \frac{\epsilon}{2}\, \bm{\sigma}^T (B_1^T B_1) \bm{\sigma}
+= \frac{\epsilon}{2}\, \bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}
+$$
+
+<h3>6.5 Worked Example: Energy on the Triangle</h3>
+
+<div class="example">
+<div class="label">Example 6.1 &mdash; Hamiltonian on $K_3$</div>
+<p>
+Using the triangle graph from &sect;3&ndash;4 with $e_0: v_0\to v_1$, $e_1: v_0\to v_2$, $e_2: v_2\to v_1$. Compute $L_1^{\text{down}} = B_1^T B_1$ element-by-element via $[B_1^T B_1]_{ij} = \sum_v [B_1]_{v,i}[B_1]_{v,j}$:
+</p>
+$$
+L_1^{\text{down}} = B_1^T B_1 = \begin{pmatrix} 2 & 1 & 1 \\ 1 & 2 & -1 \\ 1 & -1 & 2 \end{pmatrix}
+$$
+
+<p><strong>Non-ice configuration</strong> $\bm{\sigma}_1 = (+1, +1, -1)^T$ (from Example 3.1, with $\mathbf{Q} = (-2, 0, +2)^T$):</p>
+$$
+L_1^{\text{down}}\bm{\sigma}_1 = \begin{pmatrix}2+1-1\\1+2+1\\1-1-2\end{pmatrix} = \begin{pmatrix}2\\4\\-2\end{pmatrix}
+$$
+$$
+\bm{\sigma}_1^T L_1^{\text{down}} \bm{\sigma}_1 = (1)(2)+(1)(4)+(-1)(-2) = 8 = \|\mathbf{Q}\|^2 \;\checkmark
+$$
+<p>Therefore $\mathcal{H}_1 = \frac{\epsilon}{2}\cdot 8 = 4\epsilon$.</p>
+
+<p><strong>Ice configuration.</strong> We need $B_1 \bm{\sigma} = 0$, i.e., $-\sigma_0 - \sigma_1 = 0$, $\sigma_0 + \sigma_2 = 0$, $\sigma_1 - \sigma_2 = 0$. Solving: $\sigma_1 = -\sigma_0$, $\sigma_2 = -\sigma_0$. So $\ker(B_1) = \text{span}(1, -1, -1)^T$.</p>
+
+<p>Take $\bm{\sigma}_{\text{ice}} = (1, -1, -1)^T$:</p>
+$$
+B_1 \bm{\sigma}_{\text{ice}} = \begin{pmatrix}-1+1+0\\1+0-1\\0-1+1\end{pmatrix} = \begin{pmatrix}0\\0\\0\end{pmatrix} \;\checkmark
+$$
+<p>
+$\mathcal{H}_{\text{ice}} = \frac{\epsilon}{2}\, \bm{\sigma}_{\text{ice}}^T L_1^{\text{down}} \bm{\sigma}_{\text{ice}} = \frac{\epsilon}{2}\cdot 0 = 0$. The ice-rule configuration has zero energy. &check;
+</p>
+<p>
+Physically: $\bm{\sigma}_{\text{ice}} = (1,-1,-1)^T$ means $e_0$ points $v_0 \to v_1$, $e_1$ points $v_2 \to v_0$ (opposing reference), $e_2$ points $v_1 \to v_2$ (opposing reference). This is a clockwise circulation: every vertex has one spin in and one spin out.
+</p>
+</div>
+
+<h3>6.6 Computational Note: $L_1^{\text{down}}$ vs. $B_1$ for Null Space Computation</h3>
+
+<p>
+Since $\ker(L_1^{\text{down}}) = \ker(B_1^T B_1) = \ker(B_1)$ (standard linear algebra: $B_1^T B_1 \mathbf{x} = 0 \Leftrightarrow \|B_1 \mathbf{x}\|^2 = 0 \Leftrightarrow B_1 \mathbf{x} = 0$), both matrices yield the same null space. For Stage 1 computations, $L_1^{\text{down}}$ is the preferred target:
+</p>
+
+<ul>
+<li><strong>Symmetric PSD structure</strong> grants access to efficient eigensolvers: dense <code>scipy.linalg.eigh</code> for sizes S/M, sparse <code>scipy.sparse.linalg.eigsh</code> with shift-invert (<code>sigma=0</code>) for sizes L/XL.</li>
+<li><strong>No redundant work:</strong> the full eigenvalue spectrum of $L_1^{\text{down}}$ is needed anyway &mdash; for the Hamiltonian (Eq. \ref{eq:H_spectral}), the spectral gap (\ref{eq:gap}), and the monopole mode structure. The null space ($\beta_1$ count + harmonic basis vectors) falls out of the same eigendecomposition.</li>
+<li><strong>Matrix-free application:</strong> for iterative solvers on large systems, $L_1^{\text{down}}$ need not be formed explicitly. The matrix&ndash;vector product $\mathbf{x} \mapsto B_1^T(B_1 \mathbf{x})$ exploits $B_1$'s extreme sparsity (exactly 2 nonzeros per column).</li>
+<li><strong>Clean threshold test:</strong> all eigenvalues of $L_1^{\text{down}}$ are $\geq 0$, so counting eigenvalues below $10^{-10}$ directly yields $\beta_1$.</li>
+</ul>
+
+<p>
+For a <strong>one-off $\beta_1$ computation</strong> where the full spectrum is not needed, SVD of the rectangular $B_1$ ($n_0 \times n_1$, with $n_0 < n_1$) is actually cheaper for dense systems: $O(n_0 n_1^2)$ vs. $O(n_1^3)$ for <code>eigh</code> on the $n_1 \times n_1$ matrix $L_1^{\text{down}}$. But since the spectral catalog requires full eigendecomposition regardless, this advantage is moot in practice.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 7 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec7">7. Entropic Field Theory and the Graph Laplacian</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+Key Correspondence #5: Nisoli's entropic field theory is the discrete Poisson equation on the graph, mediated by $L_0$ and its pseudoinverse.
+</p>
+
+<h3>7.1 Nisoli's Entropic Field</h3>
+
+<p>
+Nisoli (2020, &sect;4) introduces a coarse-grained description of the spin ice in terms of a scalar <strong>entropic field</strong> $\varphi_v$ defined on vertices. This field mediates the effective interaction between topological charges. The key steps are:
+</p>
+
+<ol>
+<li>The partition function of the spin ice can be rewritten (via a Hubbard-Stratonovich transformation) in terms of a field $\varphi_v$.</li>
+<li>The resulting effective action involves the graph Laplacian $L_0$ acting on $\varphi$.</li>
+<li>The charge-charge correlation function is determined by the inverse (or pseudoinverse) of $L_0$.</li>
+</ol>
+
+<h3>7.2 The Discrete Gradient</h3>
+
+<p>
+Nisoli defines the gradient of the entropic field along an edge connecting $v$ and $v'$ as:
+</p>
+
+$$\begin{equation}
+\nabla_{vv'}\varphi = \varphi_{v'} - \varphi_v
+\label{eq:nisoli_grad}
+\end{equation}$$
+
+<p>
+In TDL, the <strong>coboundary operator</strong> (discrete exterior derivative) $d^0 = B_1^T$ maps 0-cochains to 1-cochains:
+</p>
+
+$$\begin{equation}
+(B_1^T \bm{\varphi})_e = [B_1^T]_{e,v}\, \varphi_v + [B_1^T]_{e,v'}\, \varphi_{v'} = \varphi_{\text{head}(e)} - \varphi_{\text{tail}(e)}
+\label{eq:coboundary}
+\end{equation}$$
+
+<p>
+For edge $e$ oriented from $u$ to $v$: $(B_1^T \bm{\varphi})_e = \varphi_v - \varphi_u$. This is precisely Nisoli's gradient $\nabla_{uv}\varphi$ along the edge direction.
+</p>
+
+<div class="key-result">
+<div class="label">Correspondence &mdash; Gradient</div>
+$$
+\nabla_{vv'}\varphi \;(\text{Nisoli}) = (B_1^T \bm{\varphi})_e = (d^0 \bm{\varphi})_e \;(\text{TDL})
+$$
+<p>Nisoli's discrete gradient is the coboundary/discrete exterior derivative $d^0 = B_1^T$.</p>
+</div>
+
+<h3>7.3 The Discrete Poisson Equation</h3>
+
+<p>
+Nisoli's discrete divergence of the gradient gives the graph Laplacian acting on $\varphi$. Specifically, from Nisoli's framework, the entropic field satisfies:
+</p>
+
+$$\begin{equation}
+\sum_{v' \sim v} (\varphi_v - \varphi_{v'}) = q_v
+\label{eq:poisson_nisoli}
+\end{equation}$$
+
+<p>
+where the sum runs over neighbors $v'$ of $v$, and $q_v$ is the (coarse-grained) charge at $v$. The left side is precisely $(L_0 \bm{\varphi})_v$:
+</p>
+
+$$
+(L_0 \bm{\varphi})_v = (D\bm{\varphi})_v - (A\bm{\varphi})_v = z_v \varphi_v - \sum_{v' \sim v} \varphi_{v'} = \sum_{v' \sim v}(\varphi_v - \varphi_{v'})
+$$
+
+<p>
+So equation $\eqref{eq:poisson_nisoli}$ is:
+</p>
+
+$$\begin{equation}
+\boxed{L_0\, \bm{\varphi} = \mathbf{q}}
+\label{eq:poisson}
+\end{equation}$$
+
+<p>
+This is the <strong>discrete Poisson equation</strong> on the graph &mdash; the exact analogue of $\nabla^2 \varphi = \rho$ in continuum electrostatics. The graph Laplacian $L_0 = B_1 B_1^T$ plays the role of the Laplacian operator $\nabla^2$.
+</p>
+
+<h3>7.4 The TDL Derivation: $L_0 = B_1 B_1^T = D - A$</h3>
+
+<p>
+We verify that $L_0 = B_1 B_1^T$ reproduces the standard graph Laplacian $D - A$. Compute element-by-element:
+</p>
+
+$$
+[B_1 B_1^T]_{vw} = \sum_{e=1}^{n_1} [B_1]_{v,e}\, [B_1]_{w,e}
+$$
+
+<p><strong>Case $v = w$ (diagonal):</strong></p>
+$$
+[B_1 B_1^T]_{vv} = \sum_e [B_1]_{v,e}^2 = \#\{e : v \in e\} = z_v = D_{vv}
+$$
+<p>(Each edge incident to $v$ contributes $(\pm 1)^2 = 1$.)</p>
+
+<p><strong>Case $v \neq w$, $v$ and $w$ adjacent (sharing edge $e$):</strong></p>
+$$
+[B_1 B_1^T]_{vw} = [B_1]_{v,e}\,[B_1]_{w,e} = (+1)(-1) = -1 = -A_{vw}
+$$
+<p>(One of $v,w$ is the head and the other is the tail of $e$.)</p>
+
+<p><strong>Case $v \neq w$, not adjacent:</strong></p>
+$$
+[B_1 B_1^T]_{vw} = 0 = -A_{vw}
+$$
+
+<p>
+Therefore $L_0 = B_1 B_1^T = D - A$. &check;
+</p>
+
+<h3>7.5 Charge-Charge Correlations and $L_0^{-1}$</h3>
+
+<p>
+In Nisoli's field theory, the charge-charge correlation function at temperature $T$ with coupling $\epsilon$ involves the <strong>Green's function</strong> (propagator) of the graph. In the Coulomb limit ($T \ll \epsilon$, or equivalently, correlation length $\xi \to \infty$), this reduces to:
+</p>
+
+$$\begin{equation}
+\langle q_v\, q_{v'} \rangle_{\text{connected}} \;\propto\; [L_0^+]_{vv'}
+\label{eq:correlator}
+\end{equation}$$
+
+<p>
+where $L_0^+ = L_0^{-1}$ restricted to the subspace orthogonal to the constant vector (the pseudoinverse of $L_0$, since $L_0$ has a zero eigenvalue corresponding to the constant mode on connected graphs).
+</p>
+
+<p>
+More explicitly, let $\{\lambda_k, \mathbf{u}_k\}$ be the eigendecomposition of $L_0$ with $\lambda_0 = 0$ and $\mathbf{u}_0 = \frac{1}{\sqrt{n_0}}\mathbf{1}$. Then:
+</p>
+
+$$\begin{equation}
+L_0^+ = \sum_{k:\lambda_k > 0} \frac{1}{\lambda_k}\, \mathbf{u}_k \mathbf{u}_k^T
+\label{eq:L0_pinv}
+\end{equation}$$
+
+<p>
+This is the kernel of the effective charge interaction: charges at vertices $v$ and $v'$ interact with strength $[L_0^+]_{vv'}$. This is structurally identical to the effective resistance (commute distance) between $v$ and $v'$ in electrical network theory, and to the infinite-depth limit of certain GNN aggregation schemes.
+</p>
+
+<h3>7.6 The Screened Green Operator</h3>
+
+<p>
+At finite temperature, Nisoli introduces the <strong>screened Green operator</strong> with screening length $\xi = \sqrt{\epsilon / T}$:
+</p>
+
+$$\begin{equation}
+\hat{G} = \bigl(\hat{L}_0 + \xi^{-2}\bigr)^{-1}
+\label{eq:screened_green}
+\end{equation}$$
+
+<p>
+where $\hat{L}_0$ is the normalized Laplacian (Nisoli normalizes by dividing by the coordination: $\hat{L}_{vv'} = \delta_{vv'} - A_{vv'}/z_v$ in the uniform-coordination case). The screening parameter $\xi^{-2}$ regularizes the zero eigenvalue and introduces exponential decay in the interaction:
+</p>
+
+<ul>
+<li><strong>$\xi \to \infty$</strong> ($T \to 0$): $\hat{G} \to \hat{L}_0^+$ &mdash; the unscreened Coulomb propagator. Charges interact at all distances.</li>
+<li><strong>$\xi \to 0$</strong> ($T \to \infty$): $\hat{G} \to \xi^2 \mathbb{1}$ &mdash; purely local (on-site). No interaction between distinct vertices.</li>
+<li><strong>Intermediate $\xi$:</strong> Interaction decays exponentially over graph distance $\sim \xi$.</li>
+</ul>
+
+<p>
+The screened operator $\eqref{eq:screened_green}$ is a spectral filter applied to $L_0$: it transforms each eigenvalue $\lambda_k$ to $(\lambda_k + \xi^{-2})^{-1}$. This is a <strong>resolvent operator</strong>, structurally identical to the regularized filters that appear in spectral graph theory.
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 5 &mdash; Entropic Field Theory = Discrete Poisson on Graph</div>
+$$
+L_0\, \bm{\varphi} = \mathbf{q}, \quad \langle q_v q_{v'}\rangle \propto [L_0^+]_{vv'}, \quad \hat{G} = (\hat{L}_0 + \xi^{-2})^{-1}
+$$
+<p>
+Nisoli's entropic field theory is the discrete Poisson equation with $L_0 = B_1 B_1^T$ as the Laplacian. The charge interaction kernel is $L_0^+$ (pseudoinverse), and finite-temperature screening introduces the resolvent $(\hat{L}_0 + \xi^{-2})^{-1}$ &mdash; a spectral filter on the graph Laplacian.
+</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 8: LINE GRAPH, DEGENERACY, BETHE PERMANENT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec8">8. Line Graph Dual, Degeneracy, and the Bethe Permanent</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+Based on Caravelli, Saccone &amp; Nisoli (2021), <em>Proc. R. Soc. A</em> <strong>477</strong>, 20210108. This section maps the spin ice degeneracy problem to graph-theoretic quantities in our TDL formalism and identifies connections to GNN message passing.
+</p>
+
+<h3>8.1 The Line Graph Dual: $L_1^{\text{down}}$ as a Frustrated Ising Model</h3>
+
+<p>
+The <strong>line graph</strong> $\mathcal{L}(G)$ of a graph $G$ is constructed by making each edge of $G$ a vertex of $\mathcal{L}(G)$, and connecting two vertices of $\mathcal{L}(G)$ whenever the corresponding edges of $G$ share a vertex. Caravelli et al. show that the spin ice Hamiltonian on $G$ is equivalent to a frustrated Ising model on $\mathcal{L}(G)$.
+</p>
+
+<p>
+The key identity connects $L_1^{\text{down}}$ to the line graph adjacency:
+</p>
+
+$$\begin{equation}
+\boxed{L_1^{\text{down}} = 2I - A_{\mathcal{L}(G)}}
+\label{eq:linegraph}
+\end{equation}$$
+
+<p>
+where $A_{\mathcal{L}(G)}$ is the <strong>weighted adjacency matrix</strong> of the directed line graph &mdash; a signed matrix with entries $\pm 1$ depending on the spin orientation. Specifically, $[A_{\mathcal{L}(G)}]_{\beta\beta'} = +1$ if edges $\beta, \beta'$ both enter or both leave their shared vertex (ferromagnetic coupling), and $-1$ if one enters and the other leaves (antiferromagnetic coupling).
+</p>
+
+<p>
+This means: the eigenvalues of $L_1^{\text{down}}$ are exactly $\lambda_k = 2 - \mu_k$ where $\{\mu_k\}$ are the eigenvalues of the signed line graph adjacency. Ground states of the spin ice ($\sigma \in \ker B_1$) correspond to ground states of the frustrated Ising model on $\mathcal{L}(G)$.
+</p>
+
+<h3>8.2 Universal Frustration: All Spin Ices with $d > 2$ Are Frustrated</h3>
+
+<p>
+Caravelli et al. prove a striking result: <strong>every vertex of degree $d > 2$ in $G$ generates a fully frustrated clique $K_d$ in the line graph dual.</strong> The $d$ edges incident to that vertex become $d$ vertices of $\mathcal{L}(G)$ forming a complete subgraph with $d(d-1)/2$ interactions, ALL of which are antiferromagnetic. Since $K_d$ with all-AF couplings is frustrated for $d \geq 3$ (every triangle has product of signs $= -1$), frustration is <em>intrinsic to vertex coordination</em>.
+</p>
+
+<div class="convention">
+<div class="label">Theorem (Caravelli et al. 2021, Remark 2.3)</div>
+The only spin ice whose ground state is <strong>non-degenerate</strong> is the one-dimensional Ising model (a path or cycle with all vertices having $d = 2$). Every other connected spin ice graph &mdash; including all 2D lattices &mdash; has a degenerate ground state manifold.
+</div>
+
+<p>
+This theorem has a direct TDL translation:
+</p>
+
+<ul>
+<li><strong>$d = 2$ everywhere</strong> (1D chain/ring): $\dim(\ker B_1) \leq 1$. At most one divergence-free mode. The only graph where edge-level oversmoothing protection is trivial.</li>
+<li><strong>Any $d > 2$</strong>: $\ker B_1$ is nontrivial AND the ice manifold is degenerate. Protection and degeneracy are <em>simultaneously guaranteed</em> by having vertices of degree $> 2$.</li>
+</ul>
+
+<p>
+For <strong>planar</strong> spin ices, Caravelli et al. further show (Remark 2.5) that frustration occurs <em>only at the vertex level</em> &mdash; cycles in the original graph $G$ correspond to unfrustrated loops in the line graph dual. Frustration on non-contractible cycles (e.g., winding modes on a torus) requires non-planar topology.
+</p>
+
+<h3>8.3 Ice Manifold Degeneracy and the Pauling Entropy</h3>
+
+<p>
+The <strong>Pauling entropy</strong> (entropy per vertex of the ice manifold) is:
+</p>
+
+$$\begin{equation}
+s(\mathcal{G}) = \frac{\ln \epsilon(\mathcal{G})}{N_v}
+\label{eq:pauling_entropy}
+\end{equation}$$
+
+<p>
+where $\epsilon(\mathcal{G}) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ is the number of Ising spin configurations satisfying the ice rule. This quantity measures the <strong>combinatorial density</strong> of discrete ice states within the continuous subspace $\ker(B_1)$.
+</p>
+
+<p>
+Crucially, $s(\mathcal{G})$ varies across lattice types <em>even when $\dim(\ker B_1)$ is the same</em>:
+</p>
+
+<table>
+<thead>
+<tr><th>Graph</th><th>$\bar{z}$</th><th>$\dim(\ker B_1)/N_v$</th><th>Pauling entropy $s$</th><th>Source</th></tr>
+</thead>
+<tbody>
+<tr><td>1D ring</td><td>2</td><td>$\to 0$</td><td>0 (only 2 states)</td><td>Remark 2.3</td></tr>
+<tr><td>Square lattice</td><td>4</td><td>1</td><td>$\approx 1.54$ (Lieb exact: $(4/3)^{3/2}$)</td><td>Table 1, Lieb [3]</td></tr>
+<tr><td>Triangular tiling</td><td>6</td><td>2</td><td>$\geq 2.33$ (Bethe lower bound)</td><td>Table 1</td></tr>
+<tr><td>Cubic lattice</td><td>6</td><td>2</td><td>$\approx 2.41$ (Bethe)</td><td>Table 1</td></tr>
+<tr><td>Complete graph $K_L$</td><td>$L-1$</td><td>$(L-2)/2$</td><td>$\sim \ln(2^{L+1}/\pi eL)$</td><td>McKay [73]</td></tr>
+</tbody>
+</table>
+
+<p>
+The Pauling entropy provides a <strong>new axis of comparison beyond $\beta_1$ and dim$(\ker B_1)$</strong>: two graphs with the same degree sequence have the same $\dim(\ker B_1)$, but they can have vastly different $s(\mathcal{G})$ depending on their cycle structure and frustration pattern. This is the quantity that distinguishes a structured frustrated lattice from a degree-matched random graph.
+</p>
+
+<h3>8.4 The Permanent Formula and Bethe Approximation</h3>
+
+<p>
+For even-degree graphs, Caravelli et al. establish an exact formula for the ice degeneracy in terms of a <strong>matrix permanent</strong>:
+</p>
+
+$$\begin{equation}
+\epsilon(\mathcal{G}) = \frac{\operatorname{perm}(A)}{\prod_{v \in V} (d_v/2)!}
+\label{eq:permanent}
+\end{equation}$$
+
+<p>
+where $A$ is the incidence matrix of a hypergraph constructed from the unsigned incidence matrix $|B_1|$ (each row of $|B_1|$ is duplicated $d_v/2$ times, creating a square matrix). Computing $\operatorname{perm}(A)$ is <strong>#P-complete</strong> &mdash; this is a provably hard counting problem. The ice degeneracy is not merely large; it is <em>computationally intractable to determine exactly</em> for general graphs.
+</p>
+
+<p>
+The <strong>Bethe permanent</strong> $B\text{perm}(A)$ provides a certified lower bound (Vontobel&ndash;Gurvits theorem):
+</p>
+
+$$\begin{equation}
+B\text{perm}(A) \leq \operatorname{perm}(A) \leq \sqrt{2}^{\,n}\; B\text{perm}(A)
+\label{eq:bethe_bound}
+\end{equation}$$
+
+<p>
+The Bethe permanent is computed via <strong>belief propagation</strong> (BP) &mdash; an iterative message-passing algorithm on the factor graph associated with the permanent calculation. The BP messages are:
+</p>
+
+$$
+m_{x_i}^{t+1}(y_j) = \sum_{x_i} \phi(x_i)\,\psi(x_i, y_j) \prod_{k \neq j} m_{y_k}^t(x_i)
+$$
+
+<p>
+which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
+</p>
+
+<h3>8.5 Message Passing: From Bethe Permanent to GNN Aggregation</h3>
+
+<p>
+The BP computation of ice degeneracy and GNN message passing share a deep structural parallel:
+</p>
+
+<table>
+<thead>
+<tr><th>Belief Propagation (Ice Degeneracy)</th><th>GNN Message Passing</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Messages $m_{i \to j}(x_j)$ between variable/factor nodes</td>
+  <td>Hidden states $\mathbf{h}_v^{(\ell)}$ aggregated from neighbors</td>
+</tr>
+<tr>
+  <td>Update: product of incoming messages</td>
+  <td>Update: sum/mean of neighbor features + nonlinearity</td>
+</tr>
+<tr>
+  <td>Bethe free energy $F_{\text{Bethe}}$ minimized at convergence</td>
+  <td>Loss function minimized during training</td>
+</tr>
+<tr>
+  <td>Exact on trees, approximate on loopy graphs</td>
+  <td>Perfect propagation on trees, oversmoothing on loopy graphs</td>
+</tr>
+<tr>
+  <td>Convergence $\to$ Bethe permanent $\to$ degeneracy bound</td>
+  <td>Convergence $\to$ learned representations $\to$ task predictions</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The parallel extends to the <strong>role of graph structure</strong>: on trees, BP converges to exact marginals and GNNs propagate information perfectly (but have $\dim(\ker B_1) = 0$ &mdash; no protection). On loopy graphs, BP becomes approximate and GNNs suffer oversmoothing, but the loops create $\ker(B_1) \neq \{0\}$ &mdash; a protected subspace.
+</p>
+
+<p>
+This suggests a precise interpretation of the Pauling entropy for GNNs:
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 8 &mdash; Three Levels of Edge-Signal Capacity</div>
+<p>
+The capacity of a graph $G$ for edge-level representation learning under $L_1^{\text{down}}$-smoothing has three distinct levels:
+</p>
+<ol>
+<li><strong>Topological capacity</strong> $= \dim(\ker B_1) = n_1 - n_0 + \beta_0$: the dimension of the protected subspace. Depends only on $n_1, n_0$ (equivalently, $\bar{z}$). Same for all graphs with the same degree sequence.</li>
+<li><strong>Combinatorial capacity</strong> $= \epsilon(\mathcal{G})$, the Pauling entropy: how many discrete $\pm 1$-valued configurations fit in $\ker(B_1)$. <em>Varies across graph structures</em> with the same degree sequence. Computable (bounded) via the Bethe permanent / belief propagation. This is the level at which frustrated lattices differ from degree-matched random controls.</li>
+<li><strong>Spectral capacity</strong> $=$ eigenvalue distribution of $L_1^{\text{down}}$: how fast non-protected modes decay. Spectral gaps, flat bands, and near-zero eigenvalue clustering provide "soft" protection beyond the exact kernel. Also structure-dependent.</li>
+</ol>
+</div>
+
+<h3>8.6 Gauge Freedom and Orientation Equivariance</h3>
+
+<p>
+Caravelli et al. emphasize the <strong>gauge freedom</strong> of the spin ice Ising model: the transformation $s_\beta \to \xi_\beta s_\beta$ (with $\xi_\beta = \pm 1$) simultaneously flips the spin and the incidence matrix entry $B_{v,\beta} \to B_{v,\beta}\,\xi_\beta$. The Hamiltonian $H = J\,\bm{\sigma}^T L_1^{\text{down}}\,\bm{\sigma}$ is <em>not</em> gauge-invariant (the couplings $Q_{\beta\beta'}$ change), but the <strong>frustration</strong> &mdash; the product of coupling signs around any loop &mdash; <em>is</em> gauge-invariant.
+</p>
+
+<p>
+In TDL terms, this gauge freedom is the <strong>orientation ambiguity</strong> of the simplicial complex: the choice of reference orientation for each edge is arbitrary, and physical/learnable quantities must not depend on it. Simplicial convolutional networks (Yang et al. 2022) handle this via orientation-equivariant architectures. The gauge invariance of frustration means that the <em>frustration pattern of the lattice is a true topological property</em>, independent of the arbitrary orientation convention &mdash; and is therefore a legitimate feature for the network to exploit.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 9: Worked Example -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec9">9. Worked Example &mdash; 3&times;3 Periodic Square Lattice</h2>
+
+<p>
+This section works through the <em>complete</em> computation on a $3 \times 3$ square lattice with periodic boundary conditions (a discrete torus). We compute every operator explicitly, verify all identities, and demonstrate each correspondence.
+</p>
+
+<h3>9.1 Lattice Setup</h3>
+
+<p>
+<strong>Vertices:</strong> 9 vertices arranged on a $3\times 3$ grid, labeled $v_0, \ldots, v_8$ in row-major order:
+</p>
+
+$$
+\begin{array}{ccccc}
+v_6 & - & v_7 & - & v_8 \\
+| & & | & & | \\
+v_3 & - & v_4 & - & v_5 \\
+| & & | & & | \\
+v_0 & - & v_1 & - & v_2
+\end{array}
+$$
+
+<p>
+with coordinates $v_k$ at position $(k \bmod 3,\; \lfloor k/3 \rfloor)$.
+</p>
+
+<p><strong>Periodic boundary conditions:</strong> The right edge wraps to the left ($v_2 \sim v_0$, $v_5 \sim v_3$, $v_8 \sim v_6$) and the top wraps to the bottom ($v_6 \sim v_0$, $v_7 \sim v_1$, $v_8 \sim v_2$). Topologically, this is a <strong>torus</strong> $T^2$.</p>
+
+<p><strong>Edges:</strong> 18 edges total &mdash; 9 horizontal and 9 vertical. Reference orientation: horizontal edges point right, vertical edges point up.</p>
+
+<table>
+<thead>
+<tr><th>Edge</th><th>Type</th><th>Tail</th><th>Head</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>$e_0$</td><td>H</td><td>$v_0$</td><td>$v_1$</td><td></td></tr>
+<tr><td>$e_1$</td><td>H</td><td>$v_1$</td><td>$v_2$</td><td></td></tr>
+<tr><td>$e_2$</td><td>H</td><td>$v_2$</td><td>$v_0$</td><td>Wrap-around</td></tr>
+<tr><td>$e_3$</td><td>H</td><td>$v_3$</td><td>$v_4$</td><td></td></tr>
+<tr><td>$e_4$</td><td>H</td><td>$v_4$</td><td>$v_5$</td><td></td></tr>
+<tr><td>$e_5$</td><td>H</td><td>$v_5$</td><td>$v_3$</td><td>Wrap-around</td></tr>
+<tr><td>$e_6$</td><td>H</td><td>$v_6$</td><td>$v_7$</td><td></td></tr>
+<tr><td>$e_7$</td><td>H</td><td>$v_7$</td><td>$v_8$</td><td></td></tr>
+<tr><td>$e_8$</td><td>H</td><td>$v_8$</td><td>$v_6$</td><td>Wrap-around</td></tr>
+<tr><td>$e_9$</td><td>V</td><td>$v_0$</td><td>$v_3$</td><td></td></tr>
+<tr><td>$e_{10}$</td><td>V</td><td>$v_1$</td><td>$v_4$</td><td></td></tr>
+<tr><td>$e_{11}$</td><td>V</td><td>$v_2$</td><td>$v_5$</td><td></td></tr>
+<tr><td>$e_{12}$</td><td>V</td><td>$v_3$</td><td>$v_6$</td><td></td></tr>
+<tr><td>$e_{13}$</td><td>V</td><td>$v_4$</td><td>$v_7$</td><td></td></tr>
+<tr><td>$e_{14}$</td><td>V</td><td>$v_5$</td><td>$v_8$</td><td></td></tr>
+<tr><td>$e_{15}$</td><td>V</td><td>$v_6$</td><td>$v_0$</td><td>Wrap-around</td></tr>
+<tr><td>$e_{16}$</td><td>V</td><td>$v_7$</td><td>$v_1$</td><td>Wrap-around</td></tr>
+<tr><td>$e_{17}$</td><td>V</td><td>$v_8$</td><td>$v_2$</td><td>Wrap-around</td></tr>
+</tbody>
+</table>
+
+<p><strong>Faces:</strong> 9 square faces. Each face is a unit square of the grid. We orient all faces counterclockwise.</p>
+
+<table>
+<thead>
+<tr><th>Face</th><th>Vertices (CCW)</th><th>Boundary edges (CCW)</th></tr>
+</thead>
+<tbody>
+<tr><td>$f_0$</td><td>$v_0, v_1, v_4, v_3$</td><td>$+e_0, +e_{10}, -e_3, -e_9$</td></tr>
+<tr><td>$f_1$</td><td>$v_1, v_2, v_5, v_4$</td><td>$+e_1, +e_{11}, -e_4, -e_{10}$</td></tr>
+<tr><td>$f_2$</td><td>$v_2, v_0, v_3, v_5$</td><td>$+e_2, +e_9, -e_5, -e_{11}$</td></tr>
+<tr><td>$f_3$</td><td>$v_3, v_4, v_7, v_6$</td><td>$+e_3, +e_{13}, -e_6, -e_{12}$</td></tr>
+<tr><td>$f_4$</td><td>$v_4, v_5, v_8, v_7$</td><td>$+e_4, +e_{14}, -e_7, -e_{13}$</td></tr>
+<tr><td>$f_5$</td><td>$v_5, v_3, v_6, v_8$</td><td>$+e_5, +e_{12}, -e_8, -e_{14}$</td></tr>
+<tr><td>$f_6$</td><td>$v_6, v_7, v_1, v_0$</td><td>$+e_6, +e_{16}, -e_0, -e_{15}$</td></tr>
+<tr><td>$f_7$</td><td>$v_7, v_8, v_2, v_1$</td><td>$+e_7, +e_{17}, -e_1, -e_{16}$</td></tr>
+<tr><td>$f_8$</td><td>$v_8, v_6, v_0, v_2$</td><td>$+e_8, +e_{15}, -e_2, -e_{17}$</td></tr>
+</tbody>
+</table>
+
+<p><strong>Counts:</strong> $n_0 = 9$, $n_1 = 18$, $n_2 = 9$.</p>
+
+<h3>9.2 The Incidence Matrix $B_1$ (9&times;18)</h3>
+
+<p>
+Using $\eqref{eq:B1def}$: $[B_1]_{v,e} = +1$ if $v$ is the head of $e$, $-1$ if the tail.
+</p>
+
+<div class="matrix-block">
+$$
+B_1 = \left(\begin{array}{rrrrrrrrrrrrrrrrrr}
+-1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & -1
+\end{array}\right)
+$$
+</div>
+
+<p>
+<strong>Structure.</strong> Each column has exactly one $+1$ (head) and one $-1$ (tail). Each row (vertex) has exactly four nonzero entries ($z_v = 4$): two $+1$'s (edges arriving) and two $-1$'s (edges leaving), in the reference orientation. Every column sums to zero.
+</p>
+
+<h3>9.3 The Incidence Matrix $B_2$ (18&times;9)</h3>
+
+<p>
+Using $\eqref{eq:B2def}$: for face $f$ with CCW boundary cycle, $[B_2]_{e,f} = +1$ if edge $e$ is traversed in its reference direction, $-1$ if against.
+</p>
+
+<p>For face $f_0$ with boundary $+e_0, +e_{10}, -e_3, -e_9$:</p>
+<ul>
+<li>$[B_2]_{e_0, f_0} = +1$ (edge traversed in reference direction)</li>
+<li>$[B_2]_{e_{10}, f_0} = +1$</li>
+<li>$[B_2]_{e_3, f_0} = -1$ (edge traversed against reference)</li>
+<li>$[B_2]_{e_9, f_0} = -1$</li>
+</ul>
+
+<div class="matrix-block">
+<p>Showing $B_2$ with rows = edges $e_0,\ldots,e_{17}$ and columns = faces $f_0,\ldots,f_8$:</p>
+$$
+B_2 = \left(\begin{array}{rrrrrrrrr}
+1 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 & -1 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & -1 \\
+-1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & -1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & -1 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & 0 & 1 \\
+-1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & -1 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 & -1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1
+\end{array}\right)
+$$
+</div>
+
+<p><strong>Structure.</strong> Each column (face) has exactly four nonzero entries (the four boundary edges of the square), two $+1$'s and two $-1$'s. Each row (edge) appears in exactly two faces (on a torus), so has exactly two nonzero entries that sum to zero.</p>
+
+<h3>9.4 Verify $B_1 B_2 = 0$</h3>
+
+<p>
+The chain complex property $B_1 B_2 = 0$ must hold. We verify on face $f_0$ (the first column of $B_2$):
+</p>
+$$
+B_1 \cdot (\text{col } f_0 \text{ of } B_2) = B_1 \begin{pmatrix} 1\\0\\0\\-1\\0\\0\\0\\0\\0\\-1\\1\\0\\0\\0\\0\\0\\0\\0 \end{pmatrix}
+$$
+<p>
+For each vertex row $v$, this sums $[B_1]_{v,e_0}(+1) + [B_1]_{v,e_3}(-1) + [B_1]_{v,e_9}(-1) + [B_1]_{v,e_{10}}(+1)$:
+</p>
+<ul>
+<li>$v_0$: $(-1)(1) + 0(-1) + (-1)(-1) + 0(1) = -1 + 1 = 0$ &check;</li>
+<li>$v_1$: $(1)(1) + 0(-1) + 0(-1) + (-1)(1) = 1 - 1 = 0$ &check;</li>
+<li>$v_3$: $0(1) + (-1)(-1) + (1)(-1) + 0(1) = 1 - 1 = 0$ &check;</li>
+<li>$v_4$: $0(1) + (1)(-1) + 0(-1) + (1)(1) = -1 + 1 = 0$ &check;</li>
+<li>All other vertices: no incident edges in $f_0$, so trivially 0.</li>
+</ul>
+<p>The same holds for all other columns of $B_2$, confirming $B_1 B_2 = 0$. &check;</p>
+
+<h3>9.5 Graph Laplacian $L_0 = B_1 B_1^T$</h3>
+
+<p>
+On the periodic $3\times 3$ square lattice, every vertex has degree $z = 4$. The graph Laplacian is:
+</p>
+
+$$
+L_0 = D - A = 4I_9 - A
+$$
+
+<p>
+where $A$ is the adjacency matrix of the torus graph. Since every vertex connects to exactly 4 neighbors (left, right, up, down with periodic wrapping), $L_0$ has a circulant-like structure. Its eigenvalues for the $3\times 3$ torus are given by:
+</p>
+
+$$
+\lambda_{jk} = 2(2 - \cos(2\pi j/3) - \cos(2\pi k/3)), \quad j,k \in \{0,1,2\}
+$$
+
+<p>giving eigenvalues (with multiplicities):</p>
+<ul>
+<li>$\lambda = 0$ (multiplicity 1): $j=k=0$</li>
+<li>$\lambda = 3$ (multiplicity 2): $j=0,k=1$ and $j=0,k=2$</li>
+<li>$\lambda = 3$ (multiplicity 2): $j=1,k=0$ and $j=2,k=0$</li>
+<li>$\lambda = 6$ (multiplicity 4): $j,k \in \{1,2\} \times \{1,2\}$</li>
+</ul>
+
+<p>So the spectrum of $L_0$ is: $\{0, 3, 3, 3, 3, 6, 6, 6, 6\}$. The spectral gap is $\lambda_1 = 3$.</p>
+
+<p>$\beta_0 = 1$ (one zero eigenvalue, graph is connected). &check;</p>
+
+<h3>9.6 Betti Numbers and Euler Characteristic</h3>
+
+<p>
+<strong>Expected Betti numbers</strong> for the torus $T^2$: $\beta_0 = 1$, $\beta_1 = 2$, $\beta_2 = 1$.
+</p>
+
+<p><strong>Euler characteristic check:</strong></p>
+$$
+\chi = n_0 - n_1 + n_2 = 9 - 18 + 9 = 0
+$$
+$$
+\chi = \beta_0 - \beta_1 + \beta_2 = 1 - 2 + 1 = 0 \;\checkmark
+$$
+
+<p><strong>Rank check:</strong></p>
+$$
+\beta_1 = n_1 - \rank(B_1) - \rank(B_2) = 18 - (9 - 1) - (9 - 1) = 18 - 8 - 8 = 2 \;\checkmark
+$$
+
+<p><strong>Ice manifold dimension:</strong></p>
+$$
+\dim(\ker B_1) = n_1 - \rank(B_1) = 18 - 8 = 10
+$$
+<p>which splits as $\rank(B_2) + \beta_1 = 8 + 2 = 10$. &check;</p>
+
+<h3>9.7 The Hodge 1-Laplacian and Its Spectrum</h3>
+
+<p>
+The full Hodge 1-Laplacian $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$ is $18 \times 18$. Rather than display the full matrix, we describe its spectral structure.
+</p>
+
+<p>
+For the periodic $3\times 3$ square lattice with all faces filled, the eigenvalues of $L_1$ can be computed analytically using Fourier analysis on the torus. The spectrum consists of:
+</p>
+
+<ul>
+<li><strong>2 zero eigenvalues</strong> ($\beta_1 = 2$): the harmonic subspace</li>
+<li><strong>8 eigenvalues from $L_1^{\text{down}}$</strong>: these come from the gradient subspace and match the nonzero eigenvalues of $L_0$ (since $L_1^{\text{down}}$ and $L_0$ share nonzero eigenvalues &mdash; the nonzero spectrum of $B_1^T B_1$ equals that of $B_1 B_1^T$)</li>
+<li><strong>8 eigenvalues from $L_1^{\text{up}}$</strong>: these come from the curl subspace and match the nonzero eigenvalues of $L_2 = B_2^T B_2$</li>
+</ul>
+
+<p>
+The eigenvalues of $L_1^{\text{down}} = B_1^T B_1$ acting on $\R^{18}$:
+</p>
+<ul>
+<li>$\lambda = 0$ with multiplicity 10 (the ice manifold = $\ker(B_1)$)</li>
+<li>$\lambda = 3$ with multiplicity 4</li>
+<li>$\lambda = 6$ with multiplicity 4</li>
+</ul>
+
+<p>The eigenvalues of $L_1^{\text{up}} = B_2 B_2^T$ acting on $\R^{18}$:</p>
+<ul>
+<li>$\lambda = 0$ with multiplicity 10 (the divergence subspace + harmonics = $\ker(B_2^T)$)</li>
+<li>$\lambda = 3$ with multiplicity 4</li>
+<li>$\lambda = 6$ with multiplicity 4</li>
+</ul>
+
+<p>The combined spectrum of $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$:</p>
+$$
+\text{spec}(L_1) = \{\underbrace{0, 0}_{\beta_1 = 2},\; \underbrace{3, 3, 3, 3, 3, 3, 3, 3}_{8},\; \underbrace{6, 6, 6, 6, 6, 6, 6, 6}_{8}\}
+$$
+
+<p>The spectral gap of $L_1$ is $\Delta_1 = 3$ (the smallest nonzero eigenvalue).</p>
+
+<h3>9.8 The Two Harmonic Modes</h3>
+
+<p>
+The two harmonic eigenvectors $\mathbf{h}_1, \mathbf{h}_2 \in \ker(L_1)$ correspond to the two independent non-contractible cycles on the torus:
+</p>
+
+<p><strong>Horizontal winding mode $\mathbf{h}_H$:</strong> uniform flow in the horizontal direction.</p>
+$$
+[\mathbf{h}_H]_e = \begin{cases} 1/3 & \text{if } e \text{ is horizontal} \\ 0 & \text{if } e \text{ is vertical} \end{cases}
+$$
+<p>(Normalized: $\|\mathbf{h}_H\| = \sqrt{9 \cdot (1/3)^2} = 1$.) This is a unit flow circulating around the horizontal direction of the torus. It represents a net "winding" of spin around the periodic horizontal boundary.</p>
+
+<p><strong>Vertical winding mode $\mathbf{h}_V$:</strong> uniform flow in the vertical direction.</p>
+$$
+[\mathbf{h}_V]_e = \begin{cases} 0 & \text{if } e \text{ is horizontal} \\ 1/3 & \text{if } e \text{ is vertical} \end{cases}
+$$
+
+<p><strong>Verification:</strong></p>
+<ul>
+<li>$B_1 \mathbf{h}_H = \mathbf{0}$: At each vertex, one horizontal edge enters and one leaves (due to periodicity), so net flow is 0. &check;</li>
+<li>$B_2^T \mathbf{h}_H = \mathbf{0}$: For each face, the horizontal edges on the top and bottom boundaries carry the same flow in the same direction, so their contributions to the face boundary cancel. More precisely, each face has one horizontal edge traversed forward ($+1/3$) and one backward ($-1/3$), and the vertical edges contribute 0. Sum = 0. &check;</li>
+<li>$L_1 \mathbf{h}_H = (B_1^T B_1 + B_2 B_2^T) \mathbf{h}_H = \mathbf{0}$ since both terms are zero. &check;</li>
+</ul>
+
+<p>These two modes are orthogonal and span $\ker(L_1)$. They are the topologically protected degrees of freedom. No sequence of local operations (plaquette flips) can change the winding numbers.</p>
+
+<h3>9.9 An Ice-Rule Configuration and Its Hodge Decomposition</h3>
+
+<p>
+Consider the "all-right, all-up" configuration: every spin aligns with the reference orientation.
+</p>
+$$
+\bm{\sigma}_0 = (\underbrace{1,1,1,1,1,1,1,1,1}_{\text{horizontal}},\;\underbrace{1,1,1,1,1,1,1,1,1}_{\text{vertical}})^T
+$$
+
+<p><strong>Check ice rule:</strong> $B_1 \bm{\sigma}_0 = ?$ At each vertex, two edges point in (one horizontal from left, one vertical from below) and two edges point out (one horizontal to right, one vertical upward). So $Q_v = 2 - 2 = 0$ for all $v$. Therefore $\bm{\sigma}_0 \in \ker(B_1)$ &mdash; it satisfies the ice rule. &check;</p>
+
+<p><strong>Hodge decomposition:</strong> Since $\bm{\sigma}_0 \in \ker(B_1)$, it has no gradient component. It decomposes as:</p>
+$$
+\bm{\sigma}_0 = \bm{\sigma}_{\text{curl}} + \bm{\sigma}_{\text{harm}}
+$$
+
+<p>The harmonic projection is:</p>
+$$
+\bm{\sigma}_{\text{harm}} = \langle \bm{\sigma}_0, \mathbf{h}_H \rangle \mathbf{h}_H + \langle \bm{\sigma}_0, \mathbf{h}_V \rangle \mathbf{h}_V
+$$
+
+<p>$\langle \bm{\sigma}_0, \mathbf{h}_H \rangle = 9 \cdot (1)(1/3) + 9 \cdot (1)(0) = 3$.</p>
+<p>$\langle \bm{\sigma}_0, \mathbf{h}_V \rangle = 9 \cdot (1)(0) + 9 \cdot (1)(1/3) = 3$.</p>
+
+<p>So $\bm{\sigma}_{\text{harm}} = 3\mathbf{h}_H + 3\mathbf{h}_V = (1,1,1,1,1,1,1,1,1,\;1,1,1,1,1,1,1,1,1)^T = \bm{\sigma}_0$.</p>
+
+<p>This means $\bm{\sigma}_{\text{curl}} = \mathbf{0}$! The "all-right, all-up" configuration is <em>purely harmonic</em>. Physically: it has nonzero winding number in both directions and no local curl structure. This makes sense &mdash; it is the most "globally coherent" ice configuration.</p>
+
+<h3>9.10 A Monopole Excitation</h3>
+
+<p>
+Starting from $\bm{\sigma}_0$, flip spin $e_0$ (the horizontal edge $v_0 \to v_1$): set $\sigma_{e_0} = -1$ (now pointing $v_1 \to v_0$). Call this $\bm{\sigma}_1$.
+</p>
+
+<p><strong>Charge computation:</strong></p>
+$$
+\mathbf{Q} = B_1 \bm{\sigma}_1 = B_1(\bm{\sigma}_0 - 2\mathbf{e}_0) = B_1 \bm{\sigma}_0 - 2 B_1 \mathbf{e}_0 = \mathbf{0} - 2 \cdot (\text{column 0 of } B_1)
+$$
+$$
+= -2 \begin{pmatrix} -1 \\ 1 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \end{pmatrix} = \begin{pmatrix} +2 \\ -2 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \end{pmatrix}
+$$
+
+<p>
+A <strong>monopole-antimonopole pair</strong>: $Q_{v_0} = +2$ (positive monopole, net inflow) and $Q_{v_1} = -2$ (negative monopole, net outflow) at adjacent vertices. All other vertices remain neutral. &check;
+</p>
+
+<p><strong>Energy:</strong></p>
+$$
+\mathcal{H}[\bm{\sigma}_1] = \frac{\epsilon}{2}\|\mathbf{Q}\|^2 = \frac{\epsilon}{2}(4 + 4) = 4\epsilon
+$$
+
+<p>Alternatively via the quadratic form: $\mathcal{H} = \frac{\epsilon}{2}\bm{\sigma}_1^T L_1^{\text{down}} \bm{\sigma}_1 = 4\epsilon$. The ice-rule configuration had $\mathcal{H} = 0$, so the monopole pair costs energy $4\epsilon$.</p>
+
+<h3>9.11 Verifying Nisoli's $S_{vv'}$ Matrix</h3>
+
+<p>
+For the all-right-all-up ice configuration $\bm{\sigma}_0$, we verify Key Result 1.
+</p>
+
+<p>Consider vertices $v_0$ and $v_1$ (connected by $e_0: v_0 \to v_1$, with $\sigma_{e_0} = +1$):</p>
+$$
+S_{v_0 v_1} = -[B_1]_{v_0, e_0} \cdot \sigma_{e_0} = -(-1)(+1) = +1
+$$
+<p>The spin points $v_0 \to v_1$, so $S_{v_0 v_1} = +1$ (outflow from $v_0$ toward $v_1$). &check;</p>
+
+<p>Consider $v_0$ and $v_3$ (connected by $e_9: v_0 \to v_3$, with $\sigma_{e_9} = +1$):</p>
+$$
+S_{v_0 v_3} = -[B_1]_{v_0, e_9} \cdot \sigma_{e_9} = -(-1)(+1) = +1 \;\checkmark
+$$
+
+<p>Consider $v_1$ and $v_0$ (same edge $e_0$, opposite direction):</p>
+$$
+S_{v_1 v_0} = -[B_1]_{v_1, e_0} \cdot \sigma_{e_0} = -(+1)(+1) = -1 = -S_{v_0 v_1} \;\checkmark
+$$
+
+<p>
+The complete $S$ matrix for this configuration has $S_{vv'} = +1$ for all neighbor pairs $(v, v')$ where $v'$ is to the right or above $v$ (following the spin direction), and $S_{vv'} = -1$ in the opposite direction.
+</p>
+
+<h3>9.12 Line Graph and $L_1^{\text{down}} = 2I - A_{L(G)}$</h3>
+
+<p>
+The <strong>line graph</strong> $L(G)$ of our $3\times 3$ torus has one vertex for each edge of $G$, so $|V(L(G))| = 18$. Two vertices of $L(G)$ are adjacent iff the corresponding edges of $G$ share a vertex. Since every vertex $v$ of $G$ has degree $z_v = 4$, it contributes a clique $K_4$ in $L(G)$ (all $\binom{4}{2} = 6$ pairs of its incident edges become adjacent). Total edges in $L(G)$: $\sum_v \binom{z_v}{2} = 9 \times 6 = 54$.
+</p>
+
+<p>
+By the line-graph dual identity (&sect;8.1), $L_1^{\text{down}} = B_1^T B_1 = 2I_{18} - A_{L(G)}$, so the adjacency matrix of $L(G)$ is:
+</p>
+$$
+A_{L(G)} = 2I_{18} - L_1^{\text{down}}
+$$
+
+<p><strong>Verification on a single edge.</strong> Consider edge $e_0$ (horizontal, $v_0 \to v_1$). Its incident vertices are $v_0$ and $v_1$. At $v_0$, the other incident edges are $e_2, e_9, e_{15}$. At $v_1$, the other incident edges are $e_1, e_{10}, e_{16}$. So $e_0$ is adjacent to 6 edges in $L(G)$: $\{e_1, e_2, e_9, e_{10}, e_{15}, e_{16}\}$.
+</p>
+
+<p>Now check $L_1^{\text{down}}$: the diagonal entry is $[L_1^{\text{down}}]_{e_0,e_0} = [B_1^T B_1]_{e_0,e_0}$. Column $e_0$ of $B_1$ is $(-1, 1, 0, 0, 0, 0, 0, 0, 0)^T$, so $[B_1^T B_1]_{e_0,e_0} = (-1)^2 + 1^2 = 2$. &check;</p>
+
+<p>For an adjacent edge, say $e_1$ ($v_1 \to v_2$): column $e_1$ of $B_1$ is $(0, -1, 1, 0, 0, 0, 0, 0, 0)^T$. So $[B_1^T B_1]_{e_0,e_1} = (-1)(0) + (1)(-1) + 0 = -1$. Then $[A_{L(G)}]_{e_0,e_1} = 2\delta_{01} - (-1) = 0 + 1 = 1$. &check;</p>
+
+<p>For a non-adjacent edge, say $e_4$ ($v_4 \to v_5$): column $e_4$ of $B_1$ has nonzeros only at rows $v_4$ and $v_5$, neither of which is $v_0$ or $v_1$. So $[B_1^T B_1]_{e_0,e_4} = 0$, and $[A_{L(G)}]_{e_0,e_4} = 0$. &check;</p>
+
+<p><strong>Frustration check.</strong> Each vertex $v$ with $z_v = 4$ contributes a $K_4$ clique in $L(G)$. $K_4$ contains triangles (odd cycles), so $L(G)$ is <strong>not bipartite</strong>. Since non-bipartiteness is the Ising frustration condition, every vertex with $z > 2$ generates frustration in the line graph. For our all-$z=4$ square torus, all 9 vertices contribute frustrated $K_4$ cliques, confirming the universal frustration theorem of &sect;8.2.</p>
+
+<h3>9.13 Ice Degeneracy and Pauling Entropy</h3>
+
+<p>
+How many binary ($\pm 1$) spin configurations $\bm{\sigma} \in \{+1,-1\}^{18}$ satisfy the ice rule $B_1 \bm{\sigma} = \mathbf{0}$ on our $3\times 3$ torus?
+</p>
+
+<p>
+We know $\dim(\ker B_1) = 10$, so the ice manifold is a 10-dimensional linear subspace of $\R^{18}$. But the <em>binary</em> ice configurations are the intersection $\ker(B_1) \cap \{+1,-1\}^{18}$, which is a combinatorial (not linear) object. Counting these is #P-complete in general (it reduces to the matrix permanent).
+</p>
+
+<p><strong>Pauling estimate.</strong> Using the Pauling approximation for a lattice with uniform coordination $z = 4$:</p>
+$$
+\varepsilon_{\text{Pauling}} = 2^{n_1} \prod_v \frac{\binom{z_v}{z_v/2}}{2^{z_v}} = 2^{18} \cdot \left(\frac{\binom{4}{2}}{2^4}\right)^9 = 262144 \cdot \left(\frac{6}{16}\right)^9
+$$
+$$
+= 262144 \cdot \left(\frac{3}{8}\right)^9 = 262144 \cdot \frac{19683}{134217728} \approx 38.4
+$$
+
+<p>The Pauling entropy per vertex:</p>
+$$
+s_{\text{Pauling}} = \frac{1}{N_v}\ln \varepsilon_{\text{Pauling}} = \frac{1}{9}\ln(38.4) \approx \frac{3.65}{9} \approx 0.405
+$$
+
+<p>
+This is close to but below the exact Lieb result for the infinite square lattice: $s_{\text{Lieb}} = \tfrac{3}{2}\ln(4/3) \approx 0.431$. The small discrepancy is due to finite-size effects on the $3\times 3$ torus.
+</p>
+
+<p><strong>The permanent formula.</strong> For a $z=4$ uniform lattice, Caravelli, Saccone &amp; Nisoli (2021) give:</p>
+$$
+\varepsilon(G) = \frac{\operatorname{perm}(A)}{\prod_v (z_v/2)!^2} = \frac{\operatorname{perm}(A)}{(2!)^{18}} = \frac{\operatorname{perm}(A)}{2^{18}}
+$$
+<p>
+where $A$ is the $9 \times 9$ adjacency matrix of our torus graph and the denominator uses $(z_v/2)! = 2! = 2$ at each of the 9 vertices, squared. Computing $\operatorname{perm}(A)$ exactly requires enumeration (or Ryser's formula), which we defer to the Stage 1 computational pipeline. The Bethe permanent provides a tractable lower bound (&sect;8.4).
+</p>
+
+<p><strong>Key observation for the lattice zoo.</strong> Two lattices with the <em>same</em> degree sequence and the same $\dim(\ker B_1)$ can have <em>very different</em> $\varepsilon(G)$ values because the permanent depends on the detailed graph structure (which edges connect which vertices), not just on the degree sequence. This is the combinatorial level of the three-level capacity framework (&sect;8, Key Result 8). The Stage 1 computational pipeline will compute these values numerically across the Morrison et al. lattice zoo.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 10 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec10">10. Master Correspondence Table</h2>
+
+<p>
+The following table summarizes all correspondences established in this document. Each row maps a concept between Nisoli's spin ice framework and TDL, with the section reference for the derivation.
+</p>
+
+<table>
+<thead>
+<tr>
+  <th style="width:5%">#</th>
+  <th style="width:25%" class="nisoli-label">Spin Ice (Nisoli 2020)</th>
+  <th style="width:30%" class="tdl-label">TDL / Simplicial Complex</th>
+  <th style="width:25%">Key Equation</th>
+  <th style="width:15%">Section</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td>Spin configuration $\{S_l\}$</td>
+  <td>1-cochain $\bm{\sigma} \in C^1(X;\R)$</td>
+  <td>$\sigma_e \in \{+1,-1\}$</td>
+  <td>&sect;2</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Antisymmetric matrix $S_{vv'}$</td>
+  <td>$\operatorname{skew}\!\big(|B_1|\,D_\sigma\,B_1^T\big)$</td>
+  <td>$S = \tfrac{1}{2}(|B_1| D_\sigma B_1^T - B_1 D_\sigma |B_1|^T)$</td>
+  <td>&sect;3</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Topological charge $Q_v$</td>
+  <td>Boundary applied to 1-cochain</td>
+  <td>$\mathbf{Q} = B_1 \bm{\sigma}$</td>
+  <td>&sect;4</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Ice rule $|Q_v| = z_v \bmod 2$</td>
+  <td>Divergence-free (even $z$) / affine coset (odd $z$)</td>
+  <td>$\bm{\sigma} \in \ker(B_1)$ or $\bm{\sigma}_0 + \ker(B_1)$</td>
+  <td>&sect;4, &sect;5</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Charge conservation $\sum_v Q_v = 0$</td>
+  <td>$\mathbf{1}^T B_1 = \mathbf{0}^T$</td>
+  <td>Columns of $B_1$ sum to zero</td>
+  <td>&sect;4</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Ice manifold $\mathcal{I}$</td>
+  <td>$\ker(B_1)$ (even $z$) or coset $\bm{\sigma}_0 + \ker(B_1)$ (odd $z$)</td>
+  <td>$\ker(B_1) = \im(B_2) \oplus \ker(L_1)$</td>
+  <td>&sect;5</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Local plaquette flips</td>
+  <td>Curl component $\im(B_2)$</td>
+  <td>$B_2 \mathbf{y}$: circulations around faces</td>
+  <td>&sect;5</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Topological winding modes</td>
+  <td>Harmonic subspace $\ker(L_1)$</td>
+  <td>$\dim = \beta_1$ (first Betti number)</td>
+  <td>&sect;5</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>Ground-state degeneracy</td>
+  <td>$\dim(\ker B_1) = n_1 - n_0 + \beta_0$</td>
+  <td>Splits: $\rank(B_2) + \beta_1$</td>
+  <td>&sect;5</td>
+</tr>
+<tr>
+  <td>10</td>
+  <td>Dumbbell Hamiltonian $\frac{\epsilon}{2}\sum_v Q_v^2$</td>
+  <td>Quadratic form in $L_1^{\text{down}}$</td>
+  <td>$\mathcal{H} = \frac{\epsilon}{2}\,\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$</td>
+  <td>&sect;6</td>
+</tr>
+<tr>
+  <td>11</td>
+  <td>Ground state ($E_{\min}$)</td>
+  <td>$\ker(L_1^{\text{down}}) = \ker(B_1)$</td>
+  <td>$E = 0$ (even $z$); $E = \frac{\epsilon}{2}\sum(z_v \bmod 2)$ (odd $z$)</td>
+  <td>&sect;6</td>
+</tr>
+<tr>
+  <td>12</td>
+  <td>Monopole excitation energy</td>
+  <td>Spectral gap of $L_1^{\text{down}}$</td>
+  <td>$E_{\min} \propto \lambda_{\min}(L_1^{\text{down}} |_{\im B_1^T})$</td>
+  <td>&sect;6</td>
+</tr>
+<tr>
+  <td>13</td>
+  <td>Discrete gradient $\nabla_{vv'}\varphi$</td>
+  <td>Coboundary $d^0 = B_1^T$</td>
+  <td>$(B_1^T \bm{\varphi})_e = \varphi_{\text{head}} - \varphi_{\text{tail}}$</td>
+  <td>&sect;7</td>
+</tr>
+<tr>
+  <td>14</td>
+  <td>Poisson equation on graph</td>
+  <td>$L_0 = B_1 B_1^T = D - A$</td>
+  <td>$L_0 \bm{\varphi} = \mathbf{q}$</td>
+  <td>&sect;7</td>
+</tr>
+<tr>
+  <td>15</td>
+  <td>Charge interaction kernel $L_0^{-1}$</td>
+  <td>Pseudoinverse $L_0^+$</td>
+  <td>$\langle q_v q_{v'}\rangle \propto [L_0^+]_{vv'}$</td>
+  <td>&sect;7</td>
+</tr>
+<tr>
+  <td>16</td>
+  <td>Screened Green operator $\hat{G}$</td>
+  <td>Resolvent operator on graph</td>
+  <td>$\hat{G} = (\hat{L}_0 + \xi^{-2})^{-1}$</td>
+  <td>&sect;7</td>
+</tr>
+<tr>
+  <td>17</td>
+  <td>Correlation length $\xi = \sqrt{\epsilon/T}$</td>
+  <td>Interaction range parameter</td>
+  <td>$\xi \to \infty$: Coulomb; $\xi \to 0$: local</td>
+  <td>&sect;7</td>
+</tr>
+<tr>
+  <td>18</td>
+  <td>Extensive degeneracy (frustrated lattice)</td>
+  <td>Large $\dim(\ker B_1)$ / topological channel capacity</td>
+  <td>$\dim(\ker B_1) = n_1 - n_0 + \beta_0$; protected fraction $= 1 - 2/\bar{z}$</td>
+  <td>&sect;5, &sect;8</td>
+</tr>
+<tr>
+  <td>19</td>
+  <td>Lower Hodge Laplacian $L_1^{\text{down}} = B_1^T B_1$</td>
+  <td>Kirchhoff matrix of line graph: $L_1^{\text{down}} = 2I - A_{L(G)}$</td>
+  <td>$[L_1^{\text{down}}]_{ee'} = \begin{cases} 2 & e = e' \\ -1 & e,e' \text{ share vertex} \\ 0 & \text{else} \end{cases}$</td>
+  <td>&sect;8.1</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td>Spin ice frustration (vertex rule violation)</td>
+  <td>Odd cliques in line graph $L(G)$</td>
+  <td>$z_v > 2 \Rightarrow K_{z_v}$ in $L(G)$ is frustrated (odd cycles)</td>
+  <td>&sect;8.2</td>
+</tr>
+<tr>
+  <td>21</td>
+  <td>Universal frustration theorem</td>
+  <td>Non-bipartiteness of $L(G)$</td>
+  <td>All ASI with $z_v > 2$ are frustrated; only $z=2$ (1D chain) is non-degenerate</td>
+  <td>&sect;8.2</td>
+</tr>
+<tr>
+  <td>22</td>
+  <td>Ice degeneracy $\varepsilon(G)$</td>
+  <td>$|\ker(B_1) \cap \{+1,-1\}^{n_1}|$</td>
+  <td>$\varepsilon(G) = \operatorname{perm}(A)/\prod_v (z_v/2)!^2$ (even $z$)</td>
+  <td>&sect;8.4</td>
+</tr>
+<tr>
+  <td>23</td>
+  <td>Pauling entropy $s(G) = \ln\varepsilon / N_v$</td>
+  <td>Combinatorial density of ice states in $\ker(B_1)$</td>
+  <td>$s_{\text{square}} \approx 0.431$; $s_{\text{kagome}} \approx 0.502$; varies by lattice</td>
+  <td>&sect;8.3</td>
+</tr>
+<tr>
+  <td>24</td>
+  <td>Bethe permanent (BP fixed point)</td>
+  <td>GNN message-passing equilibrium</td>
+  <td>$\operatorname{Bethe\text{-}perm}(A) \leq \operatorname{perm}(A)$ (Gurvits bound)</td>
+  <td>&sect;8.4, &sect;8.5</td>
+</tr>
+<tr>
+  <td>25</td>
+  <td>Belief propagation on ice graph</td>
+  <td>GNN message passing on line graph</td>
+  <td>$m_{e \to v}^{(t+1)} = f\!\big(\sum_{e' \in \mathcal{N}(e)\setminus v} m_{e' \to v}^{(t)}\big)$</td>
+  <td>&sect;8.5</td>
+</tr>
+<tr>
+  <td>26</td>
+  <td>Gauge freedom (reference orientation choice)</td>
+  <td>Orientation equivariance in SCNNs</td>
+  <td>$B_1 \mapsto B_1 G$, $\bm{\sigma} \mapsto G^{-1}\bm{\sigma}$, with $G = \text{diag}(\pm1)$</td>
+  <td>&sect;8.6</td>
+</tr>
+<tr>
+  <td>27</td>
+  <td>Three levels of ice-manifold structure</td>
+  <td>Three levels of edge-signal capacity</td>
+  <td>Topological ($\dim \ker B_1$), Combinatorial ($\varepsilon(G)$), Spectral ($\{\lambda_i(L_1^{\text{down}})\}$)</td>
+  <td>&sect;8 (Key Result)</td>
+</tr>
+</tbody>
+</table>
+
+<hr style="margin-top:3rem;">
+
+<p style="text-align:center; color:#888; font-size:0.9rem; margin-top:1.5rem;">
+<strong>References:</strong>
+Hajij et al. (2023), <em>Topological Deep Learning: Going Beyond Graph Data</em>, arXiv:2206.00606. &bull;
+Nisoli (2020), <em>Topological order of the Rys F-model and its breakdown in realistic square spin ice</em>, New J. Phys. 22, 103052. &bull;
+Morrison, Nelson &amp; Nisoli (2013), <em>Unhappy vertices in artificial spin ice</em>, New J. Phys. 15, 045009. &bull;
+Yang, Isufi &amp; Leus (2022), <em>Simplicial Convolutional Neural Networks</em>, IEEE TSP. &bull;
+Caravelli, Saccone &amp; Nisoli (2021), <em>On the Degeneracy of Spin Ice Graphs, and its Estimate via the Bethe Permanent</em>.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 11: Summary -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec11">11. Summary of Established Results</h2>
+
+<p>
+This document has established a precise, equation-level bridge between two independently developed mathematical frameworks. We summarize the key results and their status.
+</p>
+
+<h3>11.1 Rigorous Identities</h3>
+
+<p>The following correspondences are <strong>exact mathematical identities</strong>, proven in full with worked examples:</p>
+
+<ol>
+<li><strong>Spin configuration = 1-cochain</strong> (&sect;2&ndash;3). Nisoli's antisymmetric matrix $S_{vv'}$ is reconstructable from the incidence matrix $B_1$ and the spin vector $\bm{\sigma}$ via an explicit formula (Key Result 1).</li>
+
+<li><strong>Topological charge = boundary operator</strong> (&sect;4). The charge vector $\mathbf{Q} = B_1 \bm{\sigma}$ is the image of the 1-cochain under the boundary map. Charge conservation follows from $\mathbf{1}^T B_1 = \mathbf{0}$ (Key Result 2).</li>
+
+<li><strong>Ice manifold = $\ker(B_1)$</strong> (&sect;5). The ice rule $Q_v = 0$ at every vertex is $\bm{\sigma} \in \ker(B_1)$, which decomposes via Hodge as $\ker(B_1) = \im(B_2) \oplus \ker(L_1)$. The dimension $\dim(\ker B_1) = n_1 - n_0 + \beta_0$ is independent of face-filling; the split into curl and harmonic components depends on $B_2$ (Key Result 3).</li>
+
+<li><strong>Hamiltonian = quadratic form in $L_1^{\text{down}}$</strong> (&sect;6). The dumbbell Hamiltonian $\mathcal{H} = (\epsilon/2)\|\mathbf{Q}\|^2 = (\epsilon/2)\,\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$. Ground states are $\ker(L_1^{\text{down}}) = \ker(B_1)$. The monopole energy gap is the spectral gap of $L_1^{\text{down}}$ (Key Result 4).</li>
+
+<li><strong>Entropic field theory = discrete Poisson</strong> (&sect;7). Nisoli's gradient, Poisson equation, and screened Green operator map exactly to $B_1^T$, $L_0 = B_1 B_1^T$, and the resolvent $(L_0 + \xi^{-2})^{-1}$ (Key Result 5).</li>
+
+<li><strong>Line graph dual</strong> (&sect;8). $L_1^{\text{down}} = 2I - A_{L(G)}$: the lower Hodge Laplacian is the Kirchhoff matrix of the line graph. All vertices with $z > 2$ generate frustrated cliques, and only the 1D chain is non-degenerate (Key Result 8).</li>
+</ol>
+
+<h3>11.2 Quantitative Framework</h3>
+
+<p>The three-level capacity framework (&sect;8, Key Result 8) organizes the structure of the ice manifold $\ker(B_1) \cap \{+1,-1\}^{n_1}$ into three independently measurable quantities:</p>
+
+<table>
+<thead>
+<tr><th>Level</th><th>Quantity</th><th>What It Measures</th><th>Varies Across Lattice Zoo?</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Topological</strong></td>
+  <td>$\dim(\ker B_1) = n_1 - n_0 + \beta_0$</td>
+  <td>Linear dimension of the ice manifold</td>
+  <td>Depends only on $\bar{z}$; same for degree-matched graphs</td>
+</tr>
+<tr>
+  <td><strong>Combinatorial</strong></td>
+  <td>$\varepsilon(G) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$</td>
+  <td>Number of binary ice states (Pauling entropy)</td>
+  <td><strong>Yes</strong> &mdash; depends on graph structure, not just degrees</td>
+</tr>
+<tr>
+  <td><strong>Spectral</strong></td>
+  <td>Eigenvalue distribution of $L_1^{\text{down}}$</td>
+  <td>Energy landscape of excitations above ice manifold</td>
+  <td><strong>Yes</strong> &mdash; flat bands, gaps, and density of states vary</td>
+</tr>
+</tbody>
+</table>
+
+<h3>11.3 Open Questions</h3>
+
+<p>
+The mathematical bridge established here is <em>structural</em>: it translates objects and identities from one framework to the other without loss. What remains open is the question of <strong>utility</strong>: how should this bridge be exploited to design better graph neural network architectures?
+</p>
+
+<p>Several directions are under investigation:</p>
+<ul>
+<li><strong>Does higher Pauling entropy (combinatorial level) confer advantages in GNNs?</strong> Two graphs with identical degree sequences and identical $\dim(\ker B_1)$ can have very different $\varepsilon(G)$. Does this matter for learning?</li>
+<li><strong>Does spectral structure (flat bands, small gaps) affect feature propagation?</strong> The eigenvalue distribution of $L_1^{\text{down}}$ governs both the energy landscape of spin ice excitations and the filtering behavior of Hodge-domain neural networks. Frustrated lattices tend to have richer spectral structure (more flat bands, smaller gaps). The computational catalog from Stage 1 will quantify this across the Morrison et al. lattice zoo.</li>
+<li><strong>Is the BP &harr; GNN message-passing parallel actionable?</strong> The structural similarity between belief propagation on the ice graph and message passing on the line graph (&sect;8.5) suggests that physical insights about convergence, fixed points, and approximation quality might transfer. This remains speculative.</li>
+<li><strong>What role does orientation equivariance play?</strong> The gauge freedom of spin ice (&sect;8.6) maps to orientation equivariance in simplicial neural networks. Architectures that respect this symmetry may generalize better on edge-signal tasks.</li>
+</ul>
+
+<p>
+The immediate next step is the <strong>Stage 1 computational pipeline</strong>: construct all eight lattice types from the Morrison et al. zoo as simplicial complexes, compute their full spectral catalogs ($L_0$, $L_1^{\text{down}}$, $L_1$, Betti numbers, harmonic bases), and tabulate the quantities in the framework above. Numerical results may suggest which direction is most promising.
+</p>
+
+<hr style="margin-top:3rem;">
+
+<h2 id="appendixA">Appendix A: Beyond Open and Periodic &mdash; Other Boundary Topologies</h2>
+
+<p class="footnote" id="fn1"><sup><a href="#fnref1">1</a></sup>
+Open (disk) and periodic (torus) are not the only options. The boundary topology of a rectangular lattice patch is determined by how its four sides are identified, and several topologically distinct choices exist beyond these two extremes. We sketch them here for completeness; this project restricts attention to open and periodic BCs.
+</p>
+
+<p>
+For a rectangular patch with sides top/bottom and left/right, the possible identifications and their topological consequences (with all faces filled) are:
+</p>
+
+<table>
+<thead>
+<tr><th>Identification</th><th>Surface</th><th>Orientable?</th><th>$\beta_1$</th></tr>
+</thead>
+<tbody>
+<tr><td>None</td><td>Disk</td><td>Yes</td><td>0</td></tr>
+<tr><td>One pair, same orientation</td><td>Cylinder</td><td>Yes</td><td>1</td></tr>
+<tr><td>One pair, reversed orientation</td><td>M&ouml;bius strip</td><td>No</td><td>1</td></tr>
+<tr><td>Both pairs, both same orientation</td><td>Torus $T^2$</td><td>Yes</td><td>2</td></tr>
+<tr><td>Both pairs, one reversed</td><td>Klein bottle $K$</td><td>No</td><td>1</td></tr>
+</tbody>
+</table>
+
+<p>
+The <strong>cylinder</strong> (periodic in one direction, open in the other) is the intermediate case most likely to appear in practice &mdash; it gives exactly $\beta_1 = 1$, a single protected winding mode.
+</p>
+
+<p>
+<strong>Non-orientable surfaces</strong> (M&ouml;bius strip, Klein bottle) introduce a subtlety: the signed incidence matrix $B_1$ cannot be globally consistent around a non-orientable cycle. Over $\mathbb{R}$ (where our spectral computations live), the torsion in $H_1(K;\, \mathbb{Z}) = \mathbb{Z} \oplus \mathbb{Z}/2\mathbb{Z}$ is invisible &mdash; the Laplacian eigenvalue computation sees only the free part, giving $\beta_1 = 1$ for the Klein bottle rather than the "1.5" one might naively expect.
+</p>
+
+<p>
+<strong>Higher-genus surfaces.</strong> More provocatively, one can embed a lattice on a closed orientable surface of genus $g$, which gives $\beta_1 = 2g$ with all faces filled. The torus is genus 1; a genus-2 surface would give $\beta_1 = 4$, genus 3 gives $\beta_1 = 6$, and so on. This requires a $4g$-gon fundamental domain with appropriate edge identifications rather than simple rectangular wrapping, making it computationally more involved but in principle straightforward. Genus would then serve as a third independent knob for tuning topological channel capacity, alongside lattice type and face-filling strategy.
+</p>
+
+<p>
+<em>We do not pursue these extensions in the present document, but they represent a natural direction for future work if finer control over $\beta_1$ is needed beyond what the lattice zoo and face-filling strategy provide.</em>
+</p>
+
+</body>
+</html>

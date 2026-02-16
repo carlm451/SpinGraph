@@ -1,0 +1,26 @@
+{
+  "lattice_name": "shakti",
+  "size_label": "S",
+  "nx": 10,
+  "ny": 10,
+  "boundary": "open",
+  "face_strategy": "all",
+  "n_vertices": 1600,
+  "n_edges": 2321,
+  "n_faces": 722,
+  "coordination_dist": {
+    "1": 21,
+    "2": 477,
+    "3": 741,
+    "4": 361
+  },
+  "beta_0": 1,
+  "beta_1": 0,
+  "beta_2": 0,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.003989274881544558,
+  "L1_spectral_gap": 0.003989274881544191,
+  "compute_time_seconds": 21.766069889068604
+}

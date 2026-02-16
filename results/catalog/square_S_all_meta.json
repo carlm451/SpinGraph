@@ -1,0 +1,41 @@
+{
+  "lattice_name": "square",
+  "size_label": "S",
+  "nx": 10,
+  "ny": 10,
+  "boundary": "periodic",
+  "face_strategy": "all",
+  "n_vertices": 100,
+  "n_edges": 200,
+  "n_faces": 100,
+  "coordination_dist": {
+    "4": 100
+  },
+  "beta_0": 1,
+  "beta_1": 2,
+  "beta_2": 1,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.3819660112501001,
+  "L1_spectral_gap": 0.3819660112501031,
+  "compute_time_seconds": 0.02510690689086914,
+  "harmonic_validation": [
+    {
+      "mode_index": 0,
+      "divergence_norm": 1.5700637091690002e-15,
+      "curl_norm": 2.0574251907428294e-15,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    },
+    {
+      "mode_index": 1,
+      "divergence_norm": 1.4426058885420637e-15,
+      "curl_norm": 1.2415773546128906e-15,
+      "divergence_free": true,
+      "curl_free": true,
+      "is_harmonic": true
+    }
+  ]
+}

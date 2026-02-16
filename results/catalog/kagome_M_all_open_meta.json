@@ -1,0 +1,25 @@
+{
+  "lattice_name": "kagome",
+  "size_label": "M",
+  "nx": 20,
+  "ny": 20,
+  "boundary": "open",
+  "face_strategy": "all",
+  "n_vertices": 1200,
+  "n_edges": 2321,
+  "n_faces": 1122,
+  "coordination_dist": {
+    "2": 41,
+    "3": 76,
+    "4": 1083
+  },
+  "beta_0": 1,
+  "beta_1": 0,
+  "beta_2": 0,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.0044164722442783565,
+  "L1_spectral_gap": 0.0044164722442791805,
+  "compute_time_seconds": 8.823105096817017
+}

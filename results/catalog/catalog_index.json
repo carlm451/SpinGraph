@@ -1,0 +1,942 @@
+[
+  {
+    "lattice_name": "kagome",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 7500,
+    "n_edges": 15000,
+    "n_faces": 7500
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 7500,
+    "n_edges": 14801,
+    "n_faces": 7302
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 7501,
+    "n_vertices": 7500,
+    "n_edges": 15000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 7302,
+    "n_vertices": 7500,
+    "n_edges": 14801,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 1200,
+    "n_edges": 2400,
+    "n_faces": 1200
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 1200,
+    "n_edges": 2321,
+    "n_faces": 1122
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 1201,
+    "n_vertices": 1200,
+    "n_edges": 2400,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 1122,
+    "n_vertices": 1200,
+    "n_edges": 2321,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 300,
+    "n_edges": 600,
+    "n_faces": 300
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 300,
+    "n_edges": 561,
+    "n_faces": 262
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 301,
+    "n_vertices": 300,
+    "n_edges": 600,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 262,
+    "n_vertices": 300,
+    "n_edges": 561,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 30000,
+    "n_edges": 60000,
+    "n_faces": 30000
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 30000,
+    "n_edges": 59601,
+    "n_faces": 29602
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XL",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 30001,
+    "n_vertices": 30000,
+    "n_edges": 60000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 48,
+    "n_edges": 96,
+    "n_faces": 48
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 48,
+    "n_edges": 81,
+    "n_faces": 34
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 49,
+    "n_vertices": 48,
+    "n_edges": 96,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 34,
+    "n_vertices": 48,
+    "n_edges": 81,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 15000,
+    "n_edges": 22500,
+    "n_faces": 7500
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 15000,
+    "n_edges": 22350,
+    "n_faces": 7351
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 7501,
+    "n_vertices": 15000,
+    "n_edges": 22500,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 7351,
+    "n_vertices": 15000,
+    "n_edges": 22350,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 2400,
+    "n_edges": 3600,
+    "n_faces": 1200
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 2400,
+    "n_edges": 3540,
+    "n_faces": 1141
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 1201,
+    "n_vertices": 2400,
+    "n_edges": 3600,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 1141,
+    "n_vertices": 2400,
+    "n_edges": 3540,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 600,
+    "n_edges": 900,
+    "n_faces": 300
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 600,
+    "n_edges": 870,
+    "n_faces": 271
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 301,
+    "n_vertices": 600,
+    "n_edges": 900,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 271,
+    "n_vertices": 600,
+    "n_edges": 870,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 60000,
+    "n_edges": 90000,
+    "n_faces": 30000
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 60000,
+    "n_edges": 89700,
+    "n_faces": 29701
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XL",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 30001,
+    "n_vertices": 60000,
+    "n_edges": 90000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 96,
+    "n_edges": 144,
+    "n_faces": 48
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 96,
+    "n_edges": 132,
+    "n_faces": 37
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 49,
+    "n_vertices": 96,
+    "n_edges": 144,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "santa_fe",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 37,
+    "n_vertices": 96,
+    "n_edges": 132,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 40000,
+    "n_edges": 60000,
+    "n_faces": 20000
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 40000,
+    "n_edges": 59601,
+    "n_faces": 19602
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 20001,
+    "n_vertices": 40000,
+    "n_edges": 60000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 19602,
+    "n_vertices": 40000,
+    "n_edges": 59601,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 6400,
+    "n_edges": 9600,
+    "n_faces": 3200
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 6400,
+    "n_edges": 9441,
+    "n_faces": 3042
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 3201,
+    "n_vertices": 6400,
+    "n_edges": 9600,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 3042,
+    "n_vertices": 6400,
+    "n_edges": 9441,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 1600,
+    "n_edges": 2400,
+    "n_faces": 800
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 1600,
+    "n_edges": 2321,
+    "n_faces": 722
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 801,
+    "n_vertices": 1600,
+    "n_edges": 2400,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 722,
+    "n_vertices": 1600,
+    "n_edges": 2321,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 160000,
+    "n_edges": 240000,
+    "n_faces": 80000
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 160000,
+    "n_edges": 239201,
+    "n_faces": 79202
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XL",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 80001,
+    "n_vertices": 160000,
+    "n_edges": 240000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 256,
+    "n_edges": 384,
+    "n_faces": 128
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 256,
+    "n_edges": 353,
+    "n_faces": 98
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 129,
+    "n_vertices": 256,
+    "n_edges": 384,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "shakti",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 98,
+    "n_vertices": 256,
+    "n_edges": 353,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 2500,
+    "n_edges": 5000,
+    "n_faces": 2500
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 2500,
+    "n_edges": 4900,
+    "n_faces": 2401
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 2501,
+    "n_vertices": 2500,
+    "n_edges": 5000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 2401,
+    "n_vertices": 2500,
+    "n_edges": 4900,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 400,
+    "n_edges": 800,
+    "n_faces": 400
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 400,
+    "n_edges": 760,
+    "n_faces": 361
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 401,
+    "n_vertices": 400,
+    "n_edges": 800,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 361,
+    "n_vertices": 400,
+    "n_edges": 760,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 100,
+    "n_edges": 200,
+    "n_faces": 100
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 100,
+    "n_edges": 180,
+    "n_faces": 81
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 101,
+    "n_vertices": 100,
+    "n_edges": 200,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 81,
+    "n_vertices": 100,
+    "n_edges": 180,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 10000,
+    "n_edges": 20000,
+    "n_faces": 10000
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 10000,
+    "n_edges": 19800,
+    "n_faces": 9801
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XL",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 10001,
+    "n_vertices": 10000,
+    "n_edges": 20000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 16,
+    "n_edges": 32,
+    "n_faces": 16
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 16,
+    "n_edges": 24,
+    "n_faces": 9
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 17,
+    "n_vertices": 16,
+    "n_edges": 32,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "square",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 9,
+    "n_vertices": 16,
+    "n_edges": 24,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 20000,
+    "n_edges": 30000,
+    "n_faces": 10000
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "L",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 20000,
+    "n_edges": 29750,
+    "n_faces": 9751
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 10001,
+    "n_vertices": 20000,
+    "n_edges": 30000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "L",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 9751,
+    "n_vertices": 20000,
+    "n_edges": 29750,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 3200,
+    "n_edges": 4800,
+    "n_faces": 1600
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "M",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 3200,
+    "n_edges": 4700,
+    "n_faces": 1501
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 1601,
+    "n_vertices": 3200,
+    "n_edges": 4800,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "M",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 1501,
+    "n_vertices": 3200,
+    "n_edges": 4700,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 800,
+    "n_edges": 1200,
+    "n_faces": 400
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "S",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 800,
+    "n_edges": 1150,
+    "n_faces": 351
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 401,
+    "n_vertices": 800,
+    "n_edges": 1200,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "S",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 351,
+    "n_vertices": 800,
+    "n_edges": 1150,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 80000,
+    "n_edges": 120000,
+    "n_faces": 40000
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "XL",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 80000,
+    "n_edges": 119500,
+    "n_faces": 39501
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "periodic",
+    "beta_1": 2,
+    "n_vertices": 128,
+    "n_edges": 192,
+    "n_faces": 64
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "XS",
+    "face_strategy": "all",
+    "boundary": "open",
+    "beta_1": 0,
+    "n_vertices": 128,
+    "n_edges": 172,
+    "n_faces": 45
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "periodic",
+    "beta_1": 65,
+    "n_vertices": 128,
+    "n_edges": 192,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "tetris",
+    "size_label": "XS",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 45,
+    "n_vertices": 128,
+    "n_edges": 172,
+    "n_faces": 0
+  }
+]

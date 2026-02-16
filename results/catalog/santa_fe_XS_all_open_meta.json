@@ -1,0 +1,25 @@
+{
+  "lattice_name": "santa_fe",
+  "size_label": "XS",
+  "nx": 4,
+  "ny": 4,
+  "boundary": "open",
+  "face_strategy": "all",
+  "n_vertices": 96,
+  "n_edges": 132,
+  "n_faces": 37,
+  "coordination_dist": {
+    "2": 42,
+    "3": 36,
+    "4": 18
+  },
+  "beta_0": 1,
+  "beta_1": 0,
+  "beta_2": 0,
+  "euler_consistent": true,
+  "method_agreement": true,
+  "chain_complex_valid": true,
+  "L0_spectral_gap": 0.047146432459745785,
+  "L1_spectral_gap": 0.04714643245974542,
+  "compute_time_seconds": 0.0077860355377197266
+}

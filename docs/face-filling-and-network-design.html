@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Face-Filling and Neural Network Design: The Protection–Expressivity Tradeoff</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams',
+    tagSide: 'right',
+    macros: {
+      bm: ['{\\boldsymbol{#1}}', 1],
+      R: '{\\mathbb{R}}',
+      Z: '{\\mathbb{Z}}',
+      ker: '\\operatorname{ker}',
+      im: '\\operatorname{im}',
+      rank: '\\operatorname{rank}',
+      diag: '\\operatorname{diag}',
+      tr: '\\operatorname{tr}',
+      div: '\\operatorname{div}',
+      grad: '\\operatorname{grad}',
+      curl: '\\operatorname{curl}'
+    }
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root {
+  --protect-color: #1a5276;
+  --express-color: #922b21;
+  --highlight-bg: #fef9e7;
+  --key-result-bg: #eaf2f8;
+  --example-bg: #f4f6f6;
+  --border-color: #d5d8dc;
+  --link-color: #2471a3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.7;
+  color: #2c3e50;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  background: #fdfdfd;
+}
+h1 {
+  font-size: 1.9rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+.authors {
+  text-align: center;
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+h2 {
+  font-size: 1.45rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--border-color);
+  color: #1a1a2e;
+}
+h3 {
+  font-size: 1.15rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  color: #2c3e50;
+}
+h4 {
+  font-size: 1.0rem;
+  margin-top: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+}
+p { margin-bottom: 1rem; }
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Table of Contents */
+nav#toc {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+nav#toc h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.8rem;
+  border: none;
+  padding: 0;
+}
+nav#toc ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+nav#toc li {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+/* Key result boxes */
+.key-result {
+  background: var(--key-result-bg);
+  border-left: 4px solid var(--protect-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.key-result .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--protect-color);
+  margin-bottom: 0.4rem;
+}
+
+/* Proposition/Theorem boxes */
+.proposition {
+  background: #f5eef8;
+  border-left: 4px solid #7d3c98;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.proposition .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7d3c98;
+  margin-bottom: 0.4rem;
+}
+
+/* Proof boxes */
+.proof {
+  background: #fafafa;
+  border-left: 3px solid #aaa;
+  padding: 0.8rem 1.2rem;
+  margin: 0.8rem 0 1.2rem;
+  font-size: 0.95rem;
+}
+.proof .label {
+  font-weight: bold;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+.proof .qed {
+  text-align: right;
+  color: #888;
+}
+
+/* Worked examples */
+.example {
+  background: var(--example-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.example .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #27ae60;
+  margin-bottom: 0.4rem;
+}
+
+/* Convention/warning boxes */
+.convention {
+  background: #fdf2e9;
+  border-left: 4px solid #e67e22;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.convention .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #e67e22;
+  margin-bottom: 0.3rem;
+}
+
+/* Remark boxes */
+.remark {
+  background: #eafaf1;
+  border-left: 4px solid #27ae60;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.remark .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #27ae60;
+  margin-bottom: 0.3rem;
+}
+
+/* Conjecture boxes */
+.conjecture {
+  background: #fef9e7;
+  border-left: 4px solid #d4ac0d;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.conjecture .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #d4ac0d;
+  margin-bottom: 0.4rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #f2f3f4;
+  font-weight: bold;
+  color: #2c3e50;
+}
+tr:nth-child(even) { background: #fafafa; }
+.protect-label { color: var(--protect-color); font-weight: bold; }
+.express-label { color: var(--express-color); font-weight: bold; }
+
+/* Diagram containers */
+.diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.diagram svg {
+  max-width: 100%;
+}
+.diagram .caption {
+  font-size: 0.88rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* Equation references */
+.eqref { color: var(--link-color); }
+
+/* Tradeoff color coding */
+.prot { color: var(--protect-color); font-weight: bold; }
+.expr { color: var(--express-color); font-weight: bold; }
+
+/* Print styles */
+@media print {
+  body { max-width: 100%; padding: 1rem; }
+  .key-result, .example, .convention, .proposition, .conjecture { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<h1>Face-Filling and Neural Network Design:<br>The Protection&ndash;Expressivity Tradeoff</h1>
+<p class="subtitle">Why choosing which cycles to fill determines what your network can learn &mdash; and what it cannot lose</p>
+<p class="authors">SpinIceTDL Project &mdash; Reference Document v1.0</p>
+
+<nav id="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#sec1">The Question</a></li>
+  <li><a href="#sec2">Vertex-Level GCNs and $L_0$ &mdash; Where Faces Don't Matter</a></li>
+  <li><a href="#sec3">Moving to Edge Features &mdash; Where the Hodge Structure Emerges</a></li>
+  <li><a href="#sec4">The Protection&ndash;Expressivity Tradeoff</a></li>
+  <li><a href="#sec5">The No-Faces Degeneracy</a></li>
+  <li><a href="#sec6">The All-Faces Case</a></li>
+  <li><a href="#sec7">Partial Face-Filling &mdash; The Design Space</a></li>
+  <li><a href="#sec8">Face-Filling for ASI Lattices vs. Standard TDL</a></li>
+  <li><a href="#sec9">Quantitative Analysis with Catalog Data</a></li>
+  <li><a href="#sec10">Implications for Oversmoothing Experiments (Stages 2&ndash;4)</a></li>
+  <li><a href="#sec11">Open Questions</a></li>
+</ol>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec1">1. The Question</h2>
+
+<p>
+Our spectral catalog computes the first Betti number $\beta_1$ for every lattice in the zoo under two face-filling strategies: <strong>all faces filled</strong> ($\beta_1 = 2$ on the torus) and <strong>no faces filled</strong> ($\beta_1 = n_1 - n_0 + 1$, extensive in system size). The gap between these two values is enormous &mdash; for the shakti lattice at size M, it is the difference between 2 protected dimensions and 3,201. The companion <a href="tdl-spinice-correspondence.html">correspondence document</a> establishes the mathematical identity between these Betti numbers and the dimension of the harmonic subspace of the Hodge 1-Laplacian.
+</p>
+
+<p>
+But a conceptual gap remains: <strong>why should a neural network care whether we fill faces or not?</strong> The face-filling strategy is a preprocessing choice &mdash; it defines the simplicial complex before any network is built. Yet our entire thesis rests on the claim that $\beta_1$ controls oversmoothing resistance. If face-filling is "just a knob for $\beta_1$," the connection to practical network design feels ad hoc. What <em>actually changes</em> in the network's computational structure when we fill faces?
+</p>
+
+<p>
+This document answers that question. The answer turns out to be deeper than "$\beta_1$ gets bigger": face-filling controls a fundamental <span class="prot">protection</span>&ndash;<span class="expr">expressivity</span> tradeoff in the network architecture. Filling faces gives the network more independent filter branches (more spectral control over edge signals) but fewer protected dimensions. Removing faces collapses an entire filter branch but makes its output immune to smoothing. The choice is not about maximizing $\beta_1$ &mdash; it is about choosing the right balance between what the network <em>can distinguish</em> and what it <em>cannot lose</em>.
+</p>
+
+<div class="key-result">
+<div class="label">Central Claim</div>
+<p>
+Face-filling is not a mathematical bookkeeping choice. It determines the <strong>architecture</strong> of the edge-level convolutional filter: how many independent filter branches exist, which subspaces each branch can address, and which subspace is topologically protected from deep smoothing. The protection&ndash;expressivity tradeoff is a fundamental design axis for simplicial neural networks on ASI lattices.
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec2">2. Vertex-Level GCNs and $L_0$ &mdash; Where Faces Don't Matter</h2>
+
+<h3>2.1 The Standard GCN Layer</h3>
+
+<p>
+A standard Graph Convolutional Network (Kipf &amp; Welling 2017) operates on <strong>vertex features</strong>. Given a feature matrix $H^{(\ell)} \in \R^{n_0 \times d}$ at layer $\ell$, the GCN update rule is:
+</p>
+
+$$
+H^{(\ell+1)} = \sigma\!\left(\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2} \, H^{(\ell)} \, W^{(\ell)}\right) \tag{1}
+$$
+
+<p>
+where $\tilde{A} = A + I$ is the adjacency matrix with self-loops, $\tilde{D}$ is the corresponding degree matrix, $W^{(\ell)}$ is a learnable weight matrix, and $\sigma$ is a nonlinearity. The key observation (Li, Han &amp; Wu 2018) is that the aggregation step $\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}$ is a <strong>Laplacian smoothing operator</strong>:
+</p>
+
+$$
+\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2} = I - \tilde{L}_{\text{sym}} \tag{2}
+$$
+
+<p>
+where $\tilde{L}_{\text{sym}}$ is the symmetric normalized Laplacian of the augmented graph. The unnormalized version uses $L_0 = B_1 B_1^T$ &mdash; the <strong>graph Laplacian</strong>, which depends only on the graph structure through the vertex-edge incidence matrix $B_1$.
+</p>
+
+<h3>2.2 Why Faces Are Irrelevant Here</h3>
+
+<p>
+The graph Laplacian $L_0 = B_1 B_1^T$ is an $n_0 \times n_0$ matrix constructed entirely from the incidence matrix $B_1$ (shape $n_0 \times n_1$). The boundary operator $B_2$ and the face set play no role whatsoever. Whether we fill all faces, no faces, or any subset: $L_0$ is identical, the normalized adjacency is identical, and the GCN dynamics are identical.
+</p>
+
+<div class="key-result">
+<div class="label">Key Observation</div>
+<p>
+For vertex-level GCNs operating through $L_0$, the face-filling strategy is completely irrelevant. The spectral gap $\Delta_0$ of $L_0$, which controls the oversmoothing rate, depends only on the graph $(V, E)$.
+</p>
+</div>
+
+<h3>2.3 Oversmoothing via $L_0$</h3>
+
+<p>
+The eigendecomposition $L_0 = U \Lambda U^T$ with eigenvalues $0 = \lambda_1 \leq \lambda_2 \leq \cdots \leq \lambda_{n_0}$ gives the smoothing dynamics. Let $f \in \R^{n_0}$ be a vertex signal with expansion $f = \sum_i c_i u_i$ in the eigenbasis. Applying the GCN aggregation $k$ times:
+</p>
+
+$$
+(I - L_0)^k f = \sum_{i=1}^{n_0} c_i (1 - \lambda_i)^k \, u_i \tag{3}
+$$
+
+<p>
+For $0 < \lambda_i \leq 2$, the coefficient $(1 - \lambda_i)^k \to 0$ as $k \to \infty$. Only the $\beta_0 = 1$ dimensional null space (the constant vector) survives. The rate of decay is controlled by the <strong>spectral gap</strong> $\Delta_0 = \lambda_2$: larger gap means faster smoothing.
+</p>
+
+<p>
+Our catalog data shows the spectral gap scales as $\Delta_0 \sim c^*/L^2$ where $L$ is the linear system size. The dimensionless stiffness $c^*$ varies across lattice types &mdash; from $c^* \approx 1.0$ for the square lattice to smaller values for the mixed-coordination lattices &mdash; but in all cases, the asymptotic smoothing rate depends only on the graph topology through $L_0$. No Hodge decomposition, no role for faces.
+</p>
+
+<h3>2.4 What Vertex-Level Tests Measure</h3>
+
+<p>
+Our Stages 2&ndash;3 experiments propagate features through GCN operators on $L_0$ and measure oversmoothing rates. These tests probe whether the <em>graph topology itself</em> &mdash; the coordination mix, frustration structure, and loop statistics of ASI lattices &mdash; affects vertex-level smoothing dynamics compared to matched random graph controls. The question these stages answer is: <em>do frustrated lattices smooth more slowly than unfrustrated graphs with the same degree sequence?</em> Face-filling does not enter.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec3">3. Moving to Edge Features &mdash; Where the Hodge Structure Emerges</h2>
+
+<h3>3.1 Why Edge Features?</h3>
+
+<p>
+In artificial spin ice, the fundamental degrees of freedom are <strong>spins on edges</strong>. Each edge carries a binary variable $\sigma_e \in \{+1, -1\}$ indicating which direction the spin points along the edge's reference orientation. A spin configuration is a 1-cochain $\bm{\sigma} \in \{+1,-1\}^{n_1}$ &mdash; a vector-valued signal on the edge set. The vertex charge $Q_v = (B_1 \bm{\sigma})_v$ is the divergence of this edge signal.
+</p>
+
+<p>
+More broadly, edge-valued data arises naturally in many domains: flow rates in networks, forces along structural members, traffic on road segments, electric currents in circuits. These are inherently <em>oriented</em> quantities &mdash; they have a sign determined by direction along the edge. Processing such data with vertex-level GCNs requires projecting edge signals onto vertices, discarding the oriented structure. Edge-level neural networks preserve this structure.
+</p>
+
+<h3>3.2 The Hodge 1-Laplacian and Its Decomposition</h3>
+
+<p>
+Edge-level message passing uses the <strong>Hodge 1-Laplacian</strong>:
+</p>
+
+$$
+L_1 = \underbrace{B_1^T B_1}_{L_1^{\text{down}}} + \underbrace{B_2 B_2^T}_{L_1^{\text{up}}} \tag{4}
+$$
+
+<p>
+This is a sum of two independent, symmetric positive semi-definite operators:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>$L_1^{\text{down}} = B_1^T B_1$ (shape $n_1 \times n_1$): the <strong>lower edge Laplacian</strong>, constructed from the vertex-edge incidence. It captures message passing through shared vertices: edge $\to$ vertex $\to$ edge. This operator depends <em>only on the graph</em>.</li>
+<li>$L_1^{\text{up}} = B_2 B_2^T$ (shape $n_1 \times n_1$): the <strong>upper edge Laplacian</strong>, constructed from the edge-face incidence. It captures message passing through shared faces: edge $\to$ face $\to$ edge. This operator depends <em>entirely on the face set</em>.</li>
+</ul>
+
+<p>
+Now $B_2$ enters. Now faces matter. The edge signal space $\R^{n_1}$ decomposes into three orthogonal subspaces via the <strong>Hodge decomposition</strong> (see <a href="tdl-spinice-correspondence.html">&sect;5 of the correspondence document</a> for the full proof):
+</p>
+
+$$
+\R^{n_1} = \underbrace{\im(B_1^T)}_{\text{gradient}} \;\oplus\; \underbrace{\im(B_2)}_{\text{curl}} \;\oplus\; \underbrace{\ker(L_1)}_{\text{harmonic}} \tag{5}
+$$
+
+<p>
+Each subspace has a clear interpretation:
+</p>
+
+<table>
+<thead>
+<tr><th>Subspace</th><th>Definition</th><th>Dimension</th><th>Interpretation</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Gradient</strong></td>
+  <td>$\im(B_1^T)$</td>
+  <td>$n_0 - \beta_0 = n_0 - 1$</td>
+  <td>Edge signals that are gradients of vertex potentials: $f = B_1^T \phi$ for some $\phi \in \R^{n_0}$</td>
+</tr>
+<tr>
+  <td><strong>Curl</strong></td>
+  <td>$\im(B_2)$</td>
+  <td>$n_2 - \beta_2$</td>
+  <td>Edge signals that are boundaries of face signals: $f = B_2 \psi$ for some $\psi \in \R^{n_2}$</td>
+</tr>
+<tr>
+  <td><strong>Harmonic</strong></td>
+  <td>$\ker(L_1)$</td>
+  <td>$\beta_1$</td>
+  <td>Edge signals in the kernel of $L_1$: both divergence-free ($B_1 f = 0$) and curl-free ($B_2^T f = 0$)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The dimensions satisfy $\beta_1 = n_1 - (n_0 - 1) - (n_2 - \beta_2)$, which rearranges to the Euler characteristic $\beta_0 - \beta_1 + \beta_2 = n_0 - n_1 + n_2$.
+</p>
+
+<h3>3.3 The SCNN Convolutional Filter</h3>
+
+<p>
+The Simplicial Convolutional Neural Network (Yang, Isufi &amp; Leus 2022) defines the most general polynomial filter on edge signals:
+</p>
+
+$$
+H = h_0 \cdot I + \sum_{\ell=1}^{K_d} \alpha_\ell \left(L_1^{\text{down}}\right)^\ell + \sum_{\ell=1}^{K_u} \beta_\ell \left(L_1^{\text{up}}\right)^\ell \tag{6}
+$$
+
+<p>
+This filter has <strong>three independent families of coefficients</strong>:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>$h_0$</strong> (scalar): a global identity coefficient applied uniformly</li>
+<li><strong>$\{\alpha_\ell\}_{\ell=1}^{K_d}$</strong>: coefficients of the lower (gradient) filter bank</li>
+<li><strong>$\{\beta_\ell\}_{\ell=1}^{K_u}$</strong>: coefficients of the upper (curl) filter bank</li>
+</ul>
+
+<p>
+The reason this decomposition works is that $L_1^{\text{down}}$ and $L_1^{\text{up}}$ act on <em>different</em> subspaces. On the gradient subspace $\im(B_1^T)$, only $L_1^{\text{down}}$ has nonzero eigenvalues; $L_1^{\text{up}}$ restricted to this subspace is zero (since $B_2^T B_1^T = (B_1 B_2)^T = 0$ by the chain complex property). Similarly, on the curl subspace $\im(B_2)$, only $L_1^{\text{up}}$ has nonzero eigenvalues.
+</p>
+
+<h3>3.4 Message-Passing Interpretation</h3>
+
+<p>
+The two Laplacian terms have concrete message-passing semantics:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>$L_1^{\text{down}} f = B_1^T(B_1 f)$: compute the divergence $B_1 f$ at each vertex (sum of signed edge signals), then broadcast the result back to edges. This is <strong>vertex-mediated</strong> message passing: edges communicate through their shared vertices.</li>
+<li>$L_1^{\text{up}} f = B_2(B_2^T f)$: compute the circulation $B_2^T f$ around each face (signed sum of edge signals around the boundary), then broadcast back to edges. This is <strong>face-mediated</strong> message passing: edges communicate through their shared faces.</li>
+</ul>
+
+<p>
+These two channels are fundamentally different: the lower channel detects <em>sources and sinks</em> (vertex divergence), while the upper channel detects <em>vortices</em> (face circulation). A network that has both channels can distinguish gradient patterns from rotational patterns. A network with only the lower channel cannot.
+</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec4">4. The Protection&ndash;Expressivity Tradeoff</h2>
+
+<h3>4.1 What the Filter Does to Each Subspace</h3>
+
+<p>
+Consider the action of the SCNN filter $H$ (Eq.&nbsp;6) on an edge signal $f = f_{\text{grad}} + f_{\text{curl}} + f_{\text{harm}}$ decomposed via the Hodge decomposition. Since $L_1^{\text{down}}$ and $L_1^{\text{up}}$ act on orthogonal subspaces:
+</p>
+
+$$
+H f = \underbrace{\left(h_0 \cdot I + \sum_\ell \alpha_\ell (L_1^{\text{down}})^\ell\right) f_{\text{grad}}}_{\text{filtered by } \{h_0, \alpha_\ell\}} + \underbrace{\left(h_0 \cdot I + \sum_\ell \beta_\ell (L_1^{\text{up}})^\ell\right) f_{\text{curl}}}_{\text{filtered by } \{h_0, \beta_\ell\}} + \underbrace{h_0 \cdot f_{\text{harm}}}_{\text{scaled by } h_0} \tag{7}
+$$
+
+<p>
+The three subspace components are filtered <strong>independently</strong>:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>The gradient component sees a polynomial in the eigenvalues of $L_1^{\text{down}}$, with coefficients $h_0, \alpha_1, \ldots, \alpha_{K_d}$. The network can shape a frequency response over the gradient spectrum.</li>
+<li>The curl component sees a polynomial in the eigenvalues of $L_1^{\text{up}}$, with coefficients $h_0, \beta_1, \ldots, \beta_{K_u}$. The network can shape an <em>independent</em> frequency response over the curl spectrum.</li>
+<li>The harmonic component is simply multiplied by $h_0$. No spectral shaping is possible &mdash; there is only one parameter for the entire harmonic subspace.</li>
+</ul>
+
+<p>
+The harmonic subspace sits in $\ker(L_1)$, so all powers $(L_1^{\text{down}})^\ell$ and $(L_1^{\text{up}})^\ell$ vanish on it. The <em>only</em> thing the filter can do to harmonic signals is scale them by $h_0$. This is the topological protection mechanism: if $h_0 \neq 0$, harmonic signals pass through unchanged in direction, merely scaled, regardless of filter depth or the number of layers.
+</p>
+
+<h3>4.2 The Central Proposition</h3>
+
+<div class="proposition">
+<div class="label">Proposition 1 (Dimension Decomposition under Face-Filling)</div>
+<p>
+Let $G = (V, E)$ be a connected graph on a torus ($\beta_0 = 1$) with face set $F$, and let $B_1$, $B_2$ be the associated boundary operators. The edge signal space $\R^{n_1}$ decomposes as:
+</p>
+$$
+n_1 = \underbrace{(n_0 - 1)}_{\dim(\text{gradient})} + \underbrace{(n_2 - \beta_2)}_{\dim(\text{curl})} + \underbrace{\beta_1}_{\dim(\text{harmonic})}
+$$
+<p>where:</p>
+<ol style="margin-top: 0.5rem;">
+<li>The <strong>gradient dimension</strong> $n_0 - 1$ is fixed by the graph. It is independent of face-filling.</li>
+<li>The <strong>curl dimension</strong> $\rank(B_2) = n_2 - \beta_2$ increases with each face added.</li>
+<li>The <strong>harmonic dimension</strong> $\beta_1$ decreases with each face added.</li>
+<li>The <strong>sum</strong> of curl and harmonic dimensions is fixed: $\dim(\ker B_1) = n_1 - n_0 + 1$, independent of face-filling.</li>
+</ol>
+<p>
+Face-filling redistributes dimensions between the curl subspace (where the network has independent spectral control via $\{\beta_\ell\}$) and the harmonic subspace (which is topologically protected but spectrally opaque to the filter).
+</p>
+</div>
+
+<div class="proof">
+<div class="label">Proof.</div>
+<p>
+The gradient dimension is $\rank(B_1) = n_0 - \beta_0 = n_0 - 1$ by the rank-nullity theorem applied to $B_1$ (the null space of $B_1^T$ has dimension $\beta_0 = 1$ for a connected graph, so $\rank(B_1) = \rank(B_1^T) = n_0 - 1$). This depends only on $B_1$, hence only on the graph.
+</p>
+<p>
+The curl dimension is $\rank(B_2) = n_2 - \dim(\ker B_2) = n_2 - \beta_2$ by rank-nullity on $B_2$.
+</p>
+<p>
+The Hodge decomposition gives $n_1 = \rank(B_1) + \rank(B_2) + \beta_1$, so $\beta_1 = n_1 - (n_0 - 1) - (n_2 - \beta_2)$.
+</p>
+<p>
+For the fixed-sum claim: $\ker(B_1) = \im(B_2) \oplus \ker(L_1)$ (this is part of the Hodge decomposition restricted to the divergence-free subspace, since both curl and harmonic signals satisfy $B_1 f = 0$). Therefore $\dim(\ker B_1) = \rank(B_2) + \beta_1 = n_1 - (n_0 - 1) = n_1 - n_0 + 1$, independent of $B_2$.
+</p>
+<p class="qed">$\square$</p>
+</div>
+
+<h3>4.3 The Tradeoff</h3>
+
+<p>
+Proposition 1 makes precise the protection&ndash;expressivity tradeoff:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Quantity</th>
+  <th>More Faces (larger $n_2$)</th>
+  <th>Fewer Faces (smaller $n_2$)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><span class="expr">Curl dimension</span> (expressivity)</td>
+  <td>Larger &mdash; more dimensions with independent spectral control</td>
+  <td>Smaller &mdash; fewer dimensions the network can selectively filter</td>
+</tr>
+<tr>
+  <td><span class="prot">Harmonic dimension</span> (protection)</td>
+  <td>Smaller &mdash; fewer dimensions survive deep smoothing</td>
+  <td>Larger &mdash; more dimensions are topologically immune</td>
+</tr>
+<tr>
+  <td>Gradient dimension</td>
+  <td colspan="2" style="text-align:center;">Fixed at $n_0 - 1$ regardless of face-filling</td>
+</tr>
+<tr>
+  <td>Total filterable dims (gradient + curl)</td>
+  <td>Larger &mdash; network has finer spectral resolution</td>
+  <td>Smaller &mdash; coarser spectral resolution</td>
+</tr>
+<tr>
+  <td>Filter branches in SCNN</td>
+  <td><strong>3</strong> independent: $\{h_0\}$, $\{\alpha_\ell\}$, $\{\beta_\ell\}$</td>
+  <td><strong>2</strong> only: $\{h_0\}$, $\{\alpha_\ell\}$ (curl branch is dead)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The tradeoff is <em>not</em> between performance and robustness in some vague sense. It is a precise structural property of the SCNN filter: each face we add converts one dimension from the "topologically protected but spectrally opaque" harmonic subspace into the "spectrally controllable but vulnerable to deep smoothing" curl subspace. The total divergence-free subspace $\ker(B_1)$ is invariant.
+</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec5">5. The No-Faces Degeneracy</h2>
+
+<h3>5.1 What Happens When $B_2 = 0$</h3>
+
+<p>
+When no faces are filled ($n_2 = 0$), the boundary operator $B_2$ is the zero map (an $n_1 \times 0$ matrix). Consequently:
+</p>
+
+$$
+L_1^{\text{up}} = B_2 B_2^T = 0 \tag{8}
+$$
+
+<p>
+The full Hodge 1-Laplacian reduces to:
+</p>
+
+$$
+L_1 = L_1^{\text{down}} = B_1^T B_1 \tag{9}
+$$
+
+<p>
+This is the <strong>edge Laplacian of the line graph</strong>. The curl subspace is empty ($\im(B_2) = \{0\}$), and the Hodge decomposition collapses to:
+</p>
+
+$$
+\R^{n_1} = \im(B_1^T) \oplus \ker(B_1) \tag{10}
+$$
+
+<p>
+The entire divergence-free subspace $\ker(B_1)$ becomes the harmonic subspace:
+</p>
+
+$$
+\beta_1^{\text{(no faces)}} = \dim(\ker B_1) = n_1 - n_0 + 1 \tag{11}
+$$
+
+<h3>5.2 The SCNN Filter Degenerates</h3>
+
+<p>
+With $L_1^{\text{up}} = 0$, the SCNN filter (Eq.&nbsp;6) becomes:
+</p>
+
+$$
+H = h_0 \cdot I + \sum_{\ell=1}^{K_d} \alpha_\ell (L_1^{\text{down}})^\ell \tag{12}
+$$
+
+<p>
+All the $\beta_\ell$ coefficients are multiplied by zero. The curl filter branch is <strong>dead</strong>. The network has only two operational branches:
+</p>
+
+<ol style="margin-bottom: 1rem;">
+<li>The $\{\alpha_\ell\}$ branch, which shapes the frequency response over the gradient subspace's eigenvalues.</li>
+<li>The scalar $h_0$, which uniformly scales the entire harmonic subspace.</li>
+</ol>
+
+<div class="key-result">
+<div class="label">The Degeneracy</div>
+<p>
+With no faces, the network cannot distinguish between a <strong>local plaquette circulation</strong> (an edge signal circulating around a single square face) and a <strong>global winding mode</strong> (an edge signal winding around the entire torus). Both are divergence-free, both sit in $\ker(B_1)$, and the filter treats them identically &mdash; multiplying by the same scalar $h_0$.
+</p>
+</div>
+
+<p>
+In the all-faces case, these two signals would be separated: the plaquette circulation would be in $\im(B_2)$ (it is $B_2 e_f$ for the face $f$ it winds around), and the winding mode would be in $\ker(L_1)$ (it is not the boundary of any face). The network could apply different polynomial filters to each. Without faces, this distinction is lost.
+</p>
+
+<h3>5.3 Concrete Consequences</h3>
+
+<p>
+Consider the shakti lattice at size M (20&times;20 unit cells, periodic boundary conditions):
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>$n_1 = 9{,}600$ edges, $n_0 = 6{,}400$ vertices</li>
+<li>With no faces: $\beta_1 = 3{,}201$ (33.3% of edge signals are harmonic)</li>
+<li>The SCNN filter has spectral control over only $n_0 - 1 = 6{,}399$ gradient dimensions</li>
+<li>The remaining $3{,}201$ dimensions are all multiplied by the same scalar $h_0$</li>
+</ul>
+
+<p>
+A third of the edge signal space is spectrally "dark" to the filter. The network can learn to scale this block up or down, but it cannot shape the frequency response <em>within</em> it. Any information encoded in the relative magnitudes of different harmonic modes is invisible to the filter.
+</p>
+
+<div class="remark">
+<div class="label">Remark (Protection vs. Resolution)</div>
+<p>
+Maximum protection comes at the cost of minimum spectral resolution. The 3,201 harmonic dimensions are all immune to oversmoothing, but the network treats them as a single, undifferentiated block. This is the "no-faces degeneracy": the information is perfectly preserved but cannot be selectively processed.
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec6">6. The All-Faces Case</h2>
+
+<h3>6.1 Full Hodge Structure</h3>
+
+<p>
+When all minimal faces are filled, $B_2$ has $n_2$ columns and $L_1^{\text{up}}$ is a rich, structured operator. The Hodge decomposition is fully realized with all three subspaces nontrivially populated:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Gradient:</strong> $\dim = n_0 - 1$ (unchanged)</li>
+<li><strong>Curl:</strong> $\dim = n_2 - \beta_2$ (large; this is the bulk of $\ker(B_1)$)</li>
+<li><strong>Harmonic:</strong> $\dim = \beta_1$ (small; typically 2 on a torus, 0 on a disk)</li>
+</ul>
+
+<p>
+For our ASI lattices on a torus, Euler's formula gives $n_0 - n_1 + n_2 = \chi(\text{torus}) = 0$, i.e., $n_2 = n_1 - n_0$. With $\beta_0 = 1$, $\beta_2 = 1$ (the torus has one global 2-cycle), the dimensions are:
+</p>
+
+$$
+\begin{aligned}
+\text{gradient:} & \quad n_0 - 1 \\
+\text{curl:} & \quad n_2 - 1 = n_1 - n_0 - 1 \\
+\text{harmonic:} & \quad \beta_1 = 2
+\end{aligned} \tag{13}
+$$
+
+<p>
+The two harmonic dimensions correspond to the two fundamental winding modes of the torus (horizontal and vertical winding).
+</p>
+
+<h3>6.2 Full Three-Branch Expressivity</h3>
+
+<p>
+The SCNN filter now has all three branches active:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>$\{\alpha_\ell\}$: shapes the frequency response over gradient eigenvalues. The network can learn to suppress or amplify specific gradient frequencies.</li>
+<li>$\{\beta_\ell\}$: shapes the frequency response over curl eigenvalues. The network can independently control how it processes rotational patterns at different spatial scales.</li>
+<li>$h_0$: scales the two harmonic modes uniformly.</li>
+</ul>
+
+<div class="example">
+<div class="label">Example (Gradient vs. Curl Discrimination)</div>
+<p>
+Suppose the task requires distinguishing between an edge signal that is a gradient of a vertex potential (e.g., an electric field from point charges) and an edge signal that is a vortex pattern (e.g., a circulating current). With all faces filled:
+</p>
+<ul>
+<li>The gradient signal lies in $\im(B_1^T)$, affected only by $\{\alpha_\ell\}$</li>
+<li>The vortex signal lies in $\im(B_2)$, affected only by $\{\beta_\ell\}$</li>
+<li>The network can learn $\alpha_\ell \to 0$ (suppress gradient) and $\beta_\ell \to 1$ (preserve curl), or vice versa</li>
+</ul>
+<p>
+With no faces, both signals might end up in $\ker(B_1)$ (since the vortex is divergence-free), and the filter applies the same $h_0$ to both. The discrimination is lost.
+</p>
+</div>
+
+<h3>6.3 The Depth Vulnerability</h3>
+
+<p>
+The cost of full expressivity is minimal protection. With $\beta_1 = 2$, only 2 out of $n_1$ edge signal dimensions survive deep smoothing. For the shakti lattice at size M:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>$n_1 = 9{,}600$ total edge dimensions</li>
+<li>$\beta_1 = 2$ protected dimensions (0.02% of the edge space)</li>
+<li>$n_2 - 1 = 3{,}199$ curl dimensions: filterable but smoothed away at depth</li>
+<li>$n_0 - 1 = 6{,}399$ gradient dimensions: filterable but smoothed away at depth</li>
+</ul>
+
+<p>
+At large network depth, the 9,598 filterable dimensions are attenuated by the spectral gap of $L_1$, and only the two winding modes survive. The information capacity of the deep network is reduced to a 2-dimensional subspace &mdash; effectively zero for any practical task.
+</p>
+
+<div class="key-result">
+<div class="label">Summary: All-Faces Case</div>
+<p>
+Maximum spectral resolution (three independent filter branches, fine-grained control over gradient and curl spectra) at the cost of minimal oversmoothing protection (only $\beta_1 = 2$ dimensions survive at infinite depth).
+</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 7 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec7">7. Partial Face-Filling &mdash; The Design Space</h2>
+
+<h3>7.1 Intermediate Strategies</h3>
+
+<p>
+The two extremes (all faces, no faces) bracket a continuous design space. Any subset $F' \subseteq F$ of the full face set defines an intermediate simplicial complex with $0 \leq |F'| \leq n_2^{\max}$. By Proposition 1, each face we add to $F'$ converts (at most) one harmonic dimension to a curl dimension:
+</p>
+
+$$
+\beta_1(F') = n_1 - (n_0 - 1) - \rank(B_2(F')) \tag{14}
+$$
+
+<p>
+where $B_2(F')$ is the edge-face incidence matrix restricted to the faces in $F'$. Each additional face increases $\rank(B_2)$ by at most 1 (it increases by exactly 1 if the new face's boundary cycle is not already in the span of existing face boundaries).
+</p>
+
+<div class="proposition">
+<div class="label">Proposition 2 (Monotonicity)</div>
+<p>
+If $F' \subseteq F'' \subseteq F$ are nested face sets, then:
+</p>
+$$
+\beta_1(F'') \leq \beta_1(F')
+$$
+<p>
+That is, adding faces can only decrease $\beta_1$ (or leave it unchanged). Equivalently, $\rank(B_2)$ is monotonically nondecreasing under face inclusion.
+</p>
+</div>
+
+<div class="proof">
+<div class="label">Proof.</div>
+<p>
+$B_2(F'')$ has all the columns of $B_2(F')$ plus additional columns for faces in $F'' \setminus F'$. The column space can only grow: $\im(B_2(F')) \subseteq \im(B_2(F''))$. Therefore $\rank(B_2(F'')) \geq \rank(B_2(F'))$, and $\beta_1(F'') = n_1 - (n_0 - 1) - \rank(B_2(F'')) \leq \beta_1(F')$.
+</p>
+<p class="qed">$\square$</p>
+</div>
+
+<h3>7.2 The Pareto Frontier</h3>
+
+<p>
+Each intermediate face set $F'$ determines a point in the <strong>(protection, expressivity)</strong> plane:
+</p>
+
+$$
+\left(\beta_1(F'), \; \rank(B_2(F'))\right) \tag{15}
+$$
+
+<p>
+Proposition 2 guarantees that moving along the face-filling axis traces a <strong>monotone path</strong>: more faces means more expressivity (larger curl dimension) and less protection (smaller harmonic dimension). The set of achievable (protection, expressivity) pairs forms a Pareto frontier &mdash; no face set can simultaneously maximize both.
+</p>
+
+<p>
+In general, the trajectory is not strictly monotone at every step: some faces may be <strong>homologically redundant</strong> (their boundary cycle is already in $\im(B_2(F'))$), adding a column that does not increase rank. Such faces increase $n_2$ but not $\rank(B_2)$, leaving both $\beta_1$ and the curl dimension unchanged. They are "free" from the tradeoff perspective (they refine the face-mediated message passing without converting harmonic to curl dimensions).
+</p>
+
+<h3>7.3 Which Faces to Fill?</h3>
+
+<p>
+Not all faces are equal. For lattices with mixed polygon types (e.g., shakti with its mix of squares and octagons), different faces contribute differently:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Filling a small face</strong> (e.g., a square) kills a short-range cycle. The harmonic mode it removes was localized around that face.</li>
+<li><strong>Filling a large face</strong> (e.g., an octagon) kills a longer-range cycle. The harmonic mode it removes involved more edges.</li>
+<li><strong>Homologically redundant faces</strong> refine the upper Laplacian $L_1^{\text{up}}$ without changing $\beta_1$.</li>
+</ul>
+
+<conjecture>
+<div class="conjecture">
+<div class="label">Conjecture 1 (Task-Dependent Optimal Face-Filling)</div>
+<p>
+The optimal face-filling strategy is task-dependent:
+</p>
+<ul>
+<li><strong>Tasks requiring global topology discrimination</strong> (e.g., distinguishing torus winding numbers, classifying global flow patterns): fewer faces, more protection. The network needs harmonic modes to survive deep propagation.</li>
+<li><strong>Tasks requiring local flow pattern distinction</strong> (e.g., classifying local vortex types, detecting circulations at specific faces): more faces, more expressivity. The network needs the curl branch to distinguish different local circulation patterns.</li>
+<li><strong>Interpolation</strong>: for tasks with both local and global features, the optimal strategy fills faces selectively &mdash; killing short-range cycles (where local spectral control is needed) while preserving long-range ones (where topological protection matters).</li>
+</ul>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 8 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec8">8. Face-Filling for ASI Lattices vs. Standard TDL</h2>
+
+<h3>8.1 The Standard TDL Approach: Clique Complexes</h3>
+
+<p>
+In the mainstream Topological Deep Learning literature (Hajij et al. 2023, Papillon et al. 2024), the standard method for lifting a graph to a simplicial complex is the <strong>clique complex</strong> (or flag complex): fill every complete subgraph (clique) as a simplex. Specifically:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>Every edge is a 1-simplex (as usual).</li>
+<li>Every triangle (3-clique) becomes a 2-simplex (face).</li>
+<li>Every tetrahedron (4-clique) becomes a 3-simplex, and so on.</li>
+</ul>
+
+<p>
+This is a canonical, graph-determined choice: given only the graph, the clique complex is uniquely defined.
+</p>
+
+<h3>8.2 Clique Complex Gives Zero Faces for Many ASI Lattices</h3>
+
+<p>
+For the clique complex to produce any 2-cells, the graph must contain <strong>triangles</strong> (3-cycles where all three vertices are mutually adjacent). The ASI lattice zoo has a critical property: <em>most lattices have no triangles</em>.
+</p>
+
+<table>
+<thead>
+<tr><th>Lattice</th><th>Face Types (Planar)</th><th>Triangles?</th><th>Clique Complex $n_2$</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>Squares (4-gons)</td><td>No</td><td>0</td></tr>
+<tr><td>Kagome</td><td>Triangles + Hexagons</td><td>Yes</td><td>Nonzero</td></tr>
+<tr><td>Shakti</td><td>Mixed (squares, octagons)</td><td>No</td><td>0</td></tr>
+<tr><td>Tetris</td><td>Mixed (squares, hexagons)</td><td>No</td><td>0</td></tr>
+<tr><td>Santa Fe</td><td>Mixed (squares, hexagons, octagons)</td><td>No</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p>
+For the square, shakti, tetris, and santa fe lattices, the clique complex produces <strong>zero 2-cells</strong>. The standard TDL lifting procedure gives $L_1^{\text{up}} = 0$ for these lattices, resulting in the no-faces degeneracy of &sect;5 &mdash; maximum protection but no curl branch.
+</p>
+
+<p>
+The kagome lattice is the exception: its triangular faces are genuine 3-cliques, so the clique complex does produce 2-cells. However, the hexagonal faces of kagome are not cliques (the six vertices of a hexagon are not all mutually adjacent), so the clique complex fills only the triangles, not the hexagons. This gives a partial face-filling that lies between our two bracketing strategies.
+</p>
+
+<h3>8.3 Our Planar-Face Approach</h3>
+
+<p>
+Our approach is different: we identify faces as the <strong>minimal loops of the planar embedding</strong> (or the unit cell faces under periodic boundary conditions). This is the physically motivated choice &mdash; these are the faces that Morrison, Nelson &amp; Nisoli (2013) identify as the fundamental structural units of the ASI lattice. Each face is a polygon (square, hexagon, octagon, etc.) bounded by lattice edges.
+</p>
+
+<p>
+The key advantage: this approach gives <em>every</em> lattice a nontrivial face set, including those with no triangles. The square lattice gets square faces, shakti gets its mix of squares and octagons, and so on. This enables the full three-branch SCNN filter for all lattice types.
+</p>
+
+<div class="key-result">
+<div class="label">ASI vs. Standard TDL Face-Filling</div>
+<p>
+The standard TDL clique complex is inappropriate for ASI lattices with non-triangular faces. Our planar-face approach is domain-correct (matching the physics of minimal loops) and gives a non-degenerate simplicial complex for all lattice types. This is not an arbitrary methodological choice &mdash; it determines whether the SCNN has two filter branches or three.
+</p>
+</div>
+
+<h3>8.4 Implications</h3>
+
+<p>
+If a practitioner applied the standard TDL pipeline to an ASI lattice:
+</p>
+
+<ol style="margin-bottom: 1rem;">
+<li>For square, shakti, tetris, santa fe: the clique complex gives $n_2 = 0$, so $L_1^{\text{up}} = 0$. The SCNN reduces to a line-graph filter with no curl discrimination.</li>
+<li>For kagome: the clique complex fills only triangles (not hexagons), giving a <em>different</em> simplicial complex than our all-faces approach. The $\beta_1$ and spectral properties would differ.</li>
+<li>The physically meaningful face structure of the lattice would be entirely ignored.</li>
+</ol>
+
+<p>
+This is a concrete example where domain knowledge (from ASI physics) provides a better simplicial complex than the generic TDL recipe. The planar faces are not just convenient &mdash; they are the faces that make the Hodge decomposition physically meaningful, with $\im(B_2)$ corresponding to local plaquette circulations and $\ker(L_1)$ to topologically protected winding modes.
+</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 9 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec9">9. Quantitative Analysis with Catalog Data</h2>
+
+<h3>9.1 Dimension Census at Size M</h3>
+
+<p>
+The following table presents the complete Hodge decomposition dimension census for all five catalog lattices at size M (20&times;20 unit cells, periodic boundary conditions), under both face-filling strategies. All data is from our precomputed spectral catalog.
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Lattice</th>
+  <th>$n_0$</th>
+  <th>$n_1$</th>
+  <th>$n_2$ (all)</th>
+  <th style="color:var(--protect-color)">$\beta_1$ (all)</th>
+  <th style="color:var(--protect-color)">$\beta_1$ (none)</th>
+  <th>Curl dim (all)</th>
+  <th>Gradient dim</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Square</td>
+  <td>400</td>
+  <td>800</td>
+  <td>400</td>
+  <td><strong>2</strong></td>
+  <td><strong>401</strong></td>
+  <td>399</td>
+  <td>399</td>
+</tr>
+<tr>
+  <td>Kagome</td>
+  <td>1,200</td>
+  <td>2,400</td>
+  <td>1,200</td>
+  <td><strong>2</strong></td>
+  <td><strong>1,201</strong></td>
+  <td>1,199</td>
+  <td>1,199</td>
+</tr>
+<tr>
+  <td>Shakti</td>
+  <td>6,400</td>
+  <td>9,600</td>
+  <td>3,200</td>
+  <td><strong>2</strong></td>
+  <td><strong>3,201</strong></td>
+  <td>3,199</td>
+  <td>6,399</td>
+</tr>
+<tr>
+  <td>Tetris</td>
+  <td>3,200</td>
+  <td>4,800</td>
+  <td>1,600</td>
+  <td><strong>2</strong></td>
+  <td><strong>1,601</strong></td>
+  <td>1,599</td>
+  <td>3,199</td>
+</tr>
+<tr>
+  <td>Santa Fe</td>
+  <td>2,400</td>
+  <td>3,600</td>
+  <td>1,200</td>
+  <td><strong>2</strong></td>
+  <td><strong>1,201</strong></td>
+  <td>1,199</td>
+  <td>2,399</td>
+</tr>
+</tbody>
+</table>
+
+<div class="convention">
+<div class="label">Reading the Table</div>
+<p>
+Curl dim (all) $= n_2 - \beta_2 = n_2 - 1$ (on the torus). Gradient dim $= n_0 - 1$. The harmonic dimension $\beta_1$ satisfies $n_1 = \text{gradient} + \text{curl} + \beta_1$ in the all-faces case, and $n_1 = \text{gradient} + \beta_1$ in the no-faces case (curl = 0). The consistency of these totals serves as a validation check, and all pass.
+</p>
+</div>
+
+<h3>9.2 Harmonic Fractions</h3>
+
+<p>
+The fraction of edge signal space that is harmonic (i.e., topologically protected) varies dramatically with face-filling:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Lattice</th>
+  <th>$\beta_1(\text{all})/n_1$</th>
+  <th>$\beta_1(\text{none})/n_1$</th>
+  <th>TDL limit $\beta_1(\text{none})/n_1$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Square</td>
+  <td>0.25%</td>
+  <td>50.1%</td>
+  <td>$1 - n_0/n_1 = 1/2$</td>
+</tr>
+<tr>
+  <td>Kagome</td>
+  <td>0.08%</td>
+  <td>50.0%</td>
+  <td>$1/2$</td>
+</tr>
+<tr>
+  <td>Shakti</td>
+  <td>0.02%</td>
+  <td>33.3%</td>
+  <td>$1/3$</td>
+</tr>
+<tr>
+  <td>Tetris</td>
+  <td>0.04%</td>
+  <td>33.4%</td>
+  <td>$1/3$</td>
+</tr>
+<tr>
+  <td>Santa Fe</td>
+  <td>0.06%</td>
+  <td>33.4%</td>
+  <td>$1/3$</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+In the thermodynamic limit (TDL), the no-faces harmonic fraction converges to $1 - n_0/n_1 = 1 - 2/\bar{z}$ where $\bar{z}$ is the average vertex coordination number. Since each edge contributes 1 to two vertex degrees, $n_1 = \bar{z} n_0/2$, giving $n_0/n_1 = 2/\bar{z}$.
+</p>
+
+<div class="proposition">
+<div class="label">Proposition 3 (Harmonic Fraction in the TDL)</div>
+<p>
+For a lattice with average coordination $\bar{z}$, the no-faces harmonic fraction in the thermodynamic limit is:
+</p>
+$$
+\frac{\beta_1^{\text{(no faces)}}}{n_1} \;\xrightarrow{\;N \to \infty\;}\; 1 - \frac{2}{\bar{z}} \tag{16}
+$$
+<p>
+For our catalog lattices: $\bar{z} = 4$ (square, kagome) gives 50%, and $\bar{z} = 3$ (shakti, tetris, santa fe) gives 33.3%.
+</p>
+</div>
+
+<div class="proof">
+<div class="label">Proof.</div>
+<p>
+$\beta_1^{\text{(no faces)}} = n_1 - n_0 + 1$. Dividing by $n_1$: $\beta_1/n_1 = 1 - n_0/n_1 + 1/n_1$. In the TDL ($n_1 \to \infty$), the $1/n_1$ correction vanishes, and $n_0/n_1 = 2/\bar{z}$.
+</p>
+<p class="qed">$\square$</p>
+</div>
+
+<div class="remark">
+<div class="label">Remark</div>
+<p>
+The $\bar{z} = 3$ lattices (shakti, tetris, santa fe) have a <em>lower</em> harmonic fraction than the $\bar{z} = 4$ lattices (square, kagome) in the no-faces case. This might seem counterintuitive &mdash; the mixed-coordination lattices have more complex topology. But the harmonic fraction depends on the edge-to-vertex ratio, not on frustration. The mixed lattices have more vertices per edge (due to the low-coordination z=2 vertices), which reduces the divergence-free subspace per edge.
+</p>
+</div>
+
+<h3>9.3 Spectral Gap Comparison</h3>
+
+<p>
+A striking feature of our catalog data is that the spectral gap of $L_1$ is essentially identical under both face strategies:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Lattice</th>
+  <th>$\Delta_0$ ($L_0$)</th>
+  <th>$\Delta_1$ (all faces)</th>
+  <th>$\Delta_1$ (no faces)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Square</td>
+  <td>0.09789</td>
+  <td>0.09789</td>
+  <td>0.09789</td>
+</tr>
+<tr>
+  <td>Kagome</td>
+  <td>0.03281</td>
+  <td>0.03281</td>
+  <td>0.03281</td>
+</tr>
+<tr>
+  <td>Shakti</td>
+  <td>0.00411</td>
+  <td>0.00411</td>
+  <td>0.00411</td>
+</tr>
+<tr>
+  <td>Tetris</td>
+  <td>0.00247</td>
+  <td>0.00247</td>
+  <td>0.00247</td>
+</tr>
+<tr>
+  <td>Santa Fe</td>
+  <td>0.00804</td>
+  <td>0.00804</td>
+  <td>0.00804</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+This is not a coincidence. The spectral gap of $L_1$ (the smallest nonzero eigenvalue) comes from the smallest nonzero eigenvalue of either $L_1^{\text{down}}$ or $L_1^{\text{up}}$. Since $L_1^{\text{down}} = B_1^T B_1$ shares its nonzero spectrum with $L_0 = B_1 B_1^T$ (they have the same nonzero eigenvalues, a standard property of $AA^T$ and $A^TA$), the spectral gap of $L_1$ in the no-faces case is exactly $\Delta_0$. In the all-faces case, $L_1^{\text{up}}$ may contribute additional eigenvalues, but empirically the smallest nonzero eigenvalue of $L_1^{\text{up}}$ is no smaller than $\Delta_0$.
+</p>
+
+<div class="key-result">
+<div class="label">Spectral Gap Invariance</div>
+<p>
+The spectral gap of $L_1$ is invariant under face-filling for all catalog lattices. The smoothing rate of the gradient subspace (controlled by the smallest nonzero eigenvalue of $L_1^{\text{down}}$) matches $\Delta_0$, and the smallest nonzero eigenvalue of $L_1^{\text{up}}$ is at least as large. Face-filling changes the <em>dimension</em> of the protected subspace but not the <em>rate</em> at which the unprotected subspace is smoothed.
+</p>
+</div>
+
+<h3>9.4 The Conversion Arithmetic</h3>
+
+<p>
+Each face added converts (at most) one harmonic dimension to a curl dimension. For the all-faces case on a torus:
+</p>
+
+$$
+\beta_1^{\text{(none)}} - \beta_1^{\text{(all)}} = (n_1 - n_0 + 1) - 2 = n_1 - n_0 - 1 = n_2 - 1 = \rank(B_2) \tag{17}
+$$
+
+<p>
+This is precisely the number of linearly independent face boundaries &mdash; every one of the $\rank(B_2) = n_2 - 1$ independent face-boundary cycles converts one harmonic dimension to curl. The remaining 1 face is homologically redundant (its boundary is a linear combination of the others &mdash; this is the $\beta_2 = 1$ global 2-cycle of the torus).
+</p>
+
+<div class="example">
+<div class="label">Worked Example: Shakti M Conversion</div>
+<p>Going from no faces to all faces on the shakti lattice at size M:</p>
+<ul>
+<li>$\beta_1$ drops from 3,201 to 2: a decrease of 3,199</li>
+<li>$\rank(B_2)$ rises from 0 to 3,199: an increase of 3,199</li>
+<li>$n_2 = 3{,}200$ faces are filled, but $\rank(B_2) = 3{,}199 = n_2 - 1$ because $\beta_2 = 1$</li>
+<li>The gradient subspace remains at 6,399 dimensions throughout</li>
+<li>The total divergence-free subspace $\ker(B_1)$ remains at 3,201 dimensions throughout</li>
+</ul>
+<p>Every conversion moves a dimension from the $h_0$-only channel to the $\{\beta_\ell\}$-filterable channel.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 10 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec10">10. Implications for Oversmoothing Experiments (Stages 2&ndash;4)</h2>
+
+<h3>10.1 Stages 2&ndash;3: Vertex Features on $L_0$ (Face-Filling Irrelevant)</h3>
+
+<p>
+Our Stages 2&ndash;3 experiments operate entirely at the vertex level:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Stage 2:</strong> Propagate random features through GCN operators on each ASI lattice. Measure the rate of feature convergence (Dirichlet energy decay) as a function of network depth. Compare against configuration-model and Maslov-Sneppen rewired controls with matched degree sequences.</li>
+<li><strong>Stage 3:</strong> Train GCNs on a CSBM-on-lattice synthetic classification task. Produce accuracy-vs-depth curves for each lattice type.</li>
+</ul>
+
+<p>
+Since both stages use $L_0$, face-filling plays no role. The oversmoothing dynamics are controlled by:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>The spectral gap $\Delta_0$ of $L_0$ (our $c^*$ results)</li>
+<li>The full eigenvalue distribution of $L_0$ (not just the gap)</li>
+<li>The interaction between Laplacian smoothing and the nonlinear activation $\sigma$</li>
+</ul>
+
+<p>
+These stages test a different hypothesis from the face-filling tradeoff: they test whether <em>the graph topology of frustrated lattices</em> (coordination mix, loop structure, frustration) provides any vertex-level smoothing advantage compared to random graphs. The scientific question is about the lattice itself, not about how we lift it to a simplicial complex.
+</p>
+
+<h3>10.2 Stage 4: Edge Features on $L_1$ (Face-Filling Is the Design Variable)</h3>
+
+<p>
+Stage 4 moves to Simplicial Convolutional Neural Networks (SCNNs) operating on edge features through $L_1$. <strong>This is where face-filling becomes a first-class design variable.</strong> The SCNN filter (Eq.&nbsp;6) has three branches only when $L_1^{\text{up}} \neq 0$, which requires faces.
+</p>
+
+<p>
+The face-filling strategy directly determines:
+</p>
+
+<ol style="margin-bottom: 1rem;">
+<li><strong>Network architecture:</strong> 2-branch (no faces) vs. 3-branch (with faces) filter</li>
+<li><strong>Protected capacity:</strong> $\beta_1$ dimensions immune to deep smoothing</li>
+<li><strong>Spectral resolution:</strong> how many dimensions the network can selectively filter</li>
+<li><strong>Message-passing topology:</strong> whether face-mediated communication (edge$\to$face$\to$edge) exists</li>
+</ol>
+
+<h3>10.3 Experimental Predictions for Stage 4</h3>
+
+<p>
+Based on the protection&ndash;expressivity tradeoff, we predict qualitatively different accuracy-vs-depth curves for the three face-filling regimes:
+</p>
+
+<div class="proposition">
+<div class="label">Prediction 1 (No Faces &mdash; Maximum Protection)</div>
+<p>
+With no faces: the SCNN filter degenerates to a line-graph filter. The entire divergence-free subspace ($\sim$33&ndash;50% of edge dimensions, depending on $\bar{z}$) is protected from smoothing. Predicted behavior:
+</p>
+<ul>
+<li><strong>Shallow depth:</strong> Lower peak accuracy than the all-faces SCNN, because the network cannot distinguish curl from harmonic signals.</li>
+<li><strong>Deep depth:</strong> Accuracy degrades slowly. The protected subspace carries information indefinitely, so oversmoothing is delayed.</li>
+<li><strong>Net effect:</strong> Flatter accuracy-vs-depth curve &mdash; moderate performance across all depths.</li>
+</ul>
+</div>
+
+<div class="proposition">
+<div class="label">Prediction 2 (All Faces &mdash; Maximum Expressivity)</div>
+<p>
+With all faces: the full 3-branch SCNN filter is active. Only $\beta_1 = 2$ dimensions are protected. Predicted behavior:
+</p>
+<ul>
+<li><strong>Shallow depth:</strong> Higher peak accuracy, because the network has full Hodge-spectral resolution &mdash; three independent filter banks discriminating gradient, curl, and harmonic components.</li>
+<li><strong>Deep depth:</strong> Accuracy drops sharply as the 9,598 filterable dimensions (out of 9,600 for shakti M) are smoothed away, leaving only 2 winding modes.</li>
+<li><strong>Net effect:</strong> Sharp peak at moderate depth, rapid decline thereafter.</li>
+</ul>
+</div>
+
+<div class="proposition">
+<div class="label">Prediction 3 (Partial Filling &mdash; Optimal Intermediate)</div>
+<p>
+With an intermediate face-filling strategy: the network has some curl discrimination (partial upper Laplacian) and a larger protected subspace (intermediate $\beta_1$). Predicted behavior:
+</p>
+<ul>
+<li>Peak accuracy intermediate between the two extremes</li>
+<li>Depth at which oversmoothing sets in is later than all-faces but earlier than no-faces</li>
+<li>For the right task, this may achieve the <strong>best depth-integrated performance</strong> &mdash; the Pareto-optimal point</li>
+</ul>
+</div>
+
+<h3>10.4 Stages 2&ndash;3 vs. Stage 4: Different Mechanisms</h3>
+
+<p>
+It is important to recognize that Stages 2&ndash;3 and Stage 4 test <strong>fundamentally different anti-oversmoothing mechanisms</strong>:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Property</th>
+  <th>Stages 2&ndash;3 (Vertex / $L_0$)</th>
+  <th>Stage 4 (Edge / $L_1$)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Signal domain</strong></td>
+  <td>Vertex features $\in \R^{n_0}$</td>
+  <td>Edge features $\in \R^{n_1}$</td>
+</tr>
+<tr>
+  <td><strong>Laplacian</strong></td>
+  <td>$L_0 = B_1 B_1^T$</td>
+  <td>$L_1 = B_1^T B_1 + B_2 B_2^T$</td>
+</tr>
+<tr>
+  <td><strong>Role of faces</strong></td>
+  <td>None</td>
+  <td>Central &mdash; controls architecture</td>
+</tr>
+<tr>
+  <td><strong>Protected subspace</strong></td>
+  <td>$\ker(L_0) = \text{span}(\bm{1})$ (dim 1, trivial)</td>
+  <td>$\ker(L_1)$ (dim $\beta_1$, tunable)</td>
+</tr>
+<tr>
+  <td><strong>Anti-oversmoothing mechanism</strong></td>
+  <td>Graph topology $\to$ spectral gap of $L_0$<br>(slower smoothing rate)</td>
+  <td>Hodge topology $\to$ harmonic subspace of $L_1$<br>(immune subspace, zero smoothing rate)</td>
+</tr>
+<tr>
+  <td><strong>Design variables</strong></td>
+  <td>Lattice type, size, boundary conditions</td>
+  <td>All of the above <strong>plus</strong> face-filling strategy</td>
+</tr>
+<tr>
+  <td><strong>Nature of advantage</strong></td>
+  <td>Quantitative: slower decay rate</td>
+  <td>Qualitative: exact zero decay in a subspace</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Stages 2&ndash;3 ask: <em>do frustrated lattices smooth more slowly?</em> (a rate question). Stage 4 asks: <em>can the Hodge harmonic subspace provide a protected information channel?</em> (a structural question). A positive result in Stages 2&ndash;3 would mean that ASI lattice topology provides a quantitative advantage for vertex-level networks. A positive result in Stage 4 would mean something stronger: a <em>qualitative</em> protection mechanism, rooted in Hodge theory, that no amount of depth can erode.
+</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 11 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec11">11. Open Questions</h2>
+
+<h3>11.1 Can Face-Filling Be Learned?</h3>
+
+<p>
+Currently, the face set is a preprocessing choice made before training. Could it be learned end-to-end? One approach: define a <strong>soft face-filling</strong> where each face $f$ has a learnable weight $w_f \in [0, 1]$, and the upper Laplacian becomes:
+</p>
+
+$$
+L_1^{\text{up}}(w) = B_2 \, \diag(w) \, B_2^T \tag{18}
+$$
+
+<p>
+When $w_f = 1$, face $f$ is fully filled; when $w_f = 0$, it is absent. The gradient $\partial \mathcal{L}/\partial w_f$ through the SCNN loss could guide the network to fill faces where curl discrimination is needed and leave them empty where harmonic protection is needed. This would make the protection&ndash;expressivity tradeoff itself a learned quantity.
+</p>
+
+<p>
+Open challenge: the transition from "face present" to "face absent" is topological (it changes $\beta_1$ by a discrete amount), but a soft relaxation would change eigenvalues continuously. The topology would only be exactly correct at $w_f \in \{0, 1\}$. Whether the soft relaxation is a useful approximation is unclear.
+</p>
+
+<h3>11.2 Principled Face Selection</h3>
+
+<p>
+Is there a principled criterion for selecting which faces to fill, given a task? Possible approaches:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Information-theoretic:</strong> fill faces that maximize mutual information between edge features and labels, subject to a $\beta_1$ constraint.</li>
+<li><strong>Spectral:</strong> fill faces that minimize the condition number of $L_1$ restricted to the curl subspace (ensuring numerically well-behaved filtering).</li>
+<li><strong>Spatial:</strong> fill faces in regions where local discrimination is needed, leave faces empty in regions where long-range coherence matters.</li>
+<li><strong>Greedy:</strong> start with no faces; iteratively add the face whose removal from the harmonic subspace least affects task performance.</li>
+</ul>
+
+<h3>11.3 Interaction with Spectral Gap Scaling</h3>
+
+<p>
+Our catalog shows that the spectral gap $\Delta_1$ is invariant under face-filling (&sect;9.3). But the <em>distribution</em> of eigenvalues within the nonzero spectrum changes (face-filling introduces new eigenvalues from $L_1^{\text{up}}$). How does the full eigenvalue distribution under partial face-filling affect:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li>The rate of energy decay in the gradient vs. curl subspaces?</li>
+<li>The effective depth at which oversmoothing becomes dominant?</li>
+<li>The interaction between the spectral gap and the $\beta_1$-dependent protected capacity?</li>
+</ul>
+
+<h3>11.4 Connection to Nisoli's Screening Length</h3>
+
+<p>
+In Nisoli's charge framework (2020), the entropic interaction between vertex charges is mediated by $L_0^{-1}$, with a screening length $\xi$ set by the inverse spectral gap $\xi \sim 1/\sqrt{\Delta_0}$. At finite temperature, charges interact over a range $\xi$; beyond this range, the ice manifold's degeneracy effectively screens the interaction.
+</p>
+
+<p>
+A speculative question: does the ASI temperature $T$ map to an optimal face-filling strategy? At low temperature (ordered phase, long-range correlations), the system "uses" long-range harmonic modes &mdash; suggesting fewer faces (protect long-range modes). At high temperature (disordered phase, short-range correlations), local fluctuations dominate &mdash; suggesting more faces (provide local curl discrimination). The correspondence between $T$ and the optimal protection&ndash;expressivity balance is unexplored.
+</p>
+
+<h3>11.5 Beyond Binary Face-Filling</h3>
+
+<p>
+The face set need not be restricted to the minimal faces of the planar embedding. One could:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Fill non-minimal cycles:</strong> use larger polygons (e.g., a 2&times;2 block of squares as a single face). This would change $B_2$ and could give different spectral properties.</li>
+<li><strong>Use weighted faces:</strong> scale each face's contribution to $L_1^{\text{up}}$ by a factor (the soft face-filling of &sect;11.1).</li>
+<li><strong>Higher-order cells:</strong> in 3D lattice structures, fill 3-cells to create a 3-dimensional simplicial complex with $L_2$ and further Laplacians.</li>
+</ul>
+
+<h3>11.6 Generalization Beyond ASI</h3>
+
+<p>
+The protection&ndash;expressivity tradeoff is not specific to ASI lattices. It applies to <em>any</em> simplicial complex where the face set is a design choice. Application domains include:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Molecular graphs:</strong> fill aromatic rings as faces (physically motivated, as in benzene's delocalized electrons) or leave them empty.</li>
+<li><strong>Transportation networks:</strong> fill city blocks as faces (face-mediated message passing detects local circulation patterns).</li>
+<li><strong>Mesh processing:</strong> triangulated surfaces have a natural face set, but adaptive mesh refinement can partially fill faces at different resolutions.</li>
+</ul>
+
+<p>
+In each domain, the same fundamental question applies: which cycles should be filled as faces, and what is the right balance between spectral control and topological protection?
+</p>
+
+<hr style="margin-top: 3rem;">
+
+<h2 style="border: none; margin-top: 1rem;">References</h2>
+
+<p style="font-size: 0.92rem; line-height: 1.5;">
+[1] Morrison, Nelson &amp; Nisoli (2013), "Unhappy vertices in artificial spin ice: new degeneracies from vertex frustration," <em>New J. Phys.</em> 15, 045009.<br>
+[2] Nisoli (2020), "Topological order of the Rys F-model and its breakdown in realistic square spin ice," <em>New J. Phys.</em> 22, 103052.<br>
+[3] Yang, Isufi &amp; Leus (2022), "Simplicial Convolutional Neural Networks," <em>IEEE Trans. Signal Process.</em><br>
+[4] Hajij et al. (2023), "Topological Deep Learning: Going Beyond Graph Data," <em>arXiv:2206.00606</em>.<br>
+[5] Papillon et al. (2024), "Architectures of Topological Deep Learning: A Survey of Message-Passing Topological Neural Networks," <em>JMLR</em>.<br>
+[6] Kipf &amp; Welling (2017), "Semi-Supervised Classification with Graph Convolutional Networks," <em>ICLR</em>.<br>
+[7] Li, Han &amp; Wu (2018), "Deeper Insights into Graph Convolutional Networks for Semi-Supervised Learning," <em>AAAI</em>.<br>
+[8] Rusch et al. (2023), "A Survey on Oversmoothing in Graph Neural Networks," <em>arXiv:2303.10993</em>.<br>
+[9] Duranthon &amp; Zdeborová (2025), "Optimal message passing and the depth limit of deep graph neural networks," <em>Phys. Rev. X</em>.<br>
+[10] Wu et al. (2022), "Non-asymptotic Transients Away from Steady States Determine the Accuracy of Graph Neural Networks," <em>ICLR</em>.<br>
+</p>
+
+</body>
+</html>
