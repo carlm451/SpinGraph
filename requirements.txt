@@ -12,5 +12,8 @@ plotly>=5.15.0
 # Production Server
 gunicorn>=20.1.0
 
+# Deep Learning
+torch>=2.0.0
+
 # Optional: For advanced geometric/face calculations
 shapely>=2.0.0

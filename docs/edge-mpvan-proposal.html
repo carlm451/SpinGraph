@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edge-MPVAN: Neural Message Passing for Sampling Artificial Spin Ice</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams',
+    tagSide: 'right',
+    macros: {
+      bm: ['{\\boldsymbol{#1}}', 1],
+      R: '{\\mathbb{R}}',
+      Z: '{\\mathbb{Z}}',
+      ker: '\\operatorname{ker}',
+      im: '\\operatorname{im}',
+      rank: '\\operatorname{rank}',
+      diag: '\\operatorname{diag}',
+      tr: '\\operatorname{tr}',
+      div: '\\operatorname{div}',
+      grad: '\\operatorname{grad}',
+      curl: '\\operatorname{curl}',
+      abs: ['\\lvert #1 \\rvert', 1]
+    }
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root {
+  --protect-color: #1a5276;
+  --express-color: #922b21;
+  --highlight-bg: #fef9e7;
+  --key-result-bg: #eaf2f8;
+  --example-bg: #f4f6f6;
+  --border-color: #d5d8dc;
+  --link-color: #2471a3;
+  --mpvan-color: #6c3483;
+  --synthesis-color: #117a65;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.7;
+  color: #2c3e50;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  background: #fdfdfd;
+}
+h1 {
+  font-size: 1.9rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+.authors {
+  text-align: center;
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+h2 {
+  font-size: 1.45rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--border-color);
+  color: #1a1a2e;
+}
+h3 {
+  font-size: 1.15rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  color: #2c3e50;
+}
+h4 {
+  font-size: 1.0rem;
+  margin-top: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+}
+p { margin-bottom: 1rem; }
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Table of Contents */
+nav#toc {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+nav#toc h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.8rem;
+  border: none;
+  padding: 0;
+}
+nav#toc ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+nav#toc li {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+/* Key result boxes */
+.key-result {
+  background: var(--key-result-bg);
+  border-left: 4px solid var(--protect-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.key-result .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--protect-color);
+  margin-bottom: 0.4rem;
+}
+
+/* Proposition/Theorem boxes */
+.proposition {
+  background: #f5eef8;
+  border-left: 4px solid #7d3c98;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.proposition .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7d3c98;
+  margin-bottom: 0.4rem;
+}
+
+/* Proof boxes */
+.proof {
+  background: #fafafa;
+  border-left: 3px solid #aaa;
+  padding: 0.8rem 1.2rem;
+  margin: 0.8rem 0 1.2rem;
+  font-size: 0.95rem;
+}
+.proof .label {
+  font-weight: bold;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+.proof .qed {
+  text-align: right;
+  color: #888;
+}
+
+/* Worked examples */
+.example {
+  background: var(--example-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.example .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #27ae60;
+  margin-bottom: 0.4rem;
+}
+
+/* Convention/warning boxes */
+.convention {
+  background: #fdf2e9;
+  border-left: 4px solid #e67e22;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.convention .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #e67e22;
+  margin-bottom: 0.3rem;
+}
+
+/* Remark boxes */
+.remark {
+  background: #eafaf1;
+  border-left: 4px solid #27ae60;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.remark .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #27ae60;
+  margin-bottom: 0.3rem;
+}
+
+/* Conjecture boxes */
+.conjecture {
+  background: #fef9e7;
+  border-left: 4px solid #d4ac0d;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.conjecture .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #d4ac0d;
+  margin-bottom: 0.4rem;
+}
+
+/* Synthesis boxes (new for Edge-MPVAN) */
+.synthesis {
+  background: #e8f6f3;
+  border-left: 4px solid var(--synthesis-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.synthesis .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--synthesis-color);
+  margin-bottom: 0.4rem;
+}
+
+/* MPVAN boxes */
+.mpvan-result {
+  background: #f4ecf7;
+  border-left: 4px solid var(--mpvan-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.mpvan-result .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mpvan-color);
+  margin-bottom: 0.4rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #f2f3f4;
+  font-weight: bold;
+  color: #2c3e50;
+}
+tr:nth-child(even) { background: #fafafa; }
+
+/* Prominent operator-mapping box */
+.operator-map {
+  background: #eaf2f8;
+  border: 3px solid var(--protect-color);
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 6px;
+}
+.operator-map .label {
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--protect-color);
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+/* Architecture diagram box */
+.architecture-box {
+  background: #fdfefe;
+  border: 2px solid var(--synthesis-color);
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 6px;
+}
+.architecture-box .label {
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--synthesis-color);
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+/* Equation references */
+.eqref { color: var(--link-color); }
+
+/* Code snippets */
+code {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.88rem;
+  background: #f0f0f0;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+}
+
+/* Print styles */
+@media print {
+  body { max-width: 100%; padding: 1rem; }
+  .key-result, .example, .convention, .proposition, .conjecture, .operator-map, .synthesis, .mpvan-result { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<h1>Edge-MPVAN: Neural Message Passing<br>for Sampling Artificial Spin Ice</h1>
+<p class="subtitle">Variational autoregressive sampling of edge-level spin systems via EIGN operators</p>
+<p class="authors">SpinIceTDL Project &mdash; Research Proposal v1.0</p>
+
+<nav id="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#sec1">Introduction and Motivation</a></li>
+  <li><a href="#sec2">The EIGN&ndash;ASI Identity</a></li>
+  <li><a href="#sec3">MPVAN in One Page</a></li>
+  <li><a href="#sec4">The Synthesis &mdash; Edge-MPVAN Architecture</a></li>
+  <li><a href="#sec5">Training Objective</a></li>
+  <li><a href="#sec6">Sampling Mode A &mdash; Loop-Basis (Ice Rule Guaranteed)</a></li>
+  <li><a href="#sec7">Sampling Mode B &mdash; Direct Edge (Finite Temperature)</a></li>
+  <li><a href="#sec8">Experimental Design</a></li>
+  <li><a href="#sec9">Open Questions</a></li>
+  <li><a href="#sec10">Implementation Roadmap</a></li>
+</ol>
+</nav>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 1 -->
+<!-- ================================================================= -->
+<h2 id="sec1">1. Introduction and Motivation</h2>
+
+<p>
+Artificial spin ice (ASI) systems exhibit exponentially degenerate ground-state manifolds. On the kagome lattice at size M (20&times;20 unit cells), the ice manifold &mdash; the set of all spin configurations satisfying the ice rule at every vertex &mdash; has dimension $\beta_1 = 1{,}201$. The number of discrete ice states scales as $\sim 2^{\beta_1}$, a number far beyond enumeration. Understanding the structure of this manifold, sampling from it uniformly, and computing thermal averages over it are central problems in frustrated magnetism.
+</p>
+
+<p>
+Markov Chain Monte Carlo (MCMC) via directed loop algorithms (our existing <code>sample_ice_states()</code>) is the standard approach. But MCMC has well-known limitations: autocorrelation times grow with system size, and on frustrated lattices with complex energy landscapes, mixing can be slow. The sampler explores the manifold via local loop flips, and long-range correlations require many flips to establish.
+</p>
+
+<p>
+Meanwhile, a line of work in machine learning has shown that <strong>variational autoregressive networks</strong> (VANs) can learn to sample from complex distributions over discrete spin configurations. The MPVAN architecture (Hao et al.) demonstrated that incorporating the <em>Hamiltonian's coupling structure</em> into the message-passing mechanism dramatically improves sampling quality on frustrated Ising models &mdash; including triangular antiferromagnets and spin glasses.
+</p>
+
+<p>
+There is a gap: MPVAN operates on <strong>vertex-level</strong> spins (Ising variables on nodes, coupled through edges). ASI has <strong>edge-level</strong> spins (binary variables on edges, coupled through shared vertices). The standard approach to bridge this gap &mdash; mapping to the line graph $L(G)$ &mdash; loses the orientation structure that is physically meaningful in ASI.
+</p>
+
+<p>
+The EIGN architecture (Fuchsgruber, Gao &amp; G&uuml;nnemann, ICLR 2025) provides exactly the missing piece. EIGN defines edge-level message passing that respects orientation equivariance, using four operator channels built from $B_1$ and $|B_1|$. We have established (see <a href="tdl-spinice-correspondence.html">foundational mapping</a>) that these operators are <em>identical</em> to the ones governing ASI physics: EIGN's equivariant Laplacian $L_{\text{equ}} = B_1^T B_1$ is the ASI Hamiltonian.
+</p>
+
+<div class="key-result">
+<div class="label">Central Proposal</div>
+<p>
+We propose <strong>Edge-MPVAN</strong>: the first autoregressive neural sampler for edge-level spin systems. It combines MPVAN's variational autoregressive framework with EIGN's orientation-equivariant edge operators. The key insight: EIGN's equ&rarr;equ channel $L_1^{\text{down}} = B_1^T B_1$ <em>is</em> the ASI Hamiltonian interaction operator, so MPVAN's principle of "Hamiltonian-informed message passing" holds <em>by construction</em> &mdash; no separate Hamiltonian encoding is needed.
+</p>
+</div>
+
+<p>
+This document presents the mathematical identity between EIGN and ASI (&sect;2), introduces MPVAN (&sect;3), develops the Edge-MPVAN synthesis (&sect;4&ndash;5), proposes two sampling modes &mdash; loop-basis for exact ice-rule sampling (&sect;6) and direct-edge for finite temperature (&sect;7) &mdash; and designs concrete experiments (&sect;8).
+</p>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 2 -->
+<!-- ================================================================= -->
+<h2 id="sec2">2. The EIGN&ndash;ASI Identity</h2>
+
+<p>
+This section condenses the mathematical mapping established in the <a href="tdl-spinice-correspondence.html">foundational correspondence document</a> and the <a href="eign-spin-ice-edge-networks.html">EIGN analysis</a>. The mapping is not an analogy &mdash; it is a mathematical identity.
+</p>
+
+<h3>2.1 The Operator Dictionary</h3>
+
+<div class="operator-map">
+<div class="label">Core Operator Mapping &mdash; EIGN &#x2194; ASI Notation</div>
+$$
+\boxed{
+\begin{aligned}
+B_{\text{equ}} &= B_1 && \text{(signed vertex-edge incidence matrix, shape } n_0 \times n_1\text{)} \\[4pt]
+B_{\text{inv}} &= |B_1| && \text{(element-wise absolute value of } B_1\text{, shape } n_0 \times n_1\text{)} \\[4pt]
+L_{\text{equ}} &= B_1^T B_1 = L_1^{\text{down}} && \text{(lower Hodge Laplacian / ASI Hamiltonian, shape } n_1 \times n_1\text{)} \\[4pt]
+L_{\text{inv}} &= |B_1|^T |B_1| && \text{(unsigned edge Laplacian, shape } n_1 \times n_1\text{)}
+\end{aligned}
+}
+$$
+<p style="text-align:center; font-size:0.9rem; margin-top:0.5rem; margin-bottom:0;">
+$B_1[v,e] = +1$ if $v$ is the head of $e$, $-1$ if the tail, $0$ otherwise.<br>
+$|B_1|[v,e] = 1$ if $v$ is an endpoint of $e$, $0$ otherwise.
+</p>
+</div>
+
+<h3>2.2 Spin&ndash;Equivariance Identity</h3>
+
+<div class="proposition">
+<div class="label">Proposition 1 (Spin&ndash;Equivariance Identity)</div>
+<p>
+An ASI spin configuration $\bm{\sigma} \in \{+1, -1\}^{n_1}$ is an orientation-equivariant edge signal in the sense of EIGN: under the orientation-reversal map $\Pi_e$ that flips the reference direction of edge $e$, $(\Pi_e \bm{\sigma})_e = -\sigma_e$. This follows because a spin $\sigma_e$ represents the projection of a physical magnetic moment onto the reference direction of edge $e$; reversing the reference direction negates the projection.
+</p>
+</div>
+
+<h3>2.3 Ice Rule = Kernel Membership</h3>
+
+<p>
+The ice rule at vertex $v$ demands zero net spin flux:
+</p>
+
+$$
+Q_v = (B_1 \bm{\sigma})_v = \sum_{e \ni v} B_1[v,e] \, \sigma_e = 0 \tag{1}
+$$
+
+<p>
+The ice rule demands $B_1 \bm{\sigma} = 0$ everywhere, i.e., $\bm{\sigma} \in \ker(B_1) = \ker(L_1^{\text{down}}) = \ker(L_{\text{equ}})$.
+</p>
+
+<div class="key-result">
+<div class="label">Key Result</div>
+<p>
+Ice-rule-satisfying configurations are <strong>exactly</strong> the zero eigenvectors of EIGN's equivariant Laplacian. The ice manifold is $\ker(L_{\text{equ}}) = \ker(B_1)$, with dimension $\beta_1^{\text{(no faces)}} = n_1 - n_0 + 1$.
+</p>
+</div>
+
+<h3>2.4 The Hamiltonian as Rayleigh Quotient</h3>
+
+<p>
+The ASI Hamiltonian with uniform coupling $\varepsilon$ is:
+</p>
+
+$$
+H(\bm{\sigma}) = \frac{\varepsilon}{2} \sum_v Q_v^2 = \frac{\varepsilon}{2} \|B_1 \bm{\sigma}\|^2 = \frac{\varepsilon}{2} \bm{\sigma}^T \underbrace{B_1^T B_1}_{L_1^{\text{down}} = L_{\text{equ}}} \bm{\sigma} \tag{2}
+$$
+
+<p>
+The energy is the Rayleigh quotient of $L_{\text{equ}}$. Ground states ($H = 0$) are exactly $\ker(L_{\text{equ}})$. The energy of an excitation is determined by its projection onto the nonzero eigenmodes of $L_{\text{equ}}$, with the spectral gap $\Delta_1$ setting the minimum excitation energy per spin.
+</p>
+
+<h3>2.5 The Four Convolution Channels</h3>
+
+<table>
+<thead>
+<tr>
+  <th>Channel</th>
+  <th>Operator (ASI notation)</th>
+  <th>Physical meaning in ASI</th>
+  <th>Role in Edge-MPVAN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>equ&rarr;equ</strong></td>
+  <td>$B_1^T B_1 = L_1^{\text{down}}$</td>
+  <td>Spin&ndash;spin interaction via shared vertices</td>
+  <td>Hamiltonian coupling (automatic)</td>
+</tr>
+<tr>
+  <td><strong>inv&rarr;inv</strong></td>
+  <td>$|B_1|^T |B_1|$</td>
+  <td>Geometry&ndash;geometry diffusion</td>
+  <td>Lattice structure propagation</td>
+</tr>
+<tr>
+  <td><strong>equ&rarr;inv</strong></td>
+  <td>$|B_1|^T B_1$</td>
+  <td>Vertex charge computation (ice-rule violation)</td>
+  <td>Divergence monitor</td>
+</tr>
+<tr>
+  <td><strong>inv&rarr;equ</strong></td>
+  <td>$B_1^T |B_1|$</td>
+  <td>Geometry modulates spin dynamics</td>
+  <td>Lattice geometry &rarr; spin decisions</td>
+</tr>
+</tbody>
+</table>
+
+<h3>2.6 Master Correspondence Table</h3>
+
+<table>
+<thead>
+<tr>
+  <th>EIGN Concept</th>
+  <th>ASI Concept</th>
+  <th>Mathematical Identity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Equivariant edge signal $x_e^{\text{equ}}$</td>
+  <td>Spin configuration $\sigma_e$</td>
+  <td>1-cochain $\in C^1(G; \R)$</td>
+</tr>
+<tr>
+  <td>Invariant edge signal $x_e^{\text{inv}}$</td>
+  <td>Coupling/geometry $J_e, \ell_e$</td>
+  <td>0-cochain on edges (unsigned)</td>
+</tr>
+<tr>
+  <td>$B_{\text{equ}} x^{\text{equ}}$</td>
+  <td>Vertex charge $Q_v = (B_1 \bm{\sigma})_v$</td>
+  <td>Discrete divergence (coboundary)</td>
+</tr>
+<tr>
+  <td>$\ker(B_{\text{equ}})$</td>
+  <td>Ice manifold (all ground states)</td>
+  <td>$\ker(B_1)$, divergence-free subspace</td>
+</tr>
+<tr>
+  <td>$L_{\text{equ}} = B_{\text{equ}}^T B_{\text{equ}}$</td>
+  <td>$L_1^{\text{down}} = B_1^T B_1$</td>
+  <td>Lower Hodge 1-Laplacian</td>
+</tr>
+<tr>
+  <td>$\dim(\ker L_{\text{equ}})$</td>
+  <td>$\beta_1^{\text{(no faces)}} = n_1 - n_0 + 1$</td>
+  <td>Ground-state degeneracy</td>
+</tr>
+<tr>
+  <td>$x^T L_{\text{equ}} x$</td>
+  <td>$(2/\varepsilon) \, H(\bm{\sigma})$</td>
+  <td>Rayleigh quotient / Dirichlet energy</td>
+</tr>
+<tr>
+  <td>Smallest nonzero eigenvalue of $L_{\text{equ}}$</td>
+  <td>Spectral gap $\Delta_1$ of $L_1^{\text{down}}$</td>
+  <td>Minimum excitation energy per spin</td>
+</tr>
+<tr>
+  <td>equ&rarr;inv fusion ($|B_1|^T B_1 \bm{\sigma}$)</td>
+  <td>Unsigned vertex charge accumulation</td>
+  <td>Ice-rule violation detector</td>
+</tr>
+</tbody>
+</table>
+
+<h3>2.7 Spectral Catalog Data</h3>
+
+<p>
+Our precomputed spectral catalog provides the protected-channel dimensions for all five lattice types. These $\ker(L_{\text{equ}})$ dimensions &mdash; the number of independent ice-rule configurations &mdash; directly determine the ice manifold that Edge-MPVAN must learn to sample.
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Lattice</th>
+  <th>$n_0$ (M)</th>
+  <th>$n_1$ (M)</th>
+  <th>$\beta_1 = \dim(\ker L_{\text{equ}})$</th>
+  <th>Protected fraction</th>
+  <th>$\Delta_1$ gap</th>
+  <th>Gap constant $C$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Square</td>
+  <td>400</td>
+  <td>800</td>
+  <td>401</td>
+  <td>50.1%</td>
+  <td>0.09789</td>
+  <td>39.2</td>
+</tr>
+<tr>
+  <td>Kagome</td>
+  <td>1,200</td>
+  <td>2,400</td>
+  <td>1,201</td>
+  <td>50.0%</td>
+  <td>0.03281</td>
+  <td>13.2</td>
+</tr>
+<tr>
+  <td>Santa Fe</td>
+  <td>2,400</td>
+  <td>3,600</td>
+  <td>1,201</td>
+  <td>33.4%</td>
+  <td>0.00804</td>
+  <td>3.2</td>
+</tr>
+<tr>
+  <td>Tetris</td>
+  <td>3,200</td>
+  <td>4,800</td>
+  <td>1,601</td>
+  <td>33.4%</td>
+  <td>0.00247</td>
+  <td>0.98</td>
+</tr>
+<tr>
+  <td>Shakti</td>
+  <td>6,400</td>
+  <td>9,600</td>
+  <td>3,201</td>
+  <td>33.3%</td>
+  <td>0.00411</td>
+  <td>1.6</td>
+</tr>
+</tbody>
+</table>
+
+<div class="convention">
+<div class="label">Reading This Table for Sampling</div>
+<p>
+$\beta_1$ is the dimension of the ice manifold that Mode A (loop-basis sampling, &sect;6) must explore: a binary vector space of dimension $\beta_1$, giving $2^{\beta_1}$ possible ice states. The spectral gap $\Delta_1$ sets the energy scale for Mode B (direct edge sampling, &sect;7): excitations above the ice manifold cost energy $\geq (\varepsilon/2) \Delta_1$ per spin. The gap constant $C$ gives $\Delta_1 \approx C/N^2$ where $N$ is the linear system size.
+</p>
+</div>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 3 -->
+<!-- ================================================================= -->
+<h2 id="sec3">3. MPVAN in One Page</h2>
+
+<p>
+The Message Passing Variational Autoregressive Network (MPVAN, Hao et al.) learns to sample ground states of frustrated Ising models by combining two ideas: (1) autoregressive factorization of the joint distribution, and (2) Hamiltonian-informed message passing to capture the coupling structure.
+</p>
+
+<h3>3.1 Variational Autoregressive Decomposition</h3>
+
+<p>
+For $n$ binary spins $\bm{s} = (s_1, \ldots, s_n)$, any joint distribution can be factored autoregressively:
+</p>
+
+$$
+q_\theta(\bm{s}) = \prod_{i=1}^{n} q_\theta(s_i \mid s_1, \ldots, s_{i-1}) \tag{3}
+$$
+
+<p>
+Each conditional $q_\theta(s_i \mid s_{\lt i})$ is parameterized by a neural network that takes the previously-assigned spins as input and outputs a probability for $s_i = +1$. The key advantage over MCMC: samples are drawn in a single forward pass (no mixing time), and $\ln q_\theta(\bm{s})$ is tractable (sum of log-conditionals), enabling direct gradient-based optimization.
+</p>
+
+<h3>3.2 Four Message Passing Mechanisms</h3>
+
+<p>
+MPVAN introduces a hierarchy of message passing strategies, each adding more physical structure:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Method</th>
+  <th>Message weights</th>
+  <th>What it captures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>VAN</strong> (baseline)</td>
+  <td>None (dense autoregressive)</td>
+  <td>Generic correlations, no graph structure</td>
+</tr>
+<tr>
+  <td><strong>GCon-VAN</strong></td>
+  <td>Learned, graph-constrained</td>
+  <td>Graph adjacency structure</td>
+</tr>
+<tr>
+  <td><strong>Graph MP</strong></td>
+  <td>Uniform over neighbors</td>
+  <td>Local connectivity</td>
+</tr>
+<tr>
+  <td><strong>Hamiltonians MP</strong></td>
+  <td>$J_{ij}$ (Hamiltonian couplings)</td>
+  <td>Physical interaction strengths</td>
+</tr>
+</tbody>
+</table>
+
+<div class="mpvan-result">
+<div class="label">MPVAN Key Result</div>
+<p>
+<strong>Hamiltonian couplings as message weights outperform all other strategies.</strong> On the frustrated $J_1$-$J_2$ model, Hamiltonians MP achieves ground-state energy within 0.1% of exact diagonalization, while generic GCN aggregation (Graph MP) stalls at 2&ndash;5% error. The physical coupling structure is not redundant information &mdash; it is the single most important inductive bias.
+</p>
+</div>
+
+<h3>3.3 Variational Free Energy Objective</h3>
+
+<p>
+The network is trained to minimize the variational free energy:
+</p>
+
+$$
+F_\theta = \mathbb{E}_{q_\theta}\!\big[H(\bm{s})\big] + T \cdot \mathbb{E}_{q_\theta}\!\big[\ln q_\theta(\bm{s})\big] \tag{4}
+$$
+
+<p>
+At temperature $T$, $F_\theta \geq F_{\text{exact}}$ (the exact free energy), with equality when $q_\theta = P_{\text{Boltzmann}}$. Equivalently, $\text{KL}(q_\theta \| P) = (F_\theta - F_{\text{exact}}) / T \geq 0$. Temperature annealing &mdash; starting at high $T$ (easy, nearly uniform distribution) and slowly cooling &mdash; avoids mode collapse at low temperatures.
+</p>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 4 -->
+<!-- ================================================================= -->
+<h2 id="sec4">4. The Synthesis &mdash; Edge-MPVAN Architecture</h2>
+
+<h3>4.1 From Vertex Spins to Edge Spins</h3>
+
+<p>
+The conceptual shift from MPVAN to Edge-MPVAN:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th></th>
+  <th>MPVAN (vertex-level)</th>
+  <th>Edge-MPVAN (edge-level)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Spin location</strong></td>
+  <td>Vertices $s_v \in \{+1,-1\}$</td>
+  <td>Edges $\sigma_e \in \{+1,-1\}$</td>
+</tr>
+<tr>
+  <td><strong>Coupling structure</strong></td>
+  <td>Edges carry $J_{ij}$</td>
+  <td>Vertices mediate spin interactions</td>
+</tr>
+<tr>
+  <td><strong>Hamiltonian</strong></td>
+  <td>$H = \sum_{ij} J_{ij} s_i s_j$</td>
+  <td>$H = \frac{\varepsilon}{2} \bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$</td>
+</tr>
+<tr>
+  <td><strong>Message passing</strong></td>
+  <td>$L_0 = B_1 B_1^T$ (graph Laplacian)</td>
+  <td>Four EIGN operators from $B_1, |B_1|$</td>
+</tr>
+<tr>
+  <td><strong>Autoregressive unit</strong></td>
+  <td>$q_\theta(s_v \mid s_{\lt v})$</td>
+  <td>$q_\theta(\sigma_e \mid \sigma_{\lt e})$</td>
+</tr>
+<tr>
+  <td><strong>Ground-state constraint</strong></td>
+  <td>None (Ising model has unique or few ground states)</td>
+  <td>Ice rule: $B_1 \bm{\sigma} = 0$ (exponential degeneracy)</td>
+</tr>
+</tbody>
+</table>
+
+<div class="synthesis">
+<div class="label">The EIGN&ndash;MPVAN Connection</div>
+<p>
+MPVAN's "Hamiltonians MP" principle states that message weights should equal the Hamiltonian couplings $J_{ij}$. For ASI, the Hamiltonian $H = \frac{\varepsilon}{2}\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$ means the coupling between edges $e$ and $e'$ is $(L_1^{\text{down}})_{ee'} = (B_1^T B_1)_{ee'}$. This is <em>identically</em> EIGN's equ&rarr;equ operator. <strong>MPVAN's best strategy (Hamiltonians MP) is EIGN's default convolution.</strong> No separate Hamiltonian encoding step is needed.
+</p>
+</div>
+
+<h3>4.2 The EIGN-MPVAN Layer</h3>
+
+<p>
+An Edge-MPVAN layer takes edge features $(X_{\text{equ}}^{(\ell)}, X_{\text{inv}}^{(\ell)})$ and produces updated features. Using the operator dictionary from &sect;2:
+</p>
+
+$$
+X_{\text{equ}}^{(\ell+1)} = \sigma\!\Big(
+  \underbrace{L_1^{\text{down}} \, X_{\text{equ}}^{(\ell)} \, W_1^{(\ell)}}_{\text{equ}\to\text{equ: Hamiltonian MP}}
+  + \underbrace{B_1^T |B_1| \, X_{\text{inv}}^{(\ell)} \, W_2^{(\ell)}}_{\text{inv}\to\text{equ: geometry}\to\text{spin}}
+  + X_{\text{equ}}^{(\ell)} \, W_5^{(\ell)}
+\Big) \tag{5}
+$$
+
+$$
+X_{\text{inv}}^{(\ell+1)} = \sigma\!\Big(
+  \underbrace{|B_1|^T |B_1| \, X_{\text{inv}}^{(\ell)} \, W_3^{(\ell)}}_{\text{inv}\to\text{inv: geometry diffusion}}
+  + \underbrace{|B_1|^T B_1 \, X_{\text{equ}}^{(\ell)} \, W_4^{(\ell)}}_{\text{equ}\to\text{inv: charge monitor}}
+  + X_{\text{inv}}^{(\ell)} \, W_6^{(\ell)}
+\Big) \tag{6}
+$$
+
+<p>
+The skip connections ($W_5, W_6$) are critical: they preserve information in $\ker(L_1^{\text{down}})$, which is exactly the ice manifold. Without them, the equ&rarr;equ channel annihilates all ice-rule-satisfying signal components.
+</p>
+
+<div class="remark">
+<div class="label">Remark (Physical Interpretation of Each Channel)</div>
+<p>
+<strong>equ&rarr;equ</strong> ($L_1^{\text{down}}$): This IS the ASI Hamiltonian. It computes how each spin interacts with its neighbors through shared vertices. On ice-rule configurations ($\bm{\sigma} \in \ker B_1$), this term vanishes &mdash; ice states are invisible to the Hamiltonian channel. <strong>equ&rarr;inv</strong> ($|B_1|^T B_1$): Computes unsigned vertex-charge accumulation &mdash; a real-time ice-rule violation detector. During autoregressive generation, this monitors whether partially-assigned configurations are trending toward or away from ice-rule satisfaction. <strong>inv&rarr;equ</strong> ($B_1^T |B_1|$): Allows lattice geometry (coordination numbers, coupling strengths) to modulate spin dynamics. On heterogeneous lattices (shakti, tetris) with mixed coordination $z = 2, 3, 4$, this channel encodes the structural context that determines which spin assignments are favorable.
+</p>
+</div>
+
+<h3>4.3 Autoregressive Masking (Mode B Only)</h3>
+
+<div class="convention">
+<div class="label">Masking Is a Mode B Concern</div>
+<p>
+Causal masking of the EIGN operators is required <strong>only for Mode B</strong> (direct edge sampling, &sect;7), where individual edge spins are sampled sequentially and each edge must not see future assignments. <strong>Mode A</strong> (loop-basis sampling, &sect;6) avoids masking entirely: the EIGN layers always operate on a fully-assigned spin configuration (the seed plus loops flipped so far), and the autoregressive decisions are over loop flips, not individual edges. This makes Mode A substantially simpler to implement and is a key reason to build it first (see &sect;10.1).
+</p>
+</div>
+
+<p>
+For Mode B, to enforce the autoregressive property $q_\theta(\sigma_e \mid \sigma_{\lt e})$, edge $e$ must only receive messages from edges $e' \lt e$ in the ordering. This requires <strong>causal masking</strong> of the sparse operators.
+</p>
+
+<p>
+For the self-modal operators ($L_1^{\text{down}}$, $|B_1|^T |B_1|$): zero out entries $(L)_{ee'}$ where $e' \geq e$, producing lower-triangular sparse matrices. For the cross-modal operators ($|B_1|^T B_1$, $B_1^T |B_1|$): mask at the vertex aggregation step &mdash; when vertex $v$ aggregates information from its incident edges, only include edges $e' \lt e$ in the sum.
+</p>
+
+<p>
+Implementation: precompute the masked sparse matrices for each ordering. Since the operators are already sparse (each row has at most $2z_{\max} - 1$ nonzero entries), the masked versions have the same sparsity pattern with some entries zeroed.
+</p>
+
+<h3>4.4 Edge Ordering Strategies</h3>
+
+<p>
+The ordering of edges in the autoregressive decomposition affects the quality of conditional predictions. Four strategies:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>BFS from seed vertex:</strong> Start at a vertex, order its incident edges, then expand to neighboring vertices. Spatially coherent: each new edge shares a vertex with an already-assigned edge, maximizing connected context. This is the recommended default.</li>
+<li><strong>Spectral ordering:</strong> Sort edges by the Fiedler vector of $L_1^{\text{down}}$ (second-smallest eigenvector, available from our spectral catalog). Groups edges by their position in the "smoothest" mode of the Hamiltonian. Captures long-range structure but may be spatially fragmented.</li>
+<li><strong>Physics-informed (backbone-first):</strong> For heterogeneous lattices (tetris, shakti), assign high-coordination edges first (they participate in more constraints). This front-loads the most constrained decisions, leaving easier completions for later.</li>
+<li><strong>Random ordering:</strong> Train with random permutations at each epoch (&agrave; la MADE). Produces order-agnostic conditionals but may sacrifice per-ordering quality. Enables arbitrary-order sampling at test time.</li>
+</ul>
+
+<h3>4.5 Dual Modality in the Autoregressive Setting</h3>
+
+<p>
+At step $k$ of autoregressive generation, edges $e_1, \ldots, e_{k-1}$ have been assigned spins $\sigma_{e_1}, \ldots, \sigma_{e_{k-1}}$, and we must compute $q_\theta(\sigma_{e_k} \mid \sigma_{\lt e_k})$:
+</p>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Equivariant input:</strong> The partially-assigned spin vector $\tilde{\bm{\sigma}} \in \R^{n_1}$ with $\tilde{\sigma}_e = \sigma_e$ for $e \lt e_k$ and $\tilde{\sigma}_e = 0$ for $e \geq e_k$. This is equivariant: flipping edge $e$'s orientation negates $\tilde{\sigma}_e$.</li>
+<li><strong>Invariant input:</strong> Static geometric features $(z_u, z_v, \ell_e, J_e)$ for all edges &mdash; always fully available, no masking needed. These are genuinely invariant (they do not depend on edge orientation).</li>
+<li><strong>Output head:</strong> After $K$ EIGN layers, the equivariant features at edge $e_k$ are passed through a sigmoid to produce $p_k = \Pr(\sigma_{e_k} = +1 \mid \sigma_{\lt e_k})$.</li>
+</ul>
+
+<div class="proposition">
+<div class="label">Proposition 2 (Equivariance of Output)</div>
+<p>
+The conditional probability $q_\theta(\sigma_{e_k} \mid \sigma_{\lt e_k})$ is equivariant under orientation reversal: if we flip the reference orientation of edge $e_k$, the probability that the spin points in the positive direction flips, i.e., $q_\theta(\sigma_{e_k} = +1)$ becomes $q_\theta(\sigma_{e_k} = -1)$. This follows from EIGN's equivariance guarantee (the equivariant output channel produces signals that negate under orientation reversal) composed with the sigmoid output.
+</p>
+</div>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 5 -->
+<!-- ================================================================= -->
+<h2 id="sec5">5. Training Objective</h2>
+
+<h3>5.1 Variational Free Energy</h3>
+
+<p>
+Edge-MPVAN is trained by minimizing the variational free energy over edge spin configurations:
+</p>
+
+$$
+F_\theta = \mathbb{E}_{q_\theta}\!\left[\frac{\varepsilon}{2} \bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}\right] + T \cdot \mathbb{E}_{q_\theta}\!\big[\ln q_\theta(\bm{\sigma})\big] \tag{7}
+$$
+
+<p>
+The first term is the expected energy; the second is the negative entropy (times temperature). At temperature $T$, the exact Boltzmann distribution $P(\bm{\sigma}) \propto e^{-H(\bm{\sigma})/T}$ minimizes $F$. The gap $F_\theta - F_{\text{exact}} = T \cdot \text{KL}(q_\theta \| P) \geq 0$ measures how well the network approximates the Boltzmann distribution.
+</p>
+
+<h3>5.2 Gradient Estimation</h3>
+
+<p>
+The gradient $\nabla_\theta F_\theta$ is estimated via REINFORCE with a running-mean baseline $b$:
+</p>
+
+$$
+\nabla_\theta F_\theta \approx \frac{1}{M} \sum_{m=1}^{M} \left[\left(\frac{\varepsilon}{2} \bm{\sigma}_m^T L_1^{\text{down}} \bm{\sigma}_m + T \ln q_\theta(\bm{\sigma}_m) - b\right) \nabla_\theta \ln q_\theta(\bm{\sigma}_m)\right] \tag{8}
+$$
+
+<p>
+where $\bm{\sigma}_m \sim q_\theta$ are autoregressive samples. The log-probability decomposes as:
+</p>
+
+$$
+\ln q_\theta(\bm{\sigma}) = \sum_{e} \ln q_\theta(\sigma_e \mid \sigma_{\lt e}) \tag{9}
+$$
+
+<p>
+Each term is a binary cross-entropy, computed during the forward pass. The gradient $\nabla_\theta \ln q_\theta(\bm{\sigma})$ is obtained by standard backpropagation through the autoregressive network.
+</p>
+
+<h3>5.3 Temperature Annealing</h3>
+
+<p>
+Training proceeds with a geometric temperature schedule:
+</p>
+
+$$
+T(\text{epoch}) = T_{\max} \cdot \left(\frac{T_{\min}}{T_{\max}}\right)^{\text{epoch} / \text{total}} \tag{10}
+$$
+
+<p>
+<strong>Lattice-adapted calibration:</strong> $T_{\max}$ should be set relative to the spectral gap $\Delta_1$ from the catalog: $T_{\max} \sim \varepsilon \cdot \Delta_1 \cdot n_1$, ensuring that at $T_{\max}$ the Boltzmann distribution is nearly uniform over low-energy states. $T_{\min}$ should be small enough that the distribution concentrates on ground states ($T_{\min} \ll \varepsilon \Delta_1$).
+</p>
+
+<div class="example">
+<div class="label">Example (Temperature Calibration for Kagome M)</div>
+<p>
+Kagome M: $\Delta_1 = 0.03281$, $n_1 = 2{,}400$, $\varepsilon = 1$. The energy gap between the ice manifold ($H = 0$) and the first excited state is $\Delta E_{\min} = (\varepsilon/2) \Delta_1 \approx 0.0164$. Set $T_{\max} = 10 \Delta E_{\min} \approx 0.164$ (well above the gap, nearly uniform in the low-energy sector) and $T_{\min} = 0.01 \Delta E_{\min} \approx 0.000164$ (deep in the ground-state-dominated regime).
+</p>
+</div>
+
+<h3>5.4 Importance Sampling for Evaluation</h3>
+
+<p>
+Given samples $\bm{\sigma}_m \sim q_\theta$ with known log-probabilities $\ln q_\theta(\bm{\sigma}_m)$, we can compute unbiased estimates of any Boltzmann-weighted observable via importance weights:
+</p>
+
+$$
+\langle O \rangle_P \approx \frac{\sum_m w_m \, O(\bm{\sigma}_m)}{\sum_m w_m}, \qquad w_m = \frac{e^{-H(\bm{\sigma}_m)/T}}{q_\theta(\bm{\sigma}_m)} \tag{11}
+$$
+
+<p>
+The effective sample size $n_{\text{eff}} = (\sum w_m)^2 / \sum w_m^2$ measures how well $q_\theta$ approximates $P$: when $q_\theta = P$, $n_{\text{eff}} = M$ (all weights equal).
+</p>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 6 -->
+<!-- ================================================================= -->
+<h2 id="sec6">6. Sampling Mode A &mdash; Loop-Basis (Ice Rule Guaranteed)</h2>
+
+<h3>6.1 The Loop Basis Idea</h3>
+
+<p>
+Every ice-rule configuration can be written as a <strong>seed state</strong> plus a set of <strong>loop flips</strong>:
+</p>
+
+$$
+\bm{\sigma} = \bm{\sigma}_{\text{seed}} \oplus \bigoplus_{i=1}^{\beta_1} \alpha_i \, \bm{l}_i, \qquad \alpha_i \in \{0, 1\} \tag{12}
+$$
+
+<p>
+where $\oplus$ denotes spin-flip composition (multiply element-wise by $(-1)^{\text{loop edges}}$), $\bm{\sigma}_{\text{seed}}$ is a reference ice state (computed by <code>find_seed_ice_state()</code>, an $O(n)$ Eulerian circuit construction), and $\{\bm{l}_i\}_{i=1}^{\beta_1}$ are the $\beta_1$ independent loops spanning $\ker(B_1)$.
+</p>
+
+<p>
+The critical property: <strong>any combination of loop flips preserves the ice rule</strong>. If $B_1 \bm{\sigma}_{\text{seed}} = 0$ and each $\bm{l}_i$ is a cycle ($B_1 \bm{l}_i = 0$), then flipping any subset leaves the vertex charges unchanged. This is a consequence of $\ker(B_1)$ being a linear subspace: any XOR combination of ice states is an ice state.
+</p>
+
+<h3>6.2 Loop-MPVAN Architecture</h3>
+
+<p>
+Instead of autoregressively sampling $n_1$ individual edge spins, Loop-MPVAN autoregressively samples $\beta_1$ <strong>loop-flip decisions</strong>:
+</p>
+
+$$
+q_\theta(\bm{\alpha}) = \prod_{i=1}^{\beta_1} q_\theta(\alpha_i \mid \alpha_1, \ldots, \alpha_{i-1}) \tag{13}
+$$
+
+<p>
+At step $i$, the network sees the current spin configuration (the seed plus all loops flipped so far) and decides whether to flip loop $i$. The EIGN layers operate on the <strong>full lattice</strong> &mdash; message passing runs over all $n_1$ edges to provide context &mdash; but the output is a single binary probability for the $i$-th loop.
+</p>
+
+<div class="remark">
+<div class="label">Remark (No Causal Masking Required)</div>
+<p>
+Unlike Mode B (&sect;7), Mode A does <strong>not</strong> require causal masking of the EIGN operators. At every autoregressive step $i$, the spin configuration $\bm{\sigma}^{(i)} = \bm{\sigma}_{\text{seed}} \oplus \alpha_1 \bm{l}_1 \oplus \cdots \oplus \alpha_{i-1} \bm{l}_{i-1}$ is <em>fully assigned on all $n_1$ edges</em> &mdash; each edge has a definite spin value $\pm 1$. The EIGN layers simply process this complete spin configuration as equivariant input, using the standard (unmasked) operators $L_1^{\text{down}}$, $|B_1|^T B_1$, etc. The only autoregressive constraint is that the <em>output</em> at step $i$ must not depend on future loop decisions $\alpha_{i+1}, \ldots, \alpha_{\beta_1}$ &mdash; and it does not, because those loops have not yet been applied to the spin configuration. This eliminates the single hardest engineering challenge of Mode B and is a primary reason for building Mode A first (see &sect;10.1).
+</p>
+</div>
+
+<div class="key-result">
+<div class="label">Sequence Length Reduction</div>
+<p>
+Loop-MPVAN reduces the autoregressive sequence length from $n_1$ (number of edges) to $\beta_1$ (first Betti number). For the lattices in our catalog at size M:
+</p>
+<table style="margin-top: 0.5rem;">
+<thead>
+<tr><th>Lattice</th><th>$n_1$ (edges)</th><th>$\beta_1$ (loops)</th><th>Reduction</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>800</td><td>401</td><td>2.0&times;</td></tr>
+<tr><td>Kagome</td><td>2,400</td><td>1,201</td><td>2.0&times;</td></tr>
+<tr><td>Santa Fe</td><td>3,600</td><td>1,201</td><td>3.0&times;</td></tr>
+<tr><td>Tetris</td><td>4,800</td><td>1,601</td><td>3.0&times;</td></tr>
+<tr><td>Shakti</td><td>9,600</td><td>3,201</td><td>3.0&times;</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>6.3 Advantages</h3>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Exact ice-rule satisfaction</strong> for every generated sample &mdash; by construction, not by penalty.</li>
+<li><strong>Reduced sequence length:</strong> $\beta_1 \lt n_1$, with 2&ndash;3&times; reduction depending on lattice.</li>
+<li><strong>Natural for $T = 0$ sampling:</strong> All ice states have $H = 0$, so the variational free energy reduces to pure entropy: $F_\theta = T \cdot \mathbb{E}[\ln q_\theta]$. Minimizing $F_\theta$ at $T \to 0$ is equivalent to maximizing entropy &mdash; the network learns to sample uniformly from the ice manifold.</li>
+<li><strong>Topology-aware:</strong> The loop basis encodes the topological structure of the ice manifold. The network directly learns correlations between topological cycles.</li>
+</ul>
+
+<h3>6.4 Challenges</h3>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Computing the cycle basis:</strong> Required as preprocessing. NetworkX's <code>cycle_basis()</code> finds a set of $\beta_1$ independent cycles in $O(n_1 \cdot \beta_1)$ time. For kagome M ($\beta_1 = 1{,}201$), this is feasible but not trivial.</li>
+<li><strong>Loop ordering matters:</strong> The autoregressive quality depends on the ordering of loops. Spatially adjacent loops share edges and have correlated flip decisions. BFS ordering on the "loop adjacency graph" (loops connected if they share edges) may be optimal.</li>
+<li><strong>Non-local correlations:</strong> Flipping a large loop changes spins on edges spread across the lattice. The EIGN message-passing layers must have sufficient depth to propagate information across the loop's extent. The number of layers needed scales as the loop diameter divided by the message-passing receptive field.</li>
+</ul>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 7 -->
+<!-- ================================================================= -->
+<h2 id="sec7">7. Sampling Mode B &mdash; Direct Edge (Finite Temperature)</h2>
+
+<h3>7.1 Direct Autoregressive Edge Sampling</h3>
+
+<p>
+For finite-temperature sampling, we directly sample each edge spin $\sigma_e \in \{+1, -1\}$ in sequence:
+</p>
+
+$$
+q_\theta(\bm{\sigma}) = \prod_{e=1}^{n_1} q_\theta(\sigma_e \mid \sigma_{\lt e}) \tag{14}
+$$
+
+<p>
+Unlike Mode A, this allows configurations that <em>violate</em> the ice rule, with energy penalty from the Hamiltonian. This is physically correct at finite temperature: thermal excitations create monopole pairs (vertex-charge violations) with energy cost $H = (\varepsilon/2)\|B_1 \bm{\sigma}\|^2$.
+</p>
+
+<p>
+The equ&rarr;inv channel ($|B_1|^T B_1$) serves as a <strong>real-time charge monitor</strong>: during generation, the invariant features track the running vertex charges, providing the network with feedback about ice-rule compliance as each spin is assigned.
+</p>
+
+<h3>7.2 Soft Ice-Rule Constraint</h3>
+
+<p>
+To improve sample quality at low temperatures, add a soft constraint to the loss:
+</p>
+
+$$
+\mathcal{L} = F_\theta + \lambda(T) \cdot \mathbb{E}_{q_\theta}\!\left[\|B_1 \bm{\sigma}\|^2\right] \tag{15}
+$$
+
+<p>
+with $\lambda(T)$ scaling as $1/T$: strong ice-rule enforcement at low temperature, relaxed at high temperature. At $T \to 0$, this drives the network toward configurations in $\ker(B_1)$, recovering Mode A's exact ice-rule satisfaction in the limit.
+</p>
+
+<h3>7.3 Hierarchical Decomposition</h3>
+
+<div class="conjecture">
+<div class="label">Conjecture 1 (Hierarchical Decomposition)</div>
+<p>
+Any spin configuration decomposes as $\bm{\sigma} = \bm{\sigma}_{\text{ice}} + \bm{\sigma}_{\text{exc}}$, where $\bm{\sigma}_{\text{ice}} \in \ker(B_1)$ is the projection onto the ice manifold and $\bm{\sigma}_{\text{exc}} \in \im(B_1^T)$ is the gradient (excitation) component. The energy is $H(\bm{\sigma}) = (\varepsilon/2)\|\bm{\sigma}_{\text{exc}}\|_{L_1^{\text{down}}}^2$ (the cross term vanishes by orthogonality). A two-stage sampler could exploit this: (A) sample from the ice manifold using Loop-MPVAN, (B) sample excitations from $\im(B_1^T)$ using a smaller autoregressive model. Stage B conditions on Stage A's output and adds gradient-component perturbations.
+</p>
+</div>
+
+<h3>7.4 Advantages</h3>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>General:</strong> Handles any temperature, including phase transitions between ice-rule and paramagnetic phases.</li>
+<li><strong>The charge monitor provides physically meaningful intermediate representations:</strong> The invariant channel tracks vertex charges $Q_v$ at each layer, enabling the network to "see" where ice-rule violations are forming during autoregressive generation.</li>
+<li><strong>Can study monopole physics:</strong> At intermediate temperatures, thermal excitations create monopole pairs (vertices with $|Q_v| > 0$) connected by "Dirac strings" of flipped spins. The network must learn to create these correlated excitations, which requires understanding the string tension (proportional to $\Delta_1$).</li>
+</ul>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 8 -->
+<!-- ================================================================= -->
+<h2 id="sec8">8. Experimental Design</h2>
+
+<h3>8.1 Task Matrix</h3>
+
+<table>
+<thead>
+<tr>
+  <th>Task</th>
+  <th>Mode</th>
+  <th>What it tests</th>
+  <th>Lattice priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Ice ground state sampling</td>
+  <td>Loop-Basis</td>
+  <td>Can network sample uniformly from $\ker(B_1)$?</td>
+  <td>Square XS (exact check), Kagome M, Tetris M</td>
+</tr>
+<tr>
+  <td>Thermal ensemble at fixed $T$</td>
+  <td>Direct Edge</td>
+  <td>Can network approximate Boltzmann distribution?</td>
+  <td>Square S (exact comparison), Shakti S</td>
+</tr>
+<tr>
+  <td>Specific heat curve $C(T)$</td>
+  <td>Direct Edge</td>
+  <td>Can network capture phase transition?</td>
+  <td>All 5 lattices at size S</td>
+</tr>
+<tr>
+  <td>Frustrated ground state</td>
+  <td>Both</td>
+  <td>Find minimum $H$ on lattices with residual frustration</td>
+  <td>Open-BC lattices (odd-degree vertices)</td>
+</tr>
+<tr>
+  <td>Cross-lattice transfer</td>
+  <td>Loop-Basis</td>
+  <td>Does the network learn general ice-rule physics?</td>
+  <td>Train square, test kagome/shakti</td>
+</tr>
+</tbody>
+</table>
+
+<h3>8.2 Baselines</h3>
+
+<ul style="margin-bottom: 1rem;">
+<li><strong>Loop-flip MCMC</strong> (existing <code>sample_ice_states()</code>): The standard ASI sampling method, using directed random loops that preserve vertex charges. Baseline for both sample quality and wall-clock efficiency.</li>
+<li><strong>Standard MPVAN on line graph $L(G)$:</strong> Map edges to vertices via the line graph construction, then apply vanilla MPVAN. This is the "obvious" approach but loses orientation equivariance: the line graph does not know which direction spins point.</li>
+<li><strong>Simulated annealing:</strong> Direct energy minimization without the variational framework. Start from random spins, anneal temperature, use single-spin or loop flips. Standard baseline for ground-state search.</li>
+<li><strong>Exact enumeration (XS sizes only):</strong> For square XS ($n_1 = 32$, $\beta_1 = 9$, $2^9 = 512$ ice states), enumerate all configurations and compute exact distributions. Ground truth for validation.</li>
+</ul>
+
+<h3>8.3 Metrics</h3>
+
+<h4>Sample Quality</h4>
+<ul style="margin-bottom: 0.5rem;">
+<li><strong>Energy distribution:</strong> Compare $\langle H \rangle_{q_\theta}$ and $\text{Var}(H)_{q_\theta}$ against exact or MCMC values.</li>
+<li><strong>Ice-rule violation rate:</strong> For Mode B, measure $\langle \|B_1 \bm{\sigma}\|^2 \rangle / n_0$ (should be $\approx 0$ at low $T$).</li>
+<li><strong>Boltzmann KL divergence:</strong> At XS sizes where exact enumeration is feasible, compute $\text{KL}(q_\theta \| P)$ directly.</li>
+</ul>
+
+<h4>Sample Diversity</h4>
+<ul style="margin-bottom: 0.5rem;">
+<li><strong>Hamming distance:</strong> Average pairwise Hamming distance $d_H(\bm{\sigma}_a, \bm{\sigma}_b) / n_1$ between independent samples. For uniform ice-manifold sampling, this should be $\approx 0.5$.</li>
+<li><strong>Effective sample size:</strong> $n_{\text{eff}} = (\sum w_m)^2 / \sum w_m^2$ from importance weights (Eq.&nbsp;11). Higher is better.</li>
+</ul>
+
+<h4>Efficiency</h4>
+<ul style="margin-bottom: 0.5rem;">
+<li><strong>Wall-clock time per independent sample:</strong> For MCMC, this is the time per sample times the autocorrelation time. For Edge-MPVAN, it is the time for one forward pass (samples are independent by construction).</li>
+</ul>
+
+<h4>Physics</h4>
+<ul style="margin-bottom: 1rem;">
+<li><strong>Specific heat:</strong> $C(T) = (\langle H^2 \rangle - \langle H \rangle^2) / T^2$, computed from samples at each temperature.</li>
+<li><strong>Vertex charge variance:</strong> $\langle Q^2 \rangle(T) = \langle \|B_1 \bm{\sigma}\|^2 / n_0 \rangle$, measuring the density of monopole excitations.</li>
+<li><strong>Spin-spin correlations:</strong> $C(r) = \langle \sigma_e \sigma_{e'} \rangle$ as a function of edge separation $r$.</li>
+</ul>
+
+<h3>8.4 Scaling Progression</h3>
+
+<p>
+Start small, scale up as each stage validates:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Stage</th>
+  <th>Lattice &amp; Size</th>
+  <th>$n_1$</th>
+  <th>$\beta_1$</th>
+  <th>Validation method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1. Proof of concept</td>
+  <td>Square XS (4&times;4)</td>
+  <td>32</td>
+  <td>9</td>
+  <td>Exact enumeration (512 ice states)</td>
+</tr>
+<tr>
+  <td>2. First real test</td>
+  <td>Kagome S (10&times;10)</td>
+  <td>600</td>
+  <td>301</td>
+  <td>MCMC comparison, Pauling estimate</td>
+</tr>
+<tr>
+  <td>3. Frustrated lattice</td>
+  <td>Tetris M (20&times;20)</td>
+  <td>4,800</td>
+  <td>1,601</td>
+  <td>MCMC comparison, specific heat</td>
+</tr>
+<tr>
+  <td>4. Maximally frustrated</td>
+  <td>Shakti M (20&times;20)</td>
+  <td>9,600</td>
+  <td>3,201</td>
+  <td>MCMC comparison, transfer learning</td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 9 -->
+<!-- ================================================================= -->
+<h2 id="sec9">9. Open Questions</h2>
+
+<h3>9.1 Does autoregressive masking degrade message passing enough to matter?</h3>
+
+<p>
+Causal masking breaks the symmetry of the sparse operators &mdash; $L_1^{\text{down}}$ becomes lower-triangular, losing some neighbor information. BFS ordering mitigates this by ensuring spatial coherence: most of an edge's neighbors in the lattice appear before it in the ordering. Whether this is sufficient, or whether techniques like bidirectional context (processing a reverse pass after the forward pass) are needed, is an empirical question.
+</p>
+
+<h3>9.2 Can the network discover long-range correlations?</h3>
+
+<p>
+Ice-rule configurations on the kagome lattice exhibit algebraically decaying spin-spin correlations ($C(r) \sim r^{-\eta}$, $\eta = 2$ for the height function). The correlation length is set by the spectral gap: $\xi \sim 1/\sqrt{\Delta_1}$. At size M, $\Delta_1 \approx 0.033$ gives $\xi \approx 5.5$ lattice spacings. The EIGN message-passing receptive field grows linearly with depth, so $\sim \xi / a$ layers are needed to capture the full correlation structure. For kagome M, this is $\sim$6 layers &mdash; quite feasible.
+</p>
+
+<h3>9.3 Is loop-basis ordering important?</h3>
+
+<p>
+For Mode A, the $\beta_1$ loops must be ordered for autoregressive sampling. A natural approach: project each loop onto the low-energy eigenmodes of $L_1^{\text{down}}$ and sort by spectral content (smooth loops first, oscillatory loops last). Alternatively, order by spatial locality (cluster spatially overlapping loops). The best ordering likely depends on the lattice topology and is worth systematic investigation.
+</p>
+
+<h3>9.4 Can Edge-MPVAN compete with parallel tempering?</h3>
+
+<p>
+Parallel tempering (replica exchange) is a sophisticated MCMC technique that maintains replicas at multiple temperatures and exchanges configurations between them. It is the state-of-the-art for sampling frustrated spin systems. Whether Edge-MPVAN can match its sample quality while offering faster per-sample generation (no autocorrelation) is the key practical question.
+</p>
+
+<h3>9.5 Magnetic Laplacian extension</h3>
+
+<div class="conjecture">
+<div class="label">Conjecture 2 (Magnetic Laplacian for Applied Fields)</div>
+<p>
+An external magnetic field applied to an ASI lattice introduces a preferred spin direction, breaking the $\sigma_e \to -\sigma_e$ symmetry. This can be modeled by replacing $L_{\text{equ}} = B_1^T B_1$ with the magnetic Laplacian $L^{(q)} = B^{(q)T} B^{(q)}$ where $B^{(q)}[v,e] = B_1[v,e] \cdot e^{iq_e}$. A nonzero field generically lifts the ground-state degeneracy, reducing $\dim(\ker L^{(q)})$ from $\beta_1$ toward zero. This would provide a continuous interpolation between the "exponentially degenerate" and "unique ground state" regimes, controlled by a physically meaningful parameter.
+</p>
+</div>
+
+
+<!-- ================================================================= -->
+<!-- SECTION 10 -->
+<!-- ================================================================= -->
+<h2 id="sec10">10. Implementation Roadmap</h2>
+
+<p>
+The two sampling modes share a large common infrastructure. Mode A (loop-basis) is substantially simpler to implement and should be built first; Mode B (direct edge) then extends Mode A by adding causal masking and edge-level autoregression. This section makes the dependency structure explicit.
+</p>
+
+<h3>10.1 Build Order Rationale: Mode A First</h3>
+
+<div class="key-result">
+<div class="label">Why Mode A Before Mode B</div>
+<p>
+<strong>1. No causal masking.</strong> Mode A's EIGN layers operate on fully-assigned spin configurations at every autoregressive step (the seed plus loops flipped so far). The standard, unmasked operators $L_1^{\text{down}}$, $|B_1|^T B_1$, etc. are used directly. Mode B requires precomputing lower-triangular masked versions of all four operators for a given edge ordering &mdash; the single hardest engineering challenge. Building Mode A first lets you validate the <code>EIGNLayer</code> without this complexity.<br><br>
+<strong>2. Exact validation at XS size.</strong> Square XS has $\beta_1 = 9$, giving $2^9 = 512$ ice states. All can be enumerated and the network's output distribution compared to uniform &mdash; a hard, unambiguous correctness check before scaling up.<br><br>
+<strong>3. Everything carries forward.</strong> Mode B reuses the EIGN operators, the <code>EIGNLayer</code> module, the training loop (same REINFORCE + annealing), and the evaluation metrics. It adds masking, edge ordering, and the soft ice-rule constraint on top.<br><br>
+<strong>4. Loop basis aids Mode B validation.</strong> Even when doing direct-edge sampling, projecting Mode B samples onto the loop basis measures how much of the ice manifold the network has explored.
+</p>
+</div>
+
+<h3>10.2 Shared Infrastructure (Both Modes)</h3>
+
+<table>
+<thead>
+<tr>
+  <th>Component</th>
+  <th>Description</th>
+  <th>Existing code</th>
+  <th>New code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>EIGN operators in PyTorch</strong></td>
+  <td>Convert $B_1$ from scipy CSC to <code>torch.sparse_csr_tensor</code>; compute $|B_1|$ (element-wise absolute value of sparse matrix); precompute four operator products $B_1^T B_1$, $|B_1|^T |B_1|$, $|B_1|^T B_1$, $B_1^T |B_1|$ as sparse tensors</td>
+  <td><code>build_B1()</code> in <code>src/topology/incidence.py</code><br><code>build_all_laplacians()</code> in <code>src/topology/laplacians.py</code></td>
+  <td>Scipy&rarr;PyTorch conversion utilities</td>
+</tr>
+<tr>
+  <td><strong><code>EIGNLayer</code> module</strong></td>
+  <td>Dual-channel update (Eqs.&nbsp;5&ndash;6): four sparse&ndash;dense matrix multiplies, six learnable weight matrices $W_1, \ldots, W_6$, pointwise activation, skip connections. No masking at this level &mdash; masking is handled by the Mode B wrapper</td>
+  <td>Operator products from above</td>
+  <td><code>EIGNLayer(nn.Module)</code></td>
+</tr>
+<tr>
+  <td><strong>Training loop</strong></td>
+  <td>Variational free energy (Eq.&nbsp;7); REINFORCE gradient with running-mean baseline (Eq.&nbsp;8); geometric temperature annealing (Eq.&nbsp;10); logging, checkpointing</td>
+  <td>Lattice construction from <code>LATTICE_REGISTRY</code></td>
+  <td>Training script, loss functions, annealing schedule</td>
+</tr>
+<tr>
+  <td><strong>Evaluation / metrics</strong></td>
+  <td>Energy computation ($\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$ via sparse multiply); ice-rule violation ($\|B_1 \bm{\sigma}\|^2 / n_0$); Hamming distance between samples; importance-weighted estimators (Eq.&nbsp;11); effective sample size</td>
+  <td><code>verify_ice_state()</code> in <code>src/topology/ice_sampling.py</code></td>
+  <td>Metric computation utilities</td>
+</tr>
+<tr>
+  <td><strong>Lattice data pipeline</strong></td>
+  <td>Build lattice from registry; extract invariant features (coordination $z_u, z_v$, edge length $\ell_e$) from <code>LatticeResult</code>; construct equivariant input from spin configurations</td>
+  <td><code>LatticeResult</code> in <code>src/lattices/base.py</code><br><code>LATTICE_REGISTRY</code> in <code>src/lattices/registry.py</code></td>
+  <td>Feature extraction, batching</td>
+</tr>
+</tbody>
+</table>
+
+<h3>10.3 Mode A: Loop-Basis Implementation</h3>
+
+<table>
+<thead>
+<tr>
+  <th>Phase</th>
+  <th>Description</th>
+  <th>Existing code</th>
+  <th>New code</th>
+  <th>Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>A1. Loop basis extraction</strong></td>
+  <td>Compute $\beta_1$ independent cycles via <code>nx.cycle_basis(G)</code>; convert each cycle to a binary edge-indicator vector $\bm{l}_i \in \{0,1\}^{n_1}$; verify $B_1 \bm{l}_i = 0$ for each loop</td>
+  <td><code>networkx.cycle_basis()</code><br><code>LatticeResult.graph</code></td>
+  <td>Loop basis module</td>
+  <td>Count matches $\beta_1$ from catalog; $B_1 \bm{l}_i = 0$ for all $i$</td>
+</tr>
+<tr>
+  <td><strong>A2. Seed state + loop-flip representation</strong></td>
+  <td>Compute $\bm{\sigma}_{\text{seed}}$ via Eulerian construction; implement flip operation $\bm{\sigma} \oplus \alpha_i \bm{l}_i$ (multiply edges in loop $i$ by $-1$ when $\alpha_i = 1$); verify every combination satisfies ice rule</td>
+  <td><code>find_seed_ice_state()</code> in <code>src/topology/ice_sampling.py</code></td>
+  <td>Loop-flip state management</td>
+  <td>Enumerate all $2^{\beta_1}$ states at XS; verify all satisfy $B_1 \bm{\sigma} = 0$</td>
+</tr>
+<tr>
+  <td><strong>A3. <code>LoopMPVAN</code> model</strong></td>
+  <td>Stack of <code>EIGNLayer</code>s (unmasked); at step $i$, input is current spin config (fully assigned, all $n_1$ edges); output head: pool EIGN features over edges in loop $i$, sigmoid to get $\Pr(\alpha_i = 1)$</td>
+  <td><code>EIGNLayer</code> from shared infrastructure</td>
+  <td><code>LoopMPVAN(nn.Module)</code></td>
+  <td>Forward pass produces valid probabilities; gradient flows</td>
+</tr>
+<tr>
+  <td><strong>A4. Training + validation (XS)</strong></td>
+  <td>Train on square XS ($\beta_1 = 9$, 512 ice states); objective is pure entropy at $T \to 0$ (uniform sampling); compare $q_\theta$ distribution to exact enumeration</td>
+  <td><code>sample_ice_states()</code> for MCMC baseline</td>
+  <td>Training script</td>
+  <td>KL$(q_\theta \| \text{uniform}) \to 0$; all 512 states sampled</td>
+</tr>
+<tr>
+  <td><strong>A5. Scale to S and M</strong></td>
+  <td>Kagome S ($\beta_1 = 301$), Tetris M ($\beta_1 = 1{,}601$); compare sample diversity and efficiency against MCMC baseline</td>
+  <td>Spectral catalog data for calibrating $T_{\max}$</td>
+  <td>Experiment scripts</td>
+  <td>Hamming distance $\approx 0.5$; $n_{\text{eff}}$ competitive with MCMC</td>
+</tr>
+</tbody>
+</table>
+
+<h3>10.4 Mode B: Direct Edge Extension</h3>
+
+<p>
+Mode B builds on top of Mode A's validated infrastructure. The shared components (<code>EIGNLayer</code>, training loop, evaluation metrics, lattice pipeline) are reused directly. Three new components are needed:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Phase</th>
+  <th>Description</th>
+  <th>Reused from Mode A</th>
+  <th>New code</th>
+  <th>Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>B1. Causal masking</strong></td>
+  <td>For a given edge ordering, precompute masked (lower-triangular) versions of all four EIGN operator products. For self-modal operators: zero entries $(L)_{ee'}$ where $e' \geq e$. For cross-modal operators: mask at vertex aggregation step. Store as sparse tensors.</td>
+  <td>EIGN operator construction</td>
+  <td><code>MaskedEIGNLayer(nn.Module)</code>, mask precomputation utilities</td>
+  <td>Masked operator applied to one-hot edge vector produces output depending only on earlier edges</td>
+</tr>
+<tr>
+  <td><strong>B2. Edge ordering + partial assignment</strong></td>
+  <td>BFS, spectral (from Fiedler vector in catalog), backbone-first, and random orderings. Partial-assignment manager: maintains $\tilde{\bm{\sigma}}$ with assigned edges set to $\pm 1$ and unassigned edges zero-padded.</td>
+  <td>Lattice pipeline, spectral catalog</td>
+  <td>Ordering strategies, <code>EdgeMPVAN(nn.Module)</code></td>
+  <td>BFS ordering visits all edges; partial assignment is consistent</td>
+</tr>
+<tr>
+  <td><strong>B3. Soft ice-rule constraint + finite-$T$ training</strong></td>
+  <td>Add $\lambda(T) \cdot \mathbb{E}[\|B_1 \bm{\sigma}\|^2]$ to loss (Eq.&nbsp;15); $\lambda \propto 1/T$. Full temperature annealing from $T_{\max}$ (paramagnetic) to $T_{\min}$ (ice phase).</td>
+  <td>Training loop, REINFORCE, annealing schedule</td>
+  <td>Modified loss function, $\lambda(T)$ schedule</td>
+  <td>At low $T$: ice-rule violation $\to 0$; at high $T$: samples match uniform; specific heat $C(T)$ has correct peak location</td>
+</tr>
+</tbody>
+</table>
+
+<h3>10.5 Mode A vs. Mode B: Side-by-Side Comparison</h3>
+
+<table>
+<thead>
+<tr>
+  <th></th>
+  <th>Mode A (Loop-Basis)</th>
+  <th>Mode B (Direct Edge)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Autoregressive unit</strong></td>
+  <td>Loop-flip $\alpha_i \in \{0,1\}$</td>
+  <td>Edge spin $\sigma_e \in \{+1,-1\}$</td>
+</tr>
+<tr>
+  <td><strong>Sequence length</strong></td>
+  <td>$\beta_1$ (401&ndash;3,201 at size M)</td>
+  <td>$n_1$ (800&ndash;9,600 at size M)</td>
+</tr>
+<tr>
+  <td><strong>EIGN operator masking</strong></td>
+  <td><strong>None</strong> &mdash; full lattice view at every step</td>
+  <td>Causal (lower-triangular) masking required</td>
+</tr>
+<tr>
+  <td><strong>Ice rule</strong></td>
+  <td>Guaranteed by construction</td>
+  <td>Soft constraint, not guaranteed</td>
+</tr>
+<tr>
+  <td><strong>Temperature range</strong></td>
+  <td>$T = 0$ only (all ice states have $H = 0$)</td>
+  <td>Any $T$ (including phase transitions)</td>
+</tr>
+<tr>
+  <td><strong>Preprocessing</strong></td>
+  <td>Cycle basis + seed state (one-time, $O(n_1 \beta_1)$)</td>
+  <td>Edge ordering + masked operators (one-time per ordering)</td>
+</tr>
+<tr>
+  <td><strong>Implementation complexity</strong></td>
+  <td>Low &mdash; standard EIGN layers, simple output head</td>
+  <td>Medium &mdash; masked sparse ops, partial assignment management</td>
+</tr>
+<tr>
+  <td><strong>Primary scientific question</strong></td>
+  <td>Can the network sample uniformly from $\ker(B_1)$?</td>
+  <td>Can the network approximate the Boltzmann distribution at finite $T$?</td>
+</tr>
+</tbody>
+</table>
+
+<h3>10.6 Dependencies and PyTorch Setup</h3>
+
+<div class="convention">
+<div class="label">Minimal Dependencies</div>
+<p>
+<strong>Both modes require:</strong><br>
+&bull; <code>torch</code> (core tensors, autograd, <code>nn.Module</code>)<br>
+&bull; <code>torch.sparse</code> (sparse CSR tensor construction and <code>torch.sparse.mm</code> for sparse&ndash;dense products; included in <code>torch</code>, no separate install)<br>
+&bull; <code>scipy</code> (existing; used to build $B_1$ and convert to PyTorch sparse format)<br>
+&bull; <code>networkx</code> (existing; lattice construction and, for Mode A, <code>cycle_basis()</code>)<br>
+&bull; <code>numpy</code> (existing; array operations)
+</p>
+<p>
+<strong>Not required:</strong><br>
+&bull; <code>torch_geometric</code> &mdash; the EIGN operators are explicit sparse matrix multiplies, not message-passing-framework operations. No <code>MessagePassing</code> base class, no <code>Data</code>/<code>Batch</code> objects, no neighbor sampling. This keeps the dependency footprint minimal and avoids version compatibility issues.<br>
+&bull; Custom CUDA kernels &mdash; <code>torch.sparse.mm</code> handles all sparse&ndash;dense products. At the sizes in our experimental matrix ($n_1 \leq 9{,}600$), this is efficient on both CPU and GPU.
+</p>
+</div>
+
+<div class="convention">
+<div class="label">Codebase References</div>
+<p>
+<strong>Incidence matrices:</strong> <code>src/topology/incidence.py</code> &mdash; <code>build_B1(n_vertices, edge_list)</code> returns $B_1$ as scipy CSC; <code>build_B2(n_edges, face_list, edge_list)</code> returns $B_2$; <code>verify_chain_complex(B1, B2)</code> checks $B_1 B_2 = 0$.<br>
+<strong>Laplacians:</strong> <code>src/topology/laplacians.py</code> &mdash; <code>build_all_laplacians(B1, B2)</code> returns dict with keys <code>'L0'</code>, <code>'L1'</code>, <code>'L1_down'</code>, <code>'L1_up'</code>.<br>
+<strong>Ice sampling:</strong> <code>src/topology/ice_sampling.py</code> &mdash; <code>find_seed_ice_state(B1, coordination, edge_list)</code> constructs seed via Eulerian circuit; <code>sample_ice_states(B1, coordination, n_samples, ...)</code> generates states via directed loop flips; <code>verify_ice_state(B1, sigma, coordination)</code> checks ice rule.<br>
+<strong>Lattice construction:</strong> <code>src/lattices/base.py</code> &mdash; <code>LatticeResult</code> dataclass with <code>positions</code>, <code>edge_list</code>, <code>face_list</code>, <code>coordination</code>, <code>graph</code> attributes; <code>LatticeGenerator.build(nx, ny, boundary)</code>.<br>
+<strong>Registry:</strong> <code>src/lattices/registry.py</code> &mdash; <code>LATTICE_REGISTRY</code> mapping names to generators: <code>'square'</code>, <code>'kagome'</code>, <code>'shakti'</code>, <code>'tetris'</code>, <code>'santa_fe'</code>.<br>
+<strong>Spectral catalog:</strong> <code>results/catalog/</code> &mdash; precomputed <code>{lattice}_{size}_{faces}.npz</code> + <code>_meta.json</code> pairs with eigenvalues, Betti numbers, spectral gaps.
+</p>
+</div>
+
+
+<!-- ================================================================= -->
+<!-- REFERENCES -->
+<!-- ================================================================= -->
+<hr style="margin-top: 3rem;">
+
+<h2 style="border: none; margin-top: 1rem;">References</h2>
+
+<p style="font-size: 0.92rem; line-height: 1.5;">
+[1] Fuchsgruber, Gao &amp; G&uuml;nnemann (2025), "EIGN: Equivariant and Invariant Graph Neural Networks for Edge-Level Predictions," <em>ICLR</em>.<br>
+[2] Hao, Guo, Cheng &amp; Lin, "MPVAN: Message Passing Variational Autoregressive Network for Solving Frustrated Ising Models," <em>arXiv</em>.<br>
+[3] Morrison, Nelson &amp; Nisoli (2013), "Unhappy vertices in artificial spin ice: new degeneracies from vertex frustration," <em>New J. Phys.</em> 15, 045009.<br>
+[4] Nisoli (2020), "Topological order of the Rys F-model and its breakdown in realistic square spin ice," <em>New J. Phys.</em> 22, 103052.<br>
+[5] Yang, Isufi &amp; Leus (2022), "Simplicial Convolutional Neural Networks," <em>IEEE Trans. Signal Process.</em><br>
+[6] Li, Han &amp; Wu (2018), "Deeper Insights into Graph Convolutional Networks for Semi-Supervised Learning," <em>AAAI</em>.<br>
+[7] Duranthon &amp; Zdeborov&aacute; (2025), "Optimal message passing and the depth limit of deep graph neural networks," <em>Phys. Rev. X</em>.<br>
+[8] Wu, S&ouml;rensen &amp; Melko (2019), "Machine learning phases of strongly correlated matter," <em>Phys. Rev. B</em>.<br>
+[9] Sharir, Levine, Wies, Carleo &amp; Shashua (2020), "Deep Autoregressive Models for the Efficient Variational Simulation of Many-Body Quantum Systems," <em>Phys. Rev. Lett.</em> 124, 020503.<br>
+</p>
+
+</body>
+</html>

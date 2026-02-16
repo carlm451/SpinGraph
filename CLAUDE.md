@@ -351,3 +351,66 @@ A Dash/Plotly dashboard for exploring results, run via `python -m dashboard.app`
 - **Spectral gap scaling**: c* ≈ 1.0 for square (matching analytical 1D chain result). XS (L=4) excluded from fits due to strong finite-size corrections.
 - **Finite-size effects**: XS points have O(1/L⁴) corrections that bias linear fits in 1/L². Standard practice: exclude L < 10 from scaling fits.
 - **Flat bands**: Kagome L0 shows exact eigenvalue = 6 for top ~33% of spectrum (z=3 coordination). Shakti shows sub-band structure from mixed coordination z=2,3,4.
+
+---
+
+## Neural Sampling: Mode A (LoopMPVAN) — Complete
+
+### What Mode A Does
+
+Mode A is a **variational autoregressive sampler** that generates ice-rule-satisfying spin configurations by sampling β₁ loop-flip decisions instead of n₁ individual edge spins. Every sample is a valid ice state by construction — no rejection step needed.
+
+**Key insight:** The ice manifold is spanned by directed loop flips from a seed state. LoopMPVAN autoregressively decides whether to flip each of β₁ independent loops, conditioning on the current spin configuration at each step. Only directed cycles (where all edge spins flow consistently around the loop) are flippable; non-directed loops are skipped.
+
+### Architecture (`src/neural/`)
+
+| Module | Purpose |
+|--------|---------|
+| `operators.py` | EIGN operators: L_equ = B₁ᵀB₁ (Hamiltonian), L_inv = \|B₁\|ᵀ\|B₁\| (geometry), plus cross-modal |
+| `eign_layer.py` | Dual-channel (equivariant + invariant) message-passing layer with 6 weight matrices and skip connections |
+| `loop_basis.py` | Extract β₁ independent cycles, orient them, check directedness, flip loops, recover α via GF(2) Gaussian elimination |
+| `loop_mpvan.py` | LoopMPVAN: K EIGN layers → pool over loop edges → MLP → sigmoid → p(flip). Autoregressive sampling with directed-cycle gating |
+| `training.py` | REINFORCE with running-mean baseline, entropy bonus, cosine LR annealing. Objective: minimize variational free energy F_θ = T·E_q[ln q_θ] |
+| `metrics.py` | KL(empirical \|\| uniform), mean Hamming distance, ESS, energy, ice-rule violation rate |
+| `enumeration.py` | Exact enumeration of all reachable ice states via DFS over directed-cycle decisions (for validation at small β₁) |
+| `checkpointing.py` | Save/load training runs: config, metrics, model weights, samples, lattice geometry |
+| `training_plots.py` | Diagnostic plots: training curves, sampling quality, sample gallery with spin arrows + monopole markers, summary card |
+
+### Validation Results: Square XS Open
+
+Trained on 4×4 square lattice (open BC): n₀=16, n₁=24, β₁=9, 25 reachable ice states.
+
+| Metric | Value |
+|--------|-------|
+| Ice-rule violations | **0.0** (all samples valid by construction) |
+| State coverage | **25/25 = 100%** |
+| KL(empirical \|\| uniform) | **0.006** (at 2000 epochs) |
+| Mean Hamming distance | ~0.37 (close to uniform expectation) |
+| ESS | ~128 (well above batch size 32) |
+| Model parameters | 4,777 |
+
+All 57 tests pass across 6 test modules (operators, EIGN layer, loop basis, LoopMPVAN, training, MCMC benchmarks).
+
+### MCMC Baseline (`src/sampling/`)
+
+`src/sampling/benchmark.py` provides MCMC comparison via random directed-loop flips from seed states. Includes autocorrelation time estimation (τ), timing, energy, and violation metrics. `scripts/compare_samplers.py` runs head-to-head neural vs MCMC evaluation. `scripts/run_mcmc_benchmarks.py` sweeps across lattices and sizes.
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/train_xs_validation.py` | Train LoopMPVAN on square XS, validate against exact enumeration, save run artifacts |
+| `scripts/plot_training_diagnostics.py` | Generate diagnostic plots from saved training run |
+| `scripts/compare_samplers.py` | Head-to-head MCMC vs neural comparison |
+| `scripts/run_mcmc_benchmarks.py` | MCMC benchmark sweep across lattices/sizes |
+
+### Mode B: Direct Edge Sampling (Planned)
+
+Mode B will autoregressively sample n₁ individual edge spins with **causal masking** of the EIGN operators and a **soft ice-rule penalty**. This enables finite-temperature Boltzmann sampling where ice-rule violations (monopoles) are permitted but energetically penalized:
+
+- **Causal masking**: Lower-triangular masks on EIGN operators so each edge only sees previously-assigned edges
+- **Edge ordering**: BFS, spectral (Fiedler vector), or physics-informed strategies
+- **Loss**: F_θ = E_q[H(σ)] + T·E_q[ln q_θ] + λ(T)·E_q[‖B₁σ‖²]
+- **Temperature annealing**: T(t) from T_max → T_min, with λ(T) ∝ 1/T
+
+Mode B complements Mode A: Mode A gives exact T=0 ice-manifold sampling; Mode B enables finite-T thermodynamics with monopole excitations.
