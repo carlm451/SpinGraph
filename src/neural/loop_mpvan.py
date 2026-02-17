@@ -18,7 +18,7 @@ At each autoregressive step i:
 """
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 import numpy as np
 import torch
@@ -180,6 +180,7 @@ class LoopMPVAN(nn.Module):
         alpha: torch.Tensor,
         sigma_seed: torch.Tensor,
         inv_features: torch.Tensor,
+        ordering: Optional[Sequence[int]] = None,
     ) -> torch.Tensor:
         """Compute log q_theta(alpha) via teacher forcing with directed-cycle checks.
 
@@ -191,12 +192,14 @@ class LoopMPVAN(nn.Module):
         alpha : (beta_1,) binary tensor (desired flips, may be overridden)
         sigma_seed : (n1,) seed ice state +1/-1
         inv_features : (n1, 2) invariant input features
+        ordering : optional loop processing order (defaults to self.loop_basis.ordering)
 
         Returns
         -------
         log_prob : scalar tensor (differentiable)
         """
-        ordering = self.loop_basis.ordering
+        if ordering is None:
+            ordering = self.loop_basis.ordering
         indicators = self.loop_basis.loop_indicators
         log_prob = torch.tensor(0.0, dtype=torch.float32)
         sigma = sigma_seed.clone()
@@ -232,6 +235,7 @@ class LoopMPVAN(nn.Module):
         sigma_seed: torch.Tensor,
         inv_features: torch.Tensor,
         n_samples: int = 1,
+        ordering: Optional[Sequence[int]] = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Sample ice states autoregressively with directed-cycle checks.
 
@@ -240,13 +244,15 @@ class LoopMPVAN(nn.Module):
         sigma_seed : (n1,) seed ice state +1/-1
         inv_features : (n1, 2) invariant input features
         n_samples : int
+        ordering : optional loop processing order (defaults to self.loop_basis.ordering)
 
         Returns
         -------
         sigmas : (n_samples, n1) tensor of ice states
         log_probs : (n_samples,) tensor of log q_theta values
         """
-        ordering = self.loop_basis.ordering
+        if ordering is None:
+            ordering = self.loop_basis.ordering
         indicators = self.loop_basis.loop_indicators
 
         all_sigmas = []
@@ -338,6 +344,7 @@ class LoopMPVAN(nn.Module):
         alphas: torch.Tensor,
         sigma_seed: torch.Tensor,
         inv_features: torch.Tensor,
+        ordering: Optional[Sequence[int]] = None,
     ) -> torch.Tensor:
         """Compute log q_theta(alpha) for a batch via teacher forcing.
 
@@ -346,13 +353,15 @@ class LoopMPVAN(nn.Module):
         alphas : (B, beta_1) binary tensor
         sigma_seed : (n1,) seed ice state +1/-1
         inv_features : (n1, 2) invariant input features
+        ordering : optional loop processing order (defaults to self.loop_basis.ordering)
 
         Returns
         -------
         log_probs : (B,) tensor (differentiable)
         """
         B = alphas.shape[0]
-        ordering = self.loop_basis.ordering
+        if ordering is None:
+            ordering = self.loop_basis.ordering
         indicators = self.loop_basis.loop_indicators
 
         log_probs = torch.zeros(B, dtype=torch.float32)
@@ -406,6 +415,7 @@ class LoopMPVAN(nn.Module):
         sigma_seed: torch.Tensor,
         inv_features: torch.Tensor,
         n_samples: int = 1,
+        ordering: Optional[Sequence[int]] = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Sample ice states autoregressively (batched).
 
@@ -414,13 +424,15 @@ class LoopMPVAN(nn.Module):
         sigma_seed : (n1,) seed ice state +1/-1
         inv_features : (n1, 2) invariant input features
         n_samples : int
+        ordering : optional loop processing order (defaults to self.loop_basis.ordering)
 
         Returns
         -------
         sigmas : (n_samples, n1) tensor of ice states
         log_probs : (n_samples,) tensor of log q_theta values
         """
-        ordering = self.loop_basis.ordering
+        if ordering is None:
+            ordering = self.loop_basis.ordering
         indicators = self.loop_basis.loop_indicators
 
         sigmas = sigma_seed.unsqueeze(0).expand(n_samples, -1).clone()  # (B, n1)

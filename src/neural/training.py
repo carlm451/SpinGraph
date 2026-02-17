@@ -47,6 +47,7 @@ class TrainingConfig:
     eval_every: int = 200
     checkpoint_every: int = 0  # Save checkpoint every N epochs (0 = disabled)
     seed: int = 42
+    randomize_ordering: bool = True  # Randomize loop ordering per batch (closes autoregressive gap)
 
 
 @dataclass
@@ -138,25 +139,35 @@ def train(
     logger.info(
         f"Starting training: {config.n_epochs} epochs, "
         f"batch_size={config.batch_size}, lr={config.lr}, "
-        f"n_loops={n_loops}, n_params={model.count_parameters()}"
+        f"n_loops={n_loops}, n_params={model.count_parameters()}, "
+        f"randomize_ordering={config.randomize_ordering}"
     )
 
     for epoch in range(config.n_epochs):
         model.train()
         optimizer.zero_grad()
 
+        # Generate per-batch loop ordering (random permutation or fixed)
+        if config.randomize_ordering:
+            batch_ordering = np.random.permutation(n_loops).tolist()
+        else:
+            batch_ordering = None  # uses model's default ordering
+
         # Sample a batch of ice states (batched)
         with torch.no_grad():
             sigmas, log_probs_sample = model.sample_batch(
-                seed_tensor, inv_features, n_samples=config.batch_size
+                seed_tensor, inv_features, n_samples=config.batch_size,
+                ordering=batch_ordering,
             )
 
         # Recover alpha vectors for each sample
         alphas = recover_alpha(sigmas, seed_tensor, indicators)  # (batch, n_loops)
 
         # Compute log probabilities with gradients (batched teacher forcing)
+        # MUST use same ordering as sampling for consistent log_prob
         log_probs = model.forward_log_prob_batch(
-            alphas, seed_tensor, inv_features
+            alphas, seed_tensor, inv_features,
+            ordering=batch_ordering,
         )  # (batch,)
 
         # REINFORCE: maximize entropy = minimize E[log q]
@@ -203,8 +214,14 @@ def train(
         if (epoch + 1) % config.eval_every == 0 or epoch == 0:
             model.eval()
             with torch.no_grad():
+                # Use random ordering for eval too (explores different states)
+                eval_ordering = (
+                    np.random.permutation(n_loops).tolist()
+                    if config.randomize_ordering else None
+                )
                 eval_sigmas, eval_log_probs = model.sample_batch(
-                    seed_tensor, inv_features, n_samples=min(256, config.batch_size * 4)
+                    seed_tensor, inv_features, n_samples=min(256, config.batch_size * 4),
+                    ordering=eval_ordering,
                 )
 
             eval_np = eval_sigmas.numpy()

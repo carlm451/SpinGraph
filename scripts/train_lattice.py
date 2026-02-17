@@ -88,6 +88,8 @@ def main():
                         help="Number of samples for final evaluation")
     parser.add_argument("--skip-enum", action="store_true",
                         help="Skip exact enumeration even if beta_1 is small enough")
+    parser.add_argument("--no-randomize-ordering", action="store_true",
+                        help="Disable per-batch loop ordering randomization")
     parser.add_argument("--run-id", type=str, default=None)
     args = parser.parse_args()
 
@@ -127,19 +129,36 @@ def main():
     exact_states = None
     enum_time = 0.0
     if loop_basis.n_loops <= MAX_ENUM_BETA1 and not args.skip_enum:
-        from src.neural.enumeration import enumerate_all_ice_states
+        from src.neural.enumeration import enumerate_all_ice_states, enumerate_multi_ordering
 
         logger.info(f"Enumerating reachable ice states (beta_1={loop_basis.n_loops})...")
         t0 = time.perf_counter()
-        exact_states = enumerate_all_ice_states(
-            sigma_seed,
-            loop_basis.loop_indicators.numpy(),
-            B1, lattice.coordination,
-            cycle_edge_lists=loop_basis.cycle_edge_lists,
-            ordering=loop_basis.ordering,
-        )
-        enum_time = time.perf_counter() - t0
-        logger.info(f"Enumeration complete: {len(exact_states)} reachable states in {enum_time:.2f}s")
+        if not args.no_randomize_ordering:
+            # With ordering randomization, enumerate across multiple orderings
+            # to get the full set of states the model can discover
+            exact_states, cumulative = enumerate_multi_ordering(
+                sigma_seed,
+                loop_basis.loop_indicators.numpy(),
+                B1, lattice.coordination,
+                cycle_edge_lists=loop_basis.cycle_edge_lists,
+                n_orderings=200,
+                seed=args.seed,
+            )
+            enum_time = time.perf_counter() - t0
+            logger.info(
+                f"Multi-ordering enumeration: {len(exact_states)} reachable states "
+                f"across 200 orderings in {enum_time:.2f}s"
+            )
+        else:
+            exact_states = enumerate_all_ice_states(
+                sigma_seed,
+                loop_basis.loop_indicators.numpy(),
+                B1, lattice.coordination,
+                cycle_edge_lists=loop_basis.cycle_edge_lists,
+                ordering=loop_basis.ordering,
+            )
+            enum_time = time.perf_counter() - t0
+            logger.info(f"Enumeration complete: {len(exact_states)} reachable states in {enum_time:.2f}s")
     else:
         logger.info(
             f"Skipping enumeration (beta_1={loop_basis.n_loops} > {MAX_ENUM_BETA1})"
@@ -172,6 +191,7 @@ def main():
         seed=args.seed,
         eval_every=max(1, args.epochs // 10),
         checkpoint_every=checkpoint_every,
+        randomize_ordering=not args.no_randomize_ordering,
     )
 
     # Create run directory before training (for checkpoints)
@@ -196,13 +216,34 @@ def main():
     logger.info("\n=== Final Evaluation ===")
     model.eval()
     seed_tensor = torch.from_numpy(sigma_seed.astype(np.float32))
+    n_loops_eval = loop_basis.n_loops
 
     n_eval = args.n_eval_samples
     t0_sample = time.perf_counter()
     with torch.no_grad():
-        eval_sigmas, eval_log_probs = model.sample(
-            seed_tensor, inv_features, n_samples=n_eval
-        )
+        if config.randomize_ordering:
+            # Sample with multiple random orderings to measure full coverage
+            n_orderings_eval = 20
+            samples_per = max(1, n_eval // n_orderings_eval)
+            eval_sigmas_list = []
+            eval_lp_list = []
+            for _ in range(n_orderings_eval):
+                eval_ord = np.random.permutation(n_loops_eval).tolist()
+                s, lp = model.sample_batch(
+                    seed_tensor, inv_features, n_samples=samples_per,
+                    ordering=eval_ord,
+                )
+                eval_sigmas_list.append(s)
+                eval_lp_list.append(lp)
+            eval_sigmas = torch.cat(eval_sigmas_list, dim=0)
+            eval_log_probs = torch.cat(eval_lp_list, dim=0)
+            logger.info(
+                f"Eval: {len(eval_sigmas)} samples across {n_orderings_eval} random orderings"
+            )
+        else:
+            eval_sigmas, eval_log_probs = model.sample(
+                seed_tensor, inv_features, n_samples=n_eval
+            )
     sample_time = time.perf_counter() - t0_sample
 
     eval_np = eval_sigmas.numpy()

@@ -1984,15 +1984,16 @@ with equality rare in practice. The ratio $|\mathcal{I}_{\text{reachable}}| / 2^
 </div>
 
 <p>
-<strong>Counting reachable states by exhaustive tree search.</strong> The "Reachable" column in the table below is computed by exact enumeration (see <code>src/neural/enumeration.py</code>). The algorithm works as follows: starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, it performs a depth-first search through the $\beta_1$ loop decisions in autoregressive order. At decision step $i$, it checks whether loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$. If directed, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of this pruned tree are collected and deduplicated (different decision paths can produce the same final $\bm{\sigma}$).
+<strong>Counting DFS-reachable states by exhaustive tree search.</strong> The $|\mathcal{I}_{\text{DFS}}|$ column in the table below is computed by exact enumeration (see <code>src/neural/enumeration.py</code>). The algorithm works as follows: starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, it performs a depth-first search through the $\beta_1$ loop decisions in a <em>fixed autoregressive order</em> $(l_1, l_2, \ldots, l_{\beta_1})$. At decision step $i$, it checks whether loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$. If directed, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of this pruned tree are collected and deduplicated (different decision paths can produce the same final $\bm{\sigma}$). This is the same autoregressive ordering used by the LoopMPVAN sampler, so $|\mathcal{I}_{\text{DFS}}|$ is exactly the set of states that Mode&nbsp;A training can discover.
 </p>
 
 <p>
-Two mechanisms make $|\mathcal{I}_{\text{reachable}}|$ much smaller than $2^{\beta_1}$:
+Three mechanisms make $|\mathcal{I}_{\text{DFS}}|$ much smaller than $2^{\beta_1}$:
 </p>
 <ol>
 <li><strong>Directedness gating:</strong> At each node of the decision tree, if the loop is not directed in the current $\bm{\sigma}$, the flip branch is pruned entirely. This removes exponentially many paths. On lattices with tight coordination constraints (e.g., tetris), most loops are non-directed in most configurations, leaving very few open branches.</li>
 <li><strong>Path convergence:</strong> Different sequences of flip decisions can produce the same final spin configuration. For example, flipping loops $A$ then $B$ may yield the same $\bm{\sigma}$ as flipping $B$ then $A$ (or neither), especially when the loops share edges. The algorithm deduplicates by tracking the set of distinct $\bm{\sigma}$ vectors encountered.</li>
+<li><strong>Autoregressive ordering limitation:</strong> The fixed processing order $(l_1, \ldots, l_{\beta_1})$ means that whether loop $l_i$ is directed depends only on which of $l_1, \ldots, l_{i-1}$ were flipped. Some ice states may require flip sequences that violate this ordering &mdash; e.g., a state reachable by flipping $l_5$ then $l_3$ may be invisible to the DFS because $l_3$ was not directed when it was processed at step 3 (before $l_5$ was flipped at step 5). This is the dominant cause of undercounting on even-degree periodic lattices (see independent verification below).</li>
 </ol>
 
 <table>
@@ -2004,28 +2005,46 @@ Two mechanisms make $|\mathcal{I}_{\text{reachable}}|$ much smaller than $2^{\be
   <th>$\beta_1$</th>
   <th>$2^{\beta_1}$</th>
   <th>$\varepsilon_{\text{Pauling}}$</th>
-  <th>$|\mathcal{I}_{\text{reach}}|$</th>
-  <th>$|\mathcal{I}_{\text{reach}}|/2^{\beta_1}$</th>
+  <th>$\varepsilon(G)$</th>
+  <th>$|\mathcal{I}_{\text{DFS}}|$</th>
+  <th>$|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>Square</td><td>4&times;4</td><td>open</td><td>9</td><td>512</td><td>2,076</td><td>25</td><td>4.9%</td></tr>
-<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>17</td><td>131,072</td><td>657</td><td>40</td><td>0.03%</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>6</td><td>64</td><td>68</td><td>32</td><td>50%</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>13</td><td>8,192</td><td>130</td><td>172</td><td>2.1%</td></tr>
-<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>923</td><td>8</td><td>6.3%</td></tr>
-<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>112</td><td>0.04%</td></tr>
-<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>74,734</td><td>12</td><td>9.4%</td></tr>
-<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>4</td><td>0.0001%</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>open</td><td>9</td><td>512</td><td>2,076</td><td>2,768</td><td>25</td><td>4.9%</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>17</td><td>131,072</td><td>657</td><td>2,970</td><td>40</td><td>0.03%</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>6</td><td>64</td><td>68</td><td>172</td><td>32</td><td>50%</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>13</td><td>8,192</td><td>130</td><td>600</td><td>172</td><td>2.1%</td></tr>
+<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>923</td><td>1,312</td><td>8</td><td>6.3%</td></tr>
+<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>112</td><td>0.04%</td></tr>
+<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>74,734</td><td>86,560</td><td>12</td><td>9.4%</td></tr>
+<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>4</td><td>0.0001%</td></tr>
 </tbody>
 </table>
+<p style="font-size: 0.9em;">&dagger; Lower bound only; backtracking search timed out at 120s.</p>
 
 <p>
-<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice as a concrete example: $\beta_1 = 9$ gives $2^9 = 512$ candidate flip-combinations, but the tree search finds only 25 distinct ice states. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state. The result: 25 states, independently confirmed by the Mode A training achieving 25/25 state coverage with zero ice-rule violations.
+<strong>Independent verification: the $\varepsilon(G)$ column.</strong> The $\varepsilon(G)$ column shows the total number of ice states counted by an independent constraint-propagation backtracking algorithm (<code>scripts/verify_ice_counts.py</code>) that does not use the loop basis at all. It directly enumerates all $\bm{\sigma} \in \{+1,-1\}^{n_1}$ satisfying the ice rule $B_1 \bm{\sigma} = \mathbf{Q}_{\text{target}}$ for each valid charge sector, using BFS edge ordering and forward-checking to prune the search tree. For small lattices ($n_1 \leq 24$), brute-force enumeration of all $2^{n_1}$ configurations confirms exact agreement with the backtracking counts.
 </p>
 
 <p>
-Across the zoo, the reduction ratio varies from 50% (kagome 2&times;2 open, where half of all $2^{\beta_1}$ combinations yield valid states) down to 0.0001% (tetris 3&times;3 open, where $\beta_1 = 22$ but only 4 of 4.2 million candidate states are reachable). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice. For even-degree lattices (square, tetris), $|\mathcal{I}_{\text{reachable}}|$ equals the Pauling degeneracy $\varepsilon(G)$, so these counts are the <em>total</em> number of ice states, not just a subset.
+<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice: independent verification finds $\varepsilon(G) = 2{,}768$ total ice states across all charge sectors, with the largest sector containing 64 states. Yet the autoregressive DFS finds only $|\mathcal{I}_{\text{DFS}}| = 25$ &mdash; just 39% of its own charge sector. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state. The 25 states found are independently confirmed by Mode&nbsp;A training achieving 25/25 state coverage with zero ice-rule violations.
+</p>
+
+<p>
+<strong>The autoregressive ordering gap.</strong> Comparing $\varepsilon(G)$ with $|\mathcal{I}_{\text{DFS}}|$ reveals a systematic pattern: the autoregressive DFS explores only a fraction of the true ice manifold, with the gap most dramatic for <strong>even-degree periodic lattices</strong>:
+</p>
+<ul>
+<li><strong>Square 4&times;4 periodic:</strong> $\varepsilon(G) = 2{,}970$ total states, but the DFS finds only 40 (1.3%). Since all vertices have $z = 4$ on the torus, there is only one charge sector &mdash; the 2,930 missing states are topologically reachable via loop flips but invisible to the fixed autoregressive ordering.</li>
+<li><strong>Kagome 2&times;2 periodic:</strong> $\varepsilon(G) = 600$ total, DFS finds 172 (29%). Again one charge sector on this even-degree torus.</li>
+<li><strong>Odd-degree lattices (open BC):</strong> For kagome 2&times;2 open, the DFS reaches 32 states, matching exactly the 32-state charge sector of its seed. The 6 charge sectors (34, 34, 32, 32, 20, 20 states) sum to $\varepsilon(G) = 172$. This sector-matching pattern also holds for shakti&nbsp;1&times;1 (3/3) and tetris&nbsp;2&times;2 (12 matching a sector of 34).</li>
+</ul>
+<p>
+The implication for Mode&nbsp;A training is significant: LoopMPVAN uses the same fixed autoregressive ordering as the DFS, so it can discover at most $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality. On even-degree periodic lattices, this represents a <em>fundamental sampling limitation of the autoregressive architecture</em>, not a training failure. Addressing it would require either (a)&nbsp;multiple passes with different loop orderings, (b)&nbsp;a non-autoregressive architecture, or (c)&nbsp;MCMC post-processing to escape the ordering constraint.
+</p>
+
+<p>
+Across lattices where the DFS count is reliable (open-BC with sector matching), the $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ ratio varies from 50% (kagome 2&times;2 open, where half of all $2^{\beta_1}$ combinations within a sector yield valid states) down to 0.0001% (tetris 3&times;3 open, where $\beta_1 = 22$ but only 4 of 4.2 million candidate states are found). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice.
 </p>
 
 <p>
@@ -2034,18 +2053,18 @@ Across the zoo, the reduction ratio varies from 50% (kagome 2&times;2 open, wher
 <ol>
 <li><strong>Pauling can exceed $2^{\beta_1}$</strong> &mdash; dramatically so for shakti ($1.6 \times 10^9$ vs. 262k) and tetris 3&times;3 ($1.9 \times 10^{12}$ vs. 4.2M). These lattices have many low-coordination boundary vertices ($z = 1, 2$), which contribute weak per-vertex constraints to the Pauling product while not adding proportionally to $\beta_1$.</li>
 <li><strong>Pauling can be below $2^{\beta_1}$</strong> &mdash; for square 4&times;4 periodic (657 vs. 131k) and kagome 2&times;2 periodic (130 vs. 8,192). These uniform-$z$ periodic lattices have strong per-vertex constraints and large $\beta_1$ from the periodic topology.</li>
-<li><strong>Both overestimate wildly</strong> &mdash; the actual reachable count is far below <em>both</em> bounds in every case. Tetris 3&times;3 has $\varepsilon_{\text{Pauling}} \approx 10^{12}$, $2^{\beta_1} \approx 4 \times 10^6$, but only 4 reachable states.</li>
+<li><strong>Pauling tracks $\varepsilon(G)$ better than $2^{\beta_1}$ does</strong> &mdash; for uniform-$z$ periodic lattices, Pauling is within an order of magnitude of the verified $\varepsilon(G)$: Pauling gives 657 vs. $\varepsilon = 2{,}970$ for square 4&times;4 periodic, and 130 vs. 600 for kagome 2&times;2 periodic. By contrast, $2^{\beta_1}$ overshoots $\varepsilon(G)$ by 44&times; and 14&times; respectively. For open-BC mixed-coordination lattices, both Pauling and $2^{\beta_1}$ overestimate $\varepsilon(G)$ by large factors.</li>
 </ol>
 <p>
-The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices that are tractable for Mode A training, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count. The directed-cycle DFS enumeration remains the only reliable method at these sizes.
+The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices that are tractable for Mode&nbsp;A training, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count $\varepsilon(G)$. The independent backtracking enumeration (<code>scripts/verify_ice_counts.py</code>) is currently the most reliable method at these sizes.
 </p>
 
 <p>
-<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $\varepsilon(G) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states, while $|\mathcal{I}_{\text{reachable}}|$ counts those reachable from a specific seed via loop flips. For even-degree graphs (all $z_v$ even, including square and tetris), every ice state is reachable from any other via loop flips, so $|\mathcal{I}_{\text{reachable}}| = \varepsilon(G)$. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and $|\mathcal{I}_{\text{reachable}}|$ counts only those states within the seed's sector. In this case $\varepsilon(G) \geq |\mathcal{I}_{\text{reachable}}|$.
+<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $\varepsilon(G) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states. For even-degree graphs (all $z_v$ even), every ice state is topologically reachable from any other via some sequence of loop flips &mdash; the ice manifold forms a single connected component under loop moves. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and loop flips connect only states within the same sector. The autoregressive DFS count $|\mathcal{I}_{\text{DFS}}|$ is a further restriction: it counts only states reachable via loop flips <em>in the fixed autoregressive order</em>. As the $\varepsilon(G)$ column demonstrates, $|\mathcal{I}_{\text{DFS}}| \leq \varepsilon_{\text{sector}} \leq \varepsilon(G)$, with the first inequality strict whenever the autoregressive ordering misses states that require out-of-order flips.
 </p>
 
 <p>
-<strong>Implications for neural sampling.</strong> For Mode A (LoopMPVAN), the autoregressive network must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\mathcal{I}_{\text{reachable}}|$ states is uniform. When $|\mathcal{I}_{\text{reachable}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task that REINFORCE training must solve. The training difficulty correlates with the reachable-state count and the structure of the decision tree, not with $\beta_1$ alone. See <a href="mode-a-walkthrough.md">Mode A Walkthrough</a> and <a href="training-experiments.md">Training Experiments</a> for detailed results.
+<strong>Implications for neural sampling.</strong> For Mode&nbsp;A (LoopMPVAN), the autoregressive network must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\mathcal{I}_{\text{DFS}}|$ states is uniform. When $|\mathcal{I}_{\text{DFS}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task that REINFORCE training must solve. The training difficulty correlates with the DFS-reachable state count and the structure of the decision tree, not with $\beta_1$ alone. Crucially, Mode&nbsp;A can never discover more than $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality &mdash; sampling the full $\varepsilon(G)$ requires breaking the autoregressive ordering constraint. See <a href="mode-a-walkthrough.md">Mode A Walkthrough</a> and <a href="training-experiments.md">Training Experiments</a> for detailed results.
 </p>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -2719,14 +2738,14 @@ The following table summarizes all correspondences established in this document.
   <td>29</td>
   <td>Directed-cycle constraint</td>
   <td>Decision-tree pruning of loop-flip space</td>
-  <td>$|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}$</td>
+  <td>$|\mathcal{I}_{\text{DFS}}| \leq \varepsilon(G) \leq 2^{\beta_1}$</td>
   <td>&sect;8.8</td>
 </tr>
 <tr>
   <td>30</td>
-  <td>Reachable-state reduction ratio</td>
-  <td>Lattice-specific structural property</td>
-  <td>Ratio $|\mathcal{I}_{\text{reachable}}|/2^{\beta_1}$ varies from 50% to $10^{-6}$ across zoo</td>
+  <td>Autoregressive ordering gap</td>
+  <td>Fixed-order DFS undercounts ice manifold</td>
+  <td>$|\mathcal{I}_{\text{DFS}}|/\varepsilon(G)$ ranges from 1.3% (periodic) to 100% (open, sector-matched)</td>
   <td>&sect;8.8</td>
 </tr>
 </tbody>
@@ -2769,7 +2788,7 @@ This document has established a precise, equation-level bridge between two indep
 
 <li><strong>Line graph dual</strong> (&sect;8). $L_1^{\text{down}} = 2I - A_{L(G)}$: the lower Hodge Laplacian is the Kirchhoff matrix of the line graph. All vertices with $z > 2$ generate frustrated cliques, and only the 1D chain is non-degenerate (Key Result 8).</li>
 
-<li><strong>Loop-basis parameterization and directed-cycle bound</strong> (&sect;8.7&ndash;8.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving $|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}$. The directed-cycle constraint prunes this exponentially, with the reduction ratio varying by five orders of magnitude across the lattice zoo (Key Results 9, 10).</li>
+<li><strong>Loop-basis parameterization, directed-cycle bound, and autoregressive gap</strong> (&sect;8.7&ndash;8.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving $|\mathcal{I}_{\text{DFS}}| \leq \varepsilon(G) \leq 2^{\beta_1}$. The directed-cycle constraint prunes the upper bound exponentially (Key Results 9, 10), and the fixed autoregressive ordering introduces a further gap: independently verified total counts $\varepsilon(G)$ exceed the DFS-reachable count by up to 74&times; on even-degree periodic lattices.</li>
 </ol>
 
 <h3>11.2 Quantitative Framework</h3>
@@ -2800,10 +2819,10 @@ This document has established a precise, equation-level bridge between two indep
   <td><strong>Yes</strong> &mdash; flat bands, gaps, and density of states vary</td>
 </tr>
 <tr>
-  <td><strong>Directed-cycle</strong></td>
-  <td>$|\mathcal{I}_{\text{reachable}}| / 2^{\beta_1}$</td>
-  <td>Fraction of loop-flip combinations yielding distinct ice states</td>
-  <td><strong>Yes</strong> &mdash; ranges from 50% (kagome) to $10^{-6}$ (tetris); determines neural sampling difficulty</td>
+  <td><strong>Directed-cycle + autoregressive</strong></td>
+  <td>$|\mathcal{I}_{\text{DFS}}| / \varepsilon(G)$</td>
+  <td>Fraction of total ice states reachable by fixed-order autoregressive DFS</td>
+  <td><strong>Yes</strong> &mdash; ranges from 100% (open-BC sector match) to 1.3% (even-degree periodic); determines Mode&nbsp;A sampling ceiling</td>
 </tr>
 </tbody>
 </table>
@@ -2820,7 +2839,8 @@ The mathematical bridge established here is <em>structural</em>: it translates o
 <li><strong>Does spectral structure (flat bands, small gaps) affect feature propagation?</strong> The eigenvalue distribution of $L_1^{\text{down}}$ governs both the energy landscape of spin ice excitations and the filtering behavior of Hodge-domain neural networks. Frustrated lattices tend to have richer spectral structure (more flat bands, smaller gaps). The computational catalog from Stage 1 will quantify this across the Morrison et al. lattice zoo.</li>
 <li><strong>Is the BP &harr; GNN message-passing parallel actionable?</strong> The structural similarity between belief propagation on the ice graph and message passing on the line graph (&sect;8.5) suggests that physical insights about convergence, fixed points, and approximation quality might transfer. This remains speculative.</li>
 <li><strong>What role does orientation equivariance play?</strong> The gauge freedom of spin ice (&sect;8.6) maps to orientation equivariance in simplicial neural networks. Architectures that respect this symmetry may generalize better on edge-signal tasks.</li>
-<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\mathcal{I}_{\text{reachable}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;8.8), from 50% on kagome to $10^{-6}$ on tetris. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
+<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;8.8), from 50% on kagome to $10^{-6}$ on tetris. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
+<li><strong>Can the autoregressive ordering gap be closed?</strong> Independent verification (&sect;8.8) shows that the fixed-order autoregressive DFS misses the majority of ice states on even-degree periodic lattices (e.g., 40 of 2,970 for square 4&times;4 periodic). Since all states are topologically connected by loop flips, a multi-pass or non-autoregressive architecture could in principle reach the full $\varepsilon(G)$. What is the minimal modification to the LoopMPVAN architecture that achieves this?</li>
 </ul>
 
 <p>
