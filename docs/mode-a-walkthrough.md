@@ -358,3 +358,135 @@ The complete data flow for one training epoch:
 - A cycle can only be flipped if it's a *directed* cycle: at each cycle vertex, one cycle edge points in and one points out.
 - This constraint means the reachable state space is often much smaller than 2^β₁ (e.g., tetris 3×3: only 4 out of 2^22 ≈ 4M).
 - The model learns to assign p ≈ 0.5 for flippable loops and never sees non-flippable ones.
+
+---
+
+## 8. Inference: Using the Trained Model
+
+After training, the saved checkpoint contains everything needed to generate new ice state samples. This section describes how to load a trained model and use it for inference.
+
+### 8a. What's saved in a training run
+
+Each run is stored in `results/neural_training/{run_id}/` with these artifacts:
+
+| File | Contents | Needed for inference? |
+|------|----------|----------------------|
+| `config.json` | Hyperparameters (n_layers, equ_dim, inv_dim, head_hidden, lattice, boundary, etc.) | Yes — to reconstruct model |
+| `model_final.pt` | `state_dict()` of the trained LoopMPVAN | Yes — the learned weights |
+| `seed_state.npy` | σ_seed (n₁,) array of +1/-1 | Yes — starting point for sampling |
+| `positions.npy` | Vertex positions (n₀, 2) | Yes — for loop ordering |
+| `edge_list.npy` | Edge pairs (n₁, 2) | Yes — to rebuild B₁ and operators |
+| `coordination.npy` | Vertex coordinations (n₀,) | Yes — for invariant features |
+| `metrics.npz` | Training curves (loss, KL, Hamming, ESS, grad norms) | No — diagnostic only |
+| `final_samples.npy` | Samples from final evaluation | No — can regenerate |
+| `final_log_probs.npy` | Log-probs of final samples | No — can regenerate |
+| `exact_states.npy` | All enumerated ice states (if β₁ ≤ 25) | No — validation only |
+
+> `src/neural/checkpointing.py:60-138` — `save_training_run()`
+> `src/neural/checkpointing.py:141-190` — `load_training_run()`
+
+### 8b. Reconstruction procedure
+
+To generate new samples from a saved run, rebuild the model from the checkpoint:
+
+```
+1. Load config.json → extract lattice name, boundary, nx, ny, model hyperparams
+2. Rebuild lattice → gen.build(nx, ny, boundary)
+3. Build B₁ from edge_list (or rebuild from lattice)
+4. Build EIGN operators from B₁
+5. Extract loop basis + compute ordering (spatial_bfs)
+6. Construct LoopMPVAN with saved hyperparams (n_layers, equ_dim, inv_dim, head_hidden)
+7. Load state_dict from model_final.pt
+8. Load seed_state.npy → σ_seed tensor
+9. Build invariant features from edge_list + coordination
+```
+
+Steps 2–5 are deterministic given the lattice parameters, so the loop basis and ordering will be identical to the ones used during training. This is essential — the model's weights are tied to a specific loop ordering.
+
+> `scripts/train_lattice.py:97-121` — the same setup pipeline used before training
+> `src/neural/training.py` — `build_inv_features(edge_list, coordination)` for step 9
+
+### 8c. Generating samples
+
+Once the model is reconstructed:
+
+```python
+model.eval()
+seed_tensor = torch.from_numpy(sigma_seed.astype(np.float32))
+inv_features = build_inv_features(edge_list, coordination)
+
+with torch.no_grad():
+    sigmas, log_probs = model.sample(seed_tensor, inv_features, n_samples=N)
+```
+
+This returns:
+- `sigmas`: (N, n₁) tensor of ice state configurations, each ±1
+- `log_probs`: (N,) tensor of log q_θ(σ) for each sample
+
+Every sample is a valid ice state by construction. The samples are **independent** (no autocorrelation, unlike MCMC) — each one is a fresh forward pass through the autoregressive loop.
+
+> `src/neural/loop_mpvan.py:209-265` — `sample()` method (runs under `@torch.no_grad()`)
+
+### 8d. What you can compute from samples
+
+**Sample quality metrics** (same as training evaluation):
+
+```python
+from src.neural.metrics import (
+    mean_hamming_distance, effective_sample_size,
+    kl_from_samples, batch_ice_rule_violation, energy,
+)
+
+# Diversity: should be ~0.5 for uniform sampling
+h_mean, h_std = mean_hamming_distance(sigmas.numpy())
+
+# Effective sample size: higher = more uniform
+ess = effective_sample_size(log_probs.numpy())
+
+# KL divergence (only if exact_states available, β₁ ≤ 25)
+kl = kl_from_samples(sigmas.numpy(), exact_states)
+
+# Sanity checks (should always be 0.0 for Mode A)
+violation = batch_ice_rule_violation(sigmas.numpy(), B1, coordination)
+```
+
+**Importance-weighted observables:** Because log q_θ(σ) is known for each sample, you can compute importance-weighted estimates of any observable O(σ) under the true uniform distribution:
+
+```
+w_i = 1 / q_θ(σ_i)                    (uniform target)
+⟨O⟩_uniform ≈ Σ w_i O(σ_i) / Σ w_i
+```
+
+This corrects for any remaining non-uniformity in the learned distribution. The ESS measures how effective this correction is — when ESS ≈ N, the model is near-uniform and importance weights are approximately equal.
+
+> `src/neural/metrics.py:128-163` — `effective_sample_size(log_q, log_p)`
+
+### 8e. Sampling cost
+
+Each sample requires β₁ sequential passes through the EIGN stack (one per loop in the ordering). At each step:
+1. **Directed-cycle check** — O(loop_length) vertex inspections
+2. **EIGN forward pass** — K sparse-dense matrix multiplies over all n₁ edges
+3. **Output head** — pool over loop edges + 3-layer MLP → scalar
+
+Non-directed loops are skipped (no EIGN pass), so the effective number of forward passes is typically less than β₁.
+
+**Benchmark (square XS, 24 edges, β₁ = 9):** 2000 samples in ~6 seconds on CPU.
+
+The key advantage over MCMC: samples are **independent by construction**. MCMC requires τ_corr flip sweeps between independent samples, where τ_corr grows with system size. The neural sampler's cost per independent sample is fixed at one forward pass, regardless of correlation structure.
+
+### 8f. Diagnostic plots from saved runs
+
+The plotting pipeline generates all diagnostic panels from saved artifacts without reloading the model:
+
+```bash
+python -m scripts.plot_training_diagnostics results/neural_training/{run_id}
+```
+
+This reads `metrics.npz`, `final_samples.npy`, `seed_state.npy`, `positions.npy`, `edge_list.npy`, and `coordination.npy` to produce:
+- Panel 1: Training loss curve
+- Panel 2: Sampling quality (KL, Hamming, ESS over training)
+- Panel 3: Sample gallery (spin arrows + monopole markers on lattice)
+- Panel 4: Summary card (key metrics at a glance)
+- Panel 5: Gradient diagnostics (grad norm + advantage variance)
+
+> `src/neural/training_plots.py` — `generate_all_panels(run_dir)` orchestrates all panels

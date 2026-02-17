@@ -143,3 +143,49 @@ class EIGNLayer(nn.Module):
         X_inv_new = self.act(self.norm_inv(X_inv_new))
 
         return X_equ_new, X_inv_new
+
+    def forward_batch(
+        self,
+        X_equ: torch.Tensor,
+        X_inv: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Batched forward pass: dual-channel EIGN update.
+
+        Uses reshape trick for batched sparse matmul:
+        (B, n1, d) -> transpose -> (n1, B*d) -> sparse_mm -> reshape -> (B, n1, d)
+
+        Parameters
+        ----------
+        X_equ : (B, n1, equ_dim) equivariant edge features
+        X_inv : (B, n1, inv_dim) invariant edge features
+
+        Returns
+        -------
+        X_equ_new : (B, n1, equ_dim)
+        X_inv_new : (B, n1, inv_dim)
+        """
+        def _bsmm(sparse_mat, dense_batch):
+            B, n, d = dense_batch.shape
+            flat = dense_batch.transpose(0, 1).reshape(n, B * d)
+            out = torch.sparse.mm(sparse_mat, flat)
+            return out.reshape(n, B, d).transpose(0, 1)
+
+        # Message-passing terms (batched sparse @ dense)
+        msg_equ_equ = self.W1(_bsmm(self.ops.L_equ, X_equ))
+        msg_inv_equ = self.W2(_bsmm(self.ops.inv_to_equ, X_inv))
+        msg_inv_inv = self.W3(_bsmm(self.ops.L_inv, X_inv))
+        msg_equ_inv = self.W4(_bsmm(self.ops.equ_to_inv, X_equ))
+
+        # Skip connections
+        skip_equ = self.W5(X_equ)
+        skip_inv = self.W6(X_inv)
+
+        # Combine
+        X_equ_new = msg_equ_equ + msg_inv_equ + skip_equ
+        X_inv_new = msg_inv_inv + msg_equ_inv + skip_inv
+
+        # Normalize and activate
+        X_equ_new = self.act(self.norm_equ(X_equ_new))
+        X_inv_new = self.act(self.norm_inv(X_inv_new))
+
+        return X_equ_new, X_inv_new

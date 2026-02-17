@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional, Tuple
 
 import matplotlib
 matplotlib.use("Agg")
@@ -43,6 +43,57 @@ _GRAY = "#95a5a6"
 _MONOPOLE_POS = "#ff6b00"   # orange for Q > target (positive monopole)
 _MONOPOLE_NEG = "#9b59b6"   # purple for Q < target (negative monopole / vacancy)
 _VERTEX_OK = "black"
+
+
+# ── Periodic edge detection ──────────────────────────────────────────
+
+def _classify_edges_for_run(
+    metadata: dict,
+    positions: np.ndarray,
+    edge_list: np.ndarray,
+) -> Optional[Tuple[list, list, np.ndarray]]:
+    """Classify edges as interior/periodic for a saved training run.
+
+    Rebuilds the lattice from the registry to obtain unit-cell vectors
+    and grid dimensions, then delegates to :func:`classify_edges` for
+    minimum-image detection and stub geometry.
+
+    Returns ``None`` if boundary is open or classification fails.
+    """
+    boundary = metadata.get("boundary", "open")
+    if boundary != "periodic":
+        return None
+
+    try:
+        from src.lattices.registry import get_generator
+        from src.viz.periodic_edges import classify_edges
+    except ImportError:
+        logger.debug("Cannot import lattice registry or periodic_edges; skipping classification")
+        return None
+
+    lattice_name = metadata["lattice_name"]
+    n_vertices = metadata["n_vertices"]
+    n_edges = metadata["n_edges"]
+
+    gen = get_generator(lattice_name)
+    edge_list_tuples = [(int(e[0]), int(e[1])) for e in edge_list]
+
+    # Find grid size by trial (all current experiments use nx == ny)
+    for nx in range(1, 200):
+        try:
+            lat = gen.build(nx, nx, boundary="periodic")
+        except Exception:
+            continue
+        if lat.n_vertices == n_vertices and lat.n_edges == n_edges:
+            interior, periodic, is_periodic = classify_edges(
+                positions, edge_list_tuples,
+                lat.unit_cell.a1, lat.unit_cell.a2,
+                lat.nx_size, lat.ny_size, "periodic",
+            )
+            return interior, periodic, is_periodic
+
+    logger.warning("Could not determine grid size for periodic edge classification")
+    return None
 
 
 # ── Ice rule validation ───────────────────────────────────────────────
@@ -306,6 +357,7 @@ def _draw_ice_state_on_ax(
     edge_list: np.ndarray,
     coordination: np.ndarray,
     show_violations: bool = True,
+    periodic_edge_info=None,
 ):
     """Draw a single ice state with spin-colored edges, arrows, and monopole markers.
 
@@ -318,29 +370,17 @@ def _draw_ice_state_on_ax(
     coordination : array (n_vertices,)
     show_violations : bool
         If True, compute vertex charges and highlight monopoles.
+    periodic_edge_info : tuple or None
+        Output of ``_classify_edges_for_run``:
+        ``(interior_edges, periodic_edges, is_periodic)``.
+        When provided, interior edges are drawn solid and periodic edges
+        as dashed spin-colored stubs.
     """
-    edges = [(int(e[0]), int(e[1])) for e in edge_list]
-
-    # Draw edges colored by spin
-    lines_plus, lines_minus = [], []
-    for j, (u, v) in enumerate(edges):
-        seg = np.array([[positions[u, 0], positions[u, 1]],
-                        [positions[v, 0], positions[v, 1]]])
-        if sigma[j] > 0:
-            lines_plus.append(seg)
-        else:
-            lines_minus.append(seg)
-
-    if lines_plus:
-        ax.add_collection(LineCollection(lines_plus, colors=_BLUE,
-                                         linewidths=1.5, zorder=1))
-    if lines_minus:
-        ax.add_collection(LineCollection(lines_minus, colors=_RED,
-                                         linewidths=1.5, zorder=1))
-
-    # Draw spin arrows
-    for j, (u, v) in enumerate(edges):
-        _draw_spin_arrow(ax, positions, (u, v), sigma[j])
+    if periodic_edge_info is not None:
+        interior_edges, periodic_edges, _ = periodic_edge_info
+        _draw_edges_periodic(ax, sigma, positions, interior_edges, periodic_edges)
+    else:
+        _draw_edges_open(ax, sigma, positions, edge_list)
 
     # Compute vertex charges and annotate
     if show_violations:
@@ -396,6 +436,128 @@ def _draw_ice_state_on_ax(
     ax.set_yticks([])
 
 
+def _draw_edges_open(
+    ax,
+    sigma: np.ndarray,
+    positions: np.ndarray,
+    edge_list: np.ndarray,
+):
+    """Draw all edges as solid spin-colored lines with arrows (no periodic handling)."""
+    edges = [(int(e[0]), int(e[1])) for e in edge_list]
+
+    lines_plus, lines_minus = [], []
+    for j, (u, v) in enumerate(edges):
+        seg = np.array([[positions[u, 0], positions[u, 1]],
+                        [positions[v, 0], positions[v, 1]]])
+        if sigma[j] > 0:
+            lines_plus.append(seg)
+        else:
+            lines_minus.append(seg)
+
+    if lines_plus:
+        ax.add_collection(LineCollection(lines_plus, colors=_BLUE,
+                                         linewidths=1.5, zorder=1))
+    if lines_minus:
+        ax.add_collection(LineCollection(lines_minus, colors=_RED,
+                                         linewidths=1.5, zorder=1))
+
+    for j, (u, v) in enumerate(edges):
+        _draw_spin_arrow(ax, positions, (u, v), sigma[j])
+
+
+def _draw_edges_periodic(
+    ax,
+    sigma: np.ndarray,
+    positions: np.ndarray,
+    interior_edges: list,
+    periodic_edges: list,
+):
+    """Draw interior edges solid + periodic edges as dashed spin-colored stubs."""
+    # Interior edges: solid spin-colored lines + arrows
+    lines_plus, lines_minus = [], []
+    for u, v, edge_idx in interior_edges:
+        seg = np.array([[positions[u, 0], positions[u, 1]],
+                        [positions[v, 0], positions[v, 1]]])
+        if sigma[edge_idx] > 0:
+            lines_plus.append(seg)
+        else:
+            lines_minus.append(seg)
+
+    if lines_plus:
+        ax.add_collection(LineCollection(lines_plus, colors=_BLUE,
+                                         linewidths=1.5, zorder=1))
+    if lines_minus:
+        ax.add_collection(LineCollection(lines_minus, colors=_RED,
+                                         linewidths=1.5, zorder=1))
+
+    for u, v, edge_idx in interior_edges:
+        _draw_spin_arrow(ax, positions, (u, v), sigma[edge_idx])
+
+    # Periodic edges: dashed spin-colored stubs + arrows on each stub
+    stubs_plus, stubs_minus = [], []
+    for pe in periodic_edges:
+        su_start, su_end = pe.stub_u
+        sv_start, sv_end = pe.stub_v
+        seg_u = np.array([[su_start[0], su_start[1]],
+                          [su_end[0], su_end[1]]])
+        seg_v = np.array([[sv_start[0], sv_start[1]],
+                          [sv_end[0], sv_end[1]]])
+        if sigma[pe.edge_index] > 0:
+            stubs_plus.extend([seg_u, seg_v])
+        else:
+            stubs_minus.extend([seg_u, seg_v])
+
+    if stubs_plus:
+        ax.add_collection(LineCollection(stubs_plus, colors=_BLUE,
+                                         linewidths=1.5, linestyles="dashed",
+                                         zorder=1))
+    if stubs_minus:
+        ax.add_collection(LineCollection(stubs_minus, colors=_RED,
+                                         linewidths=1.5, linestyles="dashed",
+                                         zorder=1))
+
+    # Arrows on periodic stubs: direction = minimum-image displacement
+    for pe in periodic_edges:
+        su_start, su_end = pe.stub_u
+        sv_start, sv_end = pe.stub_v
+        # The minimum-image edge direction is 2× the u-stub vector
+        edge_dir = np.array(su_end) - np.array(su_start)
+        edge_len = np.linalg.norm(edge_dir) * 2  # full edge length
+        spin_val = sigma[pe.edge_index]
+
+        # Arrow on u stub
+        mid_u = 0.5 * (np.array(su_start) + np.array(su_end))
+        _draw_spin_arrow_directed(ax, mid_u, edge_dir, spin_val, edge_len)
+
+        # Arrow on v stub
+        mid_v = 0.5 * (np.array(sv_start) + np.array(sv_end))
+        _draw_spin_arrow_directed(ax, mid_v, edge_dir, spin_val, edge_len)
+
+
+def _draw_spin_arrow_directed(ax, mid, edge_dir, spin_val, scale_length):
+    """Draw a spin arrow at *mid* pointing along *edge_dir* (or reversed for sigma=-1)."""
+    dx, dy = edge_dir[0], edge_dir[1]
+    length = np.sqrt(dx**2 + dy**2)
+    if length < 1e-10:
+        return
+
+    if spin_val < 0:
+        dx, dy = -dx, -dy
+
+    scale = 0.12 * scale_length
+    dx_n = dx / length * scale
+    dy_n = dy / length * scale
+
+    color = _BLUE if spin_val > 0 else _RED
+    ax.annotate(
+        "",
+        xy=(mid[0] + dx_n, mid[1] + dy_n),
+        xytext=(mid[0] - dx_n, mid[1] - dy_n),
+        arrowprops=dict(arrowstyle="->", color=color, lw=1.0),
+        zorder=2,
+    )
+
+
 def plot_sample_gallery(
     final_samples: np.ndarray,
     positions: np.ndarray,
@@ -403,11 +565,14 @@ def plot_sample_gallery(
     coordination: np.ndarray,
     output_path: str,
     n_panels: int = 6,
+    periodic_edge_info=None,
 ) -> str:
     """Panel 3: 2x3 grid of sampled ice states with spin arrows + monopole markers.
 
     Blue edges for sigma=+1, red for sigma=-1, small arrows at midpoints.
     Monopole vertices (ice-rule violations) highlighted with colored markers.
+    Periodic edges drawn as dashed spin-colored stubs when *periodic_edge_info*
+    is provided.
     """
     n_show = min(n_panels, len(final_samples))
     nrows, ncols = 2, 3
@@ -418,7 +583,8 @@ def plot_sample_gallery(
     for panel_idx in range(n_show):
         ax = axes[panel_idx]
         sigma = final_samples[panel_idx]
-        _draw_ice_state_on_ax(ax, sigma, positions, edge_list, coordination)
+        _draw_ice_state_on_ax(ax, sigma, positions, edge_list, coordination,
+                              periodic_edge_info=periodic_edge_info)
 
         vci = compute_vertex_charges(sigma, edge_list, coordination)
         viol_str = f" [{vci.n_violations} monopole{'s' if vci.n_violations != 1 else ''}]" if vci.n_violations > 0 else ""
@@ -443,6 +609,7 @@ def plot_individual_samples(
     coordination: np.ndarray,
     output_path: str,
     n_samples: int = 6,
+    periodic_edge_info=None,
 ) -> list[str]:
     """Generate individual PNG for each sample with ice-rule validation.
 
@@ -463,6 +630,8 @@ def plot_individual_samples(
         Directory to save individual PNGs.
     n_samples : int
         Number of samples to plot (from the start of final_samples).
+    periodic_edge_info : tuple or None
+        Output of ``_classify_edges_for_run`` for periodic BC handling.
 
     Returns
     -------
@@ -477,7 +646,8 @@ def plot_individual_samples(
         vci = compute_vertex_charges(sigma, edge_list, coordination)
 
         fig, ax = plt.subplots(figsize=(7, 7))
-        _draw_ice_state_on_ax(ax, sigma, positions, edge_list, coordination)
+        _draw_ice_state_on_ax(ax, sigma, positions, edge_list, coordination,
+                              periodic_edge_info=periodic_edge_info)
 
         # Title with validation summary
         if vci.n_violations == 0:
@@ -683,6 +853,14 @@ def generate_all_panels(
     metadata = run_data["metadata"]
     paths = []
 
+    # Classify periodic edges once (shared by Panel 3 + individual samples)
+    periodic_edge_info = _classify_edges_for_run(
+        metadata, run_data["positions"], run_data["edge_list"],
+    )
+    if periodic_edge_info is not None:
+        _, periodic_edges, _ = periodic_edge_info
+        logger.info(f"Periodic BC: {len(periodic_edges)} wrap-around edges detected")
+
     # Panel 1: Training curves
     paths.append(plot_training_curves(
         loss_history=run_data["loss_history"],
@@ -709,6 +887,7 @@ def generate_all_panels(
         edge_list=run_data["edge_list"],
         coordination=run_data["coordination"],
         output_path=output_dir,
+        periodic_edge_info=periodic_edge_info,
     ))
 
     # Panel 4: Summary card
@@ -742,6 +921,7 @@ def generate_all_panels(
         coordination=run_data["coordination"],
         output_path=samples_dir,
         n_samples=n_individual,
+        periodic_edge_info=periodic_edge_info,
     )
     paths.extend(sample_paths)
 

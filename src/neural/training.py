@@ -12,6 +12,7 @@ baseline, gradient clipping.
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -43,6 +44,7 @@ class TrainingConfig:
     entropy_bonus: float = 0.01
     grad_clip: float = 1.0
     eval_every: int = 200
+    checkpoint_every: int = 0  # Save checkpoint every N epochs (0 = disabled)
     seed: int = 42
 
 
@@ -95,6 +97,7 @@ def train(
     coordination: np.ndarray,
     config: TrainingConfig,
     exact_states: Optional[np.ndarray] = None,
+    checkpoint_dir: Optional[str] = None,
 ) -> TrainingResult:
     """Train LoopMPVAN via REINFORCE to maximize entropy.
 
@@ -107,6 +110,7 @@ def train(
     coordination : array (n0,)
     config : TrainingConfig
     exact_states : optional array (n_states, n_edges) for KL evaluation
+    checkpoint_dir : optional directory for saving periodic checkpoints
 
     Returns
     -------
@@ -140,24 +144,19 @@ def train(
         model.train()
         optimizer.zero_grad()
 
-        # Sample a batch of ice states
+        # Sample a batch of ice states (batched)
         with torch.no_grad():
-            sigmas, log_probs_sample = model.sample(
+            sigmas, log_probs_sample = model.sample_batch(
                 seed_tensor, inv_features, n_samples=config.batch_size
             )
 
         # Recover alpha vectors for each sample
         alphas = recover_alpha(sigmas, seed_tensor, indicators)  # (batch, n_loops)
 
-        # Compute log probabilities with gradients (teacher forcing)
-        batch_log_probs = []
-        for b in range(config.batch_size):
-            log_q = model.forward_log_prob(
-                alphas[b], seed_tensor, inv_features
-            )
-            batch_log_probs.append(log_q)
-
-        log_probs = torch.stack(batch_log_probs)  # (batch,)
+        # Compute log probabilities with gradients (batched teacher forcing)
+        log_probs = model.forward_log_prob_batch(
+            alphas, seed_tensor, inv_features
+        )  # (batch,)
 
         # REINFORCE: maximize entropy = minimize E[log q]
         # Reward = -log_q (lower log_q = higher entropy = better)
@@ -203,7 +202,7 @@ def train(
         if (epoch + 1) % config.eval_every == 0 or epoch == 0:
             model.eval()
             with torch.no_grad():
-                eval_sigmas, eval_log_probs = model.sample(
+                eval_sigmas, eval_log_probs = model.sample_batch(
                     seed_tensor, inv_features, n_samples=min(256, config.batch_size * 4)
                 )
 
@@ -236,6 +235,18 @@ def train(
                 f"violation={violation:.4f}, KL={kl:.4f}, "
                 f"grad_norm={total_norm:.4f}, adv_var={advantages.var().item():.4f}"
             )
+
+        # Periodic checkpointing
+        if (
+            config.checkpoint_every > 0
+            and checkpoint_dir is not None
+            and (epoch + 1) % config.checkpoint_every == 0
+        ):
+            ckpt_path = os.path.join(
+                checkpoint_dir, f"model_epoch_{epoch+1}.pt"
+            )
+            torch.save(model.state_dict(), ckpt_path)
+            logger.info(f"Checkpoint saved: {ckpt_path}")
 
     # Save final model state
     result.final_model_state = {

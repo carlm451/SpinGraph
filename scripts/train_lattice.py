@@ -159,13 +159,21 @@ def main():
     inv_features = build_inv_features(lattice.edge_list, lattice.coordination)
 
     # Training config
+    checkpoint_every = max(1, args.epochs // 10)  # Checkpoint at eval intervals
     config = TrainingConfig(
         n_epochs=args.epochs,
         batch_size=args.batch_size,
         lr=args.lr,
         seed=args.seed,
         eval_every=max(1, args.epochs // 10),
+        checkpoint_every=checkpoint_every,
     )
+
+    # Create run directory before training (for checkpoints)
+    run_id = args.run_id or generate_run_id(lattice_name, args.boundary)
+    run_dir = os.path.join("results", "neural_training", run_id)
+    os.makedirs(run_dir, exist_ok=True)
+    logger.info(f"Run directory: {run_dir}")
 
     # Train
     logger.info("Starting training...")
@@ -174,6 +182,7 @@ def main():
         model, sigma_seed, inv_features,
         B1, lattice.coordination, config,
         exact_states=exact_states,
+        checkpoint_dir=run_dir,
     )
     train_time = time.perf_counter() - t0
     logger.info(f"Training complete in {train_time:.1f}s")
@@ -241,9 +250,6 @@ def main():
     logger.info(f"Sample time ({n_eval} samples) = {sample_time:.2f}s")
 
     # Save training run
-    run_id = args.run_id or generate_run_id(lattice_name, args.boundary)
-    run_dir = os.path.join("results", "neural_training", run_id)
-
     metadata = RunMetadata(
         run_id=run_id,
         lattice_name=lattice_name,

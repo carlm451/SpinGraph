@@ -122,6 +122,101 @@ class TestSampling:
         assert torch.all(torch.isfinite(log_probs)), "Some log_probs are non-finite"
 
 
+class TestBatchedEquivalence:
+    """Verify batched methods produce identical results to sequential ones."""
+
+    def test_forward_log_prob_batch_matches_sequential(self, model_setup):
+        """forward_log_prob_batch should match per-sample forward_log_prob."""
+        model, lat, B1, sigma_seed, inv_features, lb = model_setup
+        seed_t = torch.from_numpy(sigma_seed.astype(np.float32))
+        model.eval()
+
+        torch.manual_seed(123)
+        alphas = torch.bernoulli(torch.full((5, lb.n_loops), 0.5))
+
+        # Sequential
+        sequential_lps = []
+        for i in range(5):
+            lp = model.forward_log_prob(alphas[i], seed_t, inv_features)
+            sequential_lps.append(lp.item())
+
+        # Batched
+        batched_lps = model.forward_log_prob_batch(alphas, seed_t, inv_features)
+
+        for i in range(5):
+            assert abs(batched_lps[i].item() - sequential_lps[i]) < 1e-5, (
+                f"Sample {i}: batched={batched_lps[i].item():.6f} vs "
+                f"sequential={sequential_lps[i]:.6f}"
+            )
+
+    def test_forward_log_prob_batch_differentiable(self, model_setup):
+        """Batched forward should be differentiable."""
+        model, lat, B1, sigma_seed, inv_features, lb = model_setup
+        seed_t = torch.from_numpy(sigma_seed.astype(np.float32))
+
+        alphas = torch.zeros(3, lb.n_loops)
+        log_probs = model.forward_log_prob_batch(alphas, seed_t, inv_features)
+        log_probs.sum().backward()
+
+        has_grad = False
+        for p in model.parameters():
+            if p.grad is not None and p.grad.norm().item() > 0:
+                has_grad = True
+                break
+        assert has_grad, "No parameter received non-zero gradients"
+
+    def test_sample_batch_shapes(self, model_setup):
+        """sample_batch should return correct shapes."""
+        model, lat, B1, sigma_seed, inv_features, lb = model_setup
+        seed_t = torch.from_numpy(sigma_seed.astype(np.float32))
+        model.eval()
+
+        sigmas, log_probs = model.sample_batch(seed_t, inv_features, n_samples=10)
+        assert sigmas.shape == (10, lat.n_edges)
+        assert log_probs.shape == (10,)
+
+    def test_sample_batch_all_valid_ice(self, model_setup):
+        """All batched samples should be valid ice states."""
+        model, lat, B1, sigma_seed, inv_features, lb = model_setup
+        seed_t = torch.from_numpy(sigma_seed.astype(np.float32))
+        model.eval()
+
+        sigmas, log_probs = model.sample_batch(seed_t, inv_features, n_samples=20)
+
+        for i in range(20):
+            sigma_np = sigmas[i].numpy()
+            assert verify_ice_state(B1, sigma_np, lat.coordination), (
+                f"Batched sample {i} violates ice rule"
+            )
+
+    def test_sample_batch_log_probs_finite(self, model_setup):
+        """Batched sample log probs should be finite."""
+        model, lat, B1, sigma_seed, inv_features, lb = model_setup
+        seed_t = torch.from_numpy(sigma_seed.astype(np.float32))
+        model.eval()
+
+        _, log_probs = model.sample_batch(seed_t, inv_features, n_samples=10)
+        assert torch.all(torch.isfinite(log_probs)), "Some batched log_probs are non-finite"
+
+    def test_batch_is_directed_matches_sequential(self, model_setup):
+        """_batch_is_directed should match _is_loop_directed for each sample."""
+        model, lat, B1, sigma_seed, inv_features, lb = model_setup
+        seed_t = torch.from_numpy(sigma_seed.astype(np.float32))
+        model.eval()
+
+        # Generate a few different sigmas
+        sigmas, _ = model.sample_batch(seed_t, inv_features, n_samples=8)
+
+        for loop_idx in range(min(lb.n_loops, 5)):
+            batch_result = model._batch_is_directed(sigmas, loop_idx)
+            for i in range(8):
+                seq_result = model._is_loop_directed(sigmas[i], loop_idx)
+                assert batch_result[i].item() == seq_result, (
+                    f"Mismatch at sample {i}, loop {loop_idx}: "
+                    f"batch={batch_result[i].item()}, seq={seq_result}"
+                )
+
+
 class TestModelProperties:
     def test_count_parameters(self, model_setup):
         model, *_ = model_setup
