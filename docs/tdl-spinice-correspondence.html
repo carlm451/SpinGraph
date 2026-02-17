@@ -1394,7 +1394,7 @@ which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
 </p>
 
 <p>
-<strong>Hierarchy of bounds</strong> for $z=4$ periodic square lattices in the thermodynamic limit:
+<strong>Hierarchy of bounds</strong> for $z=4$ periodic square lattices in the thermodynamic limit (all vertices even-degree, single charge sector &mdash; so $|\mathcal{I}| \leq 2^{\beta_1}$ holds):
 </p>
 
 <table>
@@ -1496,24 +1496,24 @@ $$
 $$
 
 <div class="key-result">
-<div class="label">Key Result 9 &mdash; Loop-Basis Parameterization of the Ice Manifold</div>
+<div class="label">Key Result 9 &mdash; Loop-Basis Parameterization (Single Charge Sector)</div>
 <p>
-Let $G$ be a connected graph with $n_2 = 0$, $\bm{\sigma}_{\text{seed}}$ an ice state, and $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ a basis of $\ker(B_1)$. Then every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via loop flips is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$. This gives:
+Let $G$ be a connected graph with $n_2 = 0$, $\bm{\sigma}_{\text{seed}}$ an ice state in charge sector $C_{\mathbf{q}}$, and $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ a basis of $\ker(B_1)$. Then every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via loop flips is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$, and all reachable states remain in $C_{\mathbf{q}}$ (since $B_1 \mathbf{l}_i = \mathbf{0}$). This gives:
 </p>
 $$
 |\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
 $$
 <p>
-with equality if and only if every combination of loop flips produces a distinct, valid ice state. In practice, equality is rare &mdash; the directed-cycle constraint (&sect;5.8) typically reduces the count substantially.
+This is a <strong>per-sector bound</strong>: it limits the number of ice states reachable from any single seed. It does <em>not</em> bound the total ice manifold $|\mathcal{I}|$, which sums over all charge sectors.
 </p>
 </div>
 
 <p>
-<strong>Relationship to topological capacity.</strong> Key Result 9 makes explicit how the topological capacity $\dim(\ker B_1) = \beta_1$ from Key Result 8 translates into an upper bound on the number of discrete ice states. The $2^{\beta_1}$ bound arises because the cycle space is $\beta_1$-dimensional over $\R$, and $\mathrm{GF}(2)$ decisions (flip or not) select one of $2^{\beta_1}$ possible binary labelings of the basis.
+<strong>Scope of the $2^{\beta_1}$ bound.</strong> Since loop flips preserve charge (&sect;5.6), the $2^{\beta_1}$ bound applies within a single Coulomb class. The total ice manifold $|\mathcal{I}| = \sum_{\mathbf{q} \in \mathcal{Q}_{\min}} |\mathcal{I}_{\mathbf{q}}|$ sums over all minimal-charge sectors, and <strong>can exceed $2^{\beta_1}$</strong> when there are multiple sectors. For example, the square 4&times;4 open lattice has odd-degree boundary vertices ($z = 3$) creating multiple charge sectors: $|\mathcal{I}| = 2{,}768$ across all sectors, while $2^{\beta_1} = 512$ bounds the reachable count within any single sector. For even-degree graphs (single sector, $\mathcal{I} = C_{\mathbf{0}}$), the bound $|\mathcal{I}| \leq 2^{\beta_1}$ does hold: the square 4&times;4 periodic lattice has $|\mathcal{I}| = 2{,}970 \ll 2^{\beta_1} = 131{,}072$.
 </p>
 
 <p>
-<strong>Why $2^{\beta_1}$ is exponentially loose.</strong> The bound $2^{\beta_1}$ counts the number of binary loop-flip decisions &mdash; the dimension of the <em>decision space</em> &mdash; not the number of achievable ice states. For a $z=4$ periodic square lattice, $\beta_1 = n_1 - n_0 + 1 = 2n_0 - n_0 + 1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. Meanwhile, the exact count in the thermodynamic limit (Lieb, 1967) grows as $|\mathcal{I}| \sim W_{\text{Lieb}}^{n_0}$ with $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$ per vertex, and the Pauling approximation (which treats vertex constraints as independent) gives $W_{\text{Pauling}} = 3/2 = 1.500$. The ratio of any of these to $2^{\beta_1}$ is:
+<strong>The hierarchy for even-degree periodic lattices.</strong> When all vertices have even degree and periodic BCs ensure a single charge sector, the full chain of inequalities is $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}| \leq 2^{\beta_1} \leq |\mathcal{P}| = 2^{n_1}$. For a $z=4$ periodic square lattice, $\beta_1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. The exact count (Lieb, 1967) gives $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$, and the Pauling approximation $\eqref{eq:pauling_approx}$ gives $W_{\text{P}} = 3/2 = 1.500$. The ratio:
 </p>
 
 $$
@@ -1521,7 +1521,11 @@ $$
 $$
 
 <p>
-Both decay <strong>exponentially</strong> in $n_0$. For a 10&times;10 lattice ($n_0 = 100$), the Pauling/Lieb count is $\sim 10^{12}$ times smaller than $2^{\beta_1}$. The full hierarchy of per-vertex factors ($W = 4, 2, 1.540, 1.500$) is tabulated in &sect;5.5.
+decays <strong>exponentially</strong> in $n_0$. The full hierarchy of per-vertex factors ($W = 4, 2, 1.540, 1.500$) is tabulated in &sect;5.5.
+</p>
+
+<p>
+<strong>The multi-sector case.</strong> For lattices with odd-degree vertices (kagome, shakti, tetris, santa fe with open BCs), the ice manifold spans multiple charge sectors. The per-sector bound $|\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ still holds for each sector individually, but the total $|\mathcal{I}| = \sum_{\mathbf{q}} |\mathcal{I}_{\mathbf{q}}|$ can be much larger. The number of charge sectors grows combinatorially with the number of odd-degree vertices: if $n_{\text{odd}}$ vertices have odd degree, there are up to $\binom{n_{\text{odd}}}{n_{\text{odd}}/2}$ possible charge patterns (constrained by $\sum_v q_v = 0$). This is why $|\mathcal{I}|$ exceeds $2^{\beta_1}$ for lattices like square 4&times;4 open ($n_{\text{odd}} = 8$ boundary vertices with $z = 3$) and kagome 2&times;2 open ($n_{\text{odd}} = 12$, all vertices).
 </p>
 
 <h3 id="sec5.8">5.8 The Directed-Cycle Constraint and Reachable States</h3>
@@ -1539,15 +1543,18 @@ Crucially, whether cycle $\mathbf{l}_i$ is directed depends on the <em>current</
 </p>
 
 <div class="key-result">
-<div class="label">Key Result 10 &mdash; Directed-Cycle Reduction of the Ice Manifold</div>
+<div class="label">Key Result 10 &mdash; Directed-Cycle Reduction (Within a Charge Sector)</div>
 <p>
-The number of ice states reachable from a seed via loop flips satisfies:
+The directed-cycle constraint further reduces the reachable states within a single charge sector. The autoregressive DFS count satisfies:
 </p>
 $$
-|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
+|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}
 $$
 <p>
-with equality rare in practice. The ratio $|\mathcal{I}_{\text{reachable}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by more than five orders of magnitude across the Morrison et al. lattice zoo.
+where $|\mathcal{I}_{\mathbf{q}}|$ is the number of ice states in the seed's charge sector. The first inequality is due to the autoregressive ordering limitation; the second is Key Result 9. The ratio $|\mathcal{I}_{\text{DFS}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by more than five orders of magnitude across the Morrison et al. lattice zoo.
+</p>
+<p>
+<strong>Important:</strong> The total ice manifold $|\mathcal{I}| = \sum_{\mathbf{q}} |\mathcal{I}_{\mathbf{q}}|$ can exceed $2^{\beta_1}$ when multiple charge sectors exist (odd-degree vertices). See discussion in &sect;5.7.
 </p>
 </div>
 
@@ -2824,7 +2831,7 @@ The following table summarizes all correspondences established in this document.
   <td>24</td>
   <td>Directed-cycle constraint</td>
   <td>Decision-tree pruning of loop-flip space</td>
-  <td>$|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}| \leq 2^{\beta_1}$</td>
+  <td>$|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ (per sector); total $|\mathcal{I}|$ can exceed $2^{\beta_1}$</td>
   <td>&sect;5.8</td>
 </tr>
 <tr>
@@ -2874,7 +2881,7 @@ This document has established a precise, equation-level bridge between two indep
 
 <li><strong>Coulomb classes, degeneracy, and capacity</strong> (&sect;5). Nisoli's charge equivalence partitions configuration space into Coulomb classes (affine cosets of $\ker(B_1)$). The three-level capacity framework (Key Result 8, &sect;5.9) distinguishes topological ($\dim\ker B_1$), combinatorial ($|\mathcal{I}|$, Pauling entropy), and spectral capacity.</li>
 
-<li><strong>Loop-basis parameterization, directed-cycle bound, and autoregressive gap</strong> (&sect;5.7&ndash;5.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}| \leq 2^{\beta_1}$. The directed-cycle constraint prunes the upper bound exponentially (Key Results 9, 10), and the fixed autoregressive ordering introduces a further gap: independently verified total counts $|\mathcal{I}|$ exceed the DFS-reachable count by up to 74&times; on even-degree periodic lattices.</li>
+<li><strong>Loop-basis parameterization, directed-cycle bound, and autoregressive gap</strong> (&sect;5.7&ndash;5.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving a per-sector bound $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ (Key Results 9, 10). The directed-cycle constraint prunes the upper bound exponentially. Note that the total $|\mathcal{I}| = \sum_{\mathbf{q}} |\mathcal{I}_{\mathbf{q}}|$ can exceed $2^{\beta_1}$ when multiple charge sectors exist (odd-degree vertices). The fixed autoregressive ordering introduces a further gap: independently verified total counts $|\mathcal{I}|$ exceed the DFS-reachable count by up to 74&times; on even-degree periodic lattices.</li>
 </ol>
 
 <h3>12.2 Quantitative Framework</h3>
