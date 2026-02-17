@@ -212,6 +212,7 @@ def plot_training_curves(
     n_reachable_states: int,
     batch_size: int,
     output_path: str,
+    n_single_ordering: int = -1,
 ) -> str:
     """Panel 1: 2x2 grid of training curves.
 
@@ -240,8 +241,13 @@ def plot_training_curves(
     if n_reachable_states > 0:
         target_entropy = np.log(n_reachable_states)
         ax.axhline(target_entropy, color=_GRAY, linestyle="--", linewidth=1.2,
-                    label=f"ln({n_reachable_states}) = {target_entropy:.2f}")
-        ax.legend()
+                    label=f"multi-ordering: ln({n_reachable_states}) = {target_entropy:.2f}")
+    if n_single_ordering > 0:
+        single_entropy = np.log(n_single_ordering)
+        ax.axhline(single_entropy, color="#27ae60", linestyle=":", linewidth=1.5,
+                    label=f"per-batch ceiling: ln({n_single_ordering}) = {single_entropy:.2f}")
+    if n_reachable_states > 0 or n_single_ordering > 0:
+        ax.legend(fontsize=7)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Entropy")
     ax.set_title("(b) Entropy", fontweight="bold")
@@ -871,6 +877,7 @@ def generate_all_panels(
         n_reachable_states=metadata.get("n_reachable_states", -1),
         batch_size=metadata["batch_size"],
         output_path=output_dir,
+        n_single_ordering=metadata.get("n_reachable_single_ordering", -1),
     ))
 
     # Panel 2: Sampling quality

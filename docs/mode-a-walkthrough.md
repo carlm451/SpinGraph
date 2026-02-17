@@ -6,9 +6,9 @@ A step-by-step guide to how the autoregressive loop-flip sampler works, from dat
 
 ## 1. Problem Setup
 
-**Goal:** Learn to sample uniformly from the ice manifold — the set of all spin configurations satisfying the ice rule (divergence-free at every vertex).
+**Goal:** Learn to sample uniformly from ice states reachable by loop flips from a seed configuration. Because loop flips preserve vertex charge (see Section 8), this samples uniformly within a single **charge sector** of the ice manifold, not the full manifold.
 
-**Key insight:** The ice manifold is a discrete set connected by *directed loop flips*. Starting from any valid ice state (the "seed"), every other reachable ice state can be reached by flipping some subset of β₁ independent cycles. This means we can parameterize the manifold as β₁ binary decisions (flip or don't flip each loop), and train an autoregressive model over these decisions.
+**Key insight:** The ice manifold is a discrete set connected by *directed loop flips* within each charge sector. Starting from any valid ice state (the "seed"), every other ice state in the same charge sector can be reached by flipping some subset of β₁ independent cycles. This means we can parameterize the sector as β₁ binary decisions (flip or don't flip each loop), and train an autoregressive model over these decisions.
 
 ---
 
@@ -400,11 +400,63 @@ The complete data flow for one training epoch:
 
 ---
 
-## 8. Inference: Using the Trained Model
+## 8. Fundamental Limitation: Charge Sector Confinement
+
+Mode A samples uniformly *within a single charge sector* of the ice manifold. It cannot sample the full manifold. This is a mathematical constraint, not a training limitation.
+
+### 8a. Why loop flips preserve charge
+
+A loop flip applies a divergence-free perturbation to the spin configuration: if c is the oriented cycle vector, then B₁c = 0 by definition of a cycle. The vertex charge is Q = B₁σ, so after flipping:
+
+```
+Q_new = B₁(σ + 2c) = B₁σ + 2B₁c = Q + 0 = Q
+```
+
+Every loop flip — and therefore every autoregressive decision Mode A makes — preserves the vertex charge at every vertex. The model is confined to the **Coulomb class** of the seed state σ_seed.
+
+### 8b. Charge sectors on different lattice types
+
+**Even-degree lattices** (square, all z = 4): The ice rule forces Q_v = 0 at every vertex. There is only one charge sector (the zero-charge sector), so all ice states are reachable by loop flips in principle. The practical limitation here is the *autoregressive ordering gap*, not the charge sector.
+
+**Odd-degree lattices** (kagome z=3, and mixed-coordination lattices like shakti, tetris, santa_fe): The ice rule allows Q_v = ±1 at odd-degree vertices. Different assignments of these ±1 charges define distinct charge sectors. Loop flips cannot change any vertex charge, so the ice manifold is partitioned into multiple disconnected sectors that Mode A cannot bridge.
+
+### 8c. Impact on coverage
+
+The "100% coverage" reported in Mode A experiments means 100% of states reachable *within the seed's charge sector*, not 100% of the full ice manifold. The table below shows how the sector relates to the full manifold for our test lattices (from `docs/tdl-spinice-correspondence.html` §5.8):
+
+| Lattice | BC | |I_sector| (Mode A sees) | |I| (full manifold) | Fraction |
+|---------|-----|------------------------|---------------------|----------|
+| Square 4×4 | open | 38 | 2,768 | 1.4% |
+| Square 4×4 | periodic | 299 | 2,768 | 10.8% |
+| Kagome 2×2 | open | 34 | 172 | 19.8% |
+| Kagome 2×2 | periodic | 355 | 7,833 | 4.5% |
+| Santa Fe 2×2 | open | 23 | 23+ | ~100%* |
+| Tetris 2×2 | open | 17 | 86,560 | 0.02% |
+| Shakti 1×1 | open | 3 | 3+ | ~100%* |
+
+*For Santa Fe and Shakti at these tiny sizes, exact full-manifold counts are pending; the sector may coincide with the full manifold at minimal system size.
+
+For larger or more frustrated lattices, Mode A accesses only a tiny fraction of the full ice manifold. This is not a failure of the neural network — it is a topological constraint on loop-flip dynamics.
+
+### 8d. Implications and path forward
+
+Mode A is best understood as a **within-sector sampler**: given a charge sector (defined by the seed state), it learns to sample uniformly over that sector's ice states. This is useful for:
+
+- Computing sector-conditioned observables
+- Studying the structure of individual Coulomb classes
+- Validating the loop-flip dynamics and EIGN architecture
+
+To sample across the *full* ice manifold — including all charge sectors — requires moves that change vertex charges. This is the motivation for **Mode B** (direct edge sampling), which autoregressively assigns individual edge spins and can naturally access all charge sectors. Mode B trades Mode A's guaranteed validity for generality: it uses a soft ice-rule penalty rather than hard enforcement, but can reach any spin configuration including those in different charge sectors.
+
+See `docs/tdl-spinice-correspondence.html` §5 for the full mathematical treatment of Coulomb classes and their connection to the Hodge decomposition.
+
+---
+
+## 9. Inference: Using the Trained Model
 
 After training, the saved checkpoint contains everything needed to generate new ice state samples. This section describes how to load a trained model and use it for inference.
 
-### 8a. What's saved in a training run
+### 9a. What's saved in a training run
 
 Each run is stored in `results/neural_training/{run_id}/` with these artifacts:
 
@@ -424,7 +476,7 @@ Each run is stored in `results/neural_training/{run_id}/` with these artifacts:
 > `src/neural/checkpointing.py:60-138` — `save_training_run()`
 > `src/neural/checkpointing.py:141-190` — `load_training_run()`
 
-### 8b. Reconstruction procedure
+### 9b. Reconstruction procedure
 
 To generate new samples from a saved run, rebuild the model from the checkpoint:
 
@@ -445,7 +497,7 @@ Steps 2–5 are deterministic given the lattice parameters, so the loop basis wi
 > `scripts/train_lattice.py:97-121` — the same setup pipeline used before training
 > `src/neural/training.py` — `build_inv_features(edge_list, coordination)` for step 9
 
-### 8c. Generating samples
+### 9c. Generating samples
 
 Once the model is reconstructed:
 
@@ -480,7 +532,7 @@ Every sample is a valid ice state by construction. The samples are **independent
 > `src/neural/loop_mpvan.py:412-483` — `sample_batch()` method with ordering parameter
 > `src/neural/loop_mpvan.py:232-291` — `sample()` single-sample version
 
-### 8d. What you can compute from samples
+### 9d. What you can compute from samples
 
 **Sample quality metrics** (same as training evaluation):
 
@@ -514,7 +566,7 @@ This corrects for any remaining non-uniformity in the learned distribution. The 
 
 > `src/neural/metrics.py:128-163` — `effective_sample_size(log_q, log_p)`
 
-### 8e. Sampling cost
+### 9e. Sampling cost
 
 Each sample requires β₁ sequential passes through the EIGN stack (one per loop in the ordering). At each step:
 1. **Directed-cycle check** — O(loop_length) vertex inspections
@@ -527,7 +579,7 @@ Non-directed loops are skipped (no EIGN pass), so the effective number of forwar
 
 The key advantage over MCMC: samples are **independent by construction**. MCMC requires τ_corr flip sweeps between independent samples, where τ_corr grows with system size. The neural sampler's cost per independent sample is fixed at one forward pass, regardless of correlation structure.
 
-### 8f. Diagnostic plots from saved runs
+### 9f. Diagnostic plots from saved runs
 
 The plotting pipeline generates all diagnostic panels from saved artifacts without reloading the model:
 

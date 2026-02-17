@@ -127,6 +127,7 @@ def main():
 
     # Exact enumeration (only if beta_1 small enough)
     exact_states = None
+    n_reachable_single = -1
     enum_time = 0.0
     if loop_basis.n_loops <= MAX_ENUM_BETA1 and not args.skip_enum:
         from src.neural.enumeration import enumerate_all_ice_states, enumerate_multi_ordering
@@ -145,9 +146,12 @@ def main():
                 seed=args.seed,
             )
             enum_time = time.perf_counter() - t0
+            # First ordering's count = single-ordering baseline
+            n_reachable_single = cumulative[0] if cumulative else -1
             logger.info(
                 f"Multi-ordering enumeration: {len(exact_states)} reachable states "
-                f"across 200 orderings in {enum_time:.2f}s"
+                f"across 200 orderings ({n_reachable_single} from first ordering) "
+                f"in {enum_time:.2f}s"
             )
         else:
             exact_states = enumerate_all_ice_states(
@@ -157,6 +161,7 @@ def main():
                 cycle_edge_lists=loop_basis.cycle_edge_lists,
                 ordering=loop_basis.ordering,
             )
+            n_reachable_single = len(exact_states)
             enum_time = time.perf_counter() - t0
             logger.info(f"Enumeration complete: {len(exact_states)} reachable states in {enum_time:.2f}s")
     else:
@@ -222,8 +227,11 @@ def main():
     t0_sample = time.perf_counter()
     with torch.no_grad():
         if config.randomize_ordering:
-            # Sample with multiple random orderings to measure full coverage
-            n_orderings_eval = 20
+            # Sample with many random orderings to cover the full manifold.
+            # 20 orderings can miss states reachable only by rare orderings;
+            # 100 orderings gives >99% chance of hitting a state reachable
+            # by 5% of orderings: 1 - 0.95^100 = 0.994
+            n_orderings_eval = 100
             samples_per = max(1, n_eval // n_orderings_eval)
             eval_sigmas_list = []
             eval_lp_list = []
@@ -305,6 +313,7 @@ def main():
         n_edges=lattice.n_edges,
         beta_1=loop_basis.n_loops,
         n_reachable_states=n_reachable,
+        n_reachable_single_ordering=n_reachable_single,
         n_model_params=model.count_parameters(),
         n_epochs=args.epochs,
         batch_size=args.batch_size,

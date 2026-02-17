@@ -214,15 +214,28 @@ def train(
         if (epoch + 1) % config.eval_every == 0 or epoch == 0:
             model.eval()
             with torch.no_grad():
-                # Use random ordering for eval too (explores different states)
-                eval_ordering = (
-                    np.random.permutation(n_loops).tolist()
-                    if config.randomize_ordering else None
-                )
-                eval_sigmas, eval_log_probs = model.sample_batch(
-                    seed_tensor, inv_features, n_samples=min(256, config.batch_size * 4),
-                    ordering=eval_ordering,
-                )
+                if config.randomize_ordering:
+                    # Use multiple random orderings for eval to get better
+                    # coverage estimates (single ordering misses states)
+                    n_eval_orderings = 10
+                    n_eval_per = max(1, min(256, config.batch_size * 4) // n_eval_orderings)
+                    eval_s_list, eval_lp_list = [], []
+                    for _ in range(n_eval_orderings):
+                        eo = np.random.permutation(n_loops).tolist()
+                        s, lp = model.sample_batch(
+                            seed_tensor, inv_features, n_samples=n_eval_per,
+                            ordering=eo,
+                        )
+                        eval_s_list.append(s)
+                        eval_lp_list.append(lp)
+                    eval_sigmas = torch.cat(eval_s_list, dim=0)
+                    eval_log_probs = torch.cat(eval_lp_list, dim=0)
+                else:
+                    eval_sigmas, eval_log_probs = model.sample_batch(
+                        seed_tensor, inv_features,
+                        n_samples=min(256, config.batch_size * 4),
+                        ordering=None,
+                    )
 
             eval_np = eval_sigmas.numpy()
             log_probs_np = eval_log_probs.numpy()

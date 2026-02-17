@@ -28,7 +28,7 @@ class RunMetadata:
     n_vertices: int
     n_edges: int
     beta_1: int
-    n_reachable_states: int  # from enumeration (or -1 if not enumerated)
+    n_reachable_states: int  # from multi-ordering enumeration (or -1 if not enumerated)
     n_model_params: int
     # Training config fields
     n_epochs: int
@@ -50,6 +50,8 @@ class RunMetadata:
     train_time_s: float
     sample_time_s: float
     timestamp: str
+    # Optional (backward-compatible)
+    n_reachable_single_ordering: int = -1  # from single (default) ordering DFS
 
 
 def generate_run_id(lattice_name: str, boundary: str) -> str:
