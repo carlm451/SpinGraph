@@ -60,7 +60,9 @@ Finds β₁ = n₁ - rank(B₁) independent cycles using `networkx.cycle_basis()
 
 ### 2f. Compute loop ordering
 
-The autoregressive ordering determines which loop is decided first, second, etc. The default strategy is `spatial_bfs`: build an overlap graph of loops (loops that share edges are adjacent), start from the most central loop, and BFS outward.
+The autoregressive ordering determines which loop is decided first, second, etc. A default ordering is computed using the `spatial_bfs` strategy: build an overlap graph of loops (loops that share edges are adjacent), start from the most central loop, and BFS outward.
+
+**Important:** During training, this default ordering is overridden by a random permutation generated fresh for each batch (see Section 5b). This "ordering randomization" is analogous to XLNet's permutation training and dramatically expands the set of reachable states — a fixed ordering can miss 30-99% of states on periodic lattices due to the autoregressive ordering gap (see `docs/tdl-spinice-correspondence.html` §8.8). The default ordering is still used when `--no-randomize-ordering` is passed, or as a fallback for inference without explicit ordering.
 
 > `src/neural/loop_basis.py:227-310` — `compute_loop_ordering(loop_basis, strategy, positions, edge_list)`
 > `src/neural/loop_basis.py:261-307` — spatial_bfs: overlap graph → BFS from center
@@ -69,8 +71,11 @@ The autoregressive ordering determines which loop is decided first, second, etc.
 
 For β₁ ≤ 25, DFS through the autoregressive decision tree. At each node, if the current loop is a directed cycle, both branches (flip / no-flip) are explored. If not directed, only no-flip. This prunes the 2^β₁ tree dramatically.
 
-> `src/neural/enumeration.py:23-91` — `enumerate_reachable_ice_states()` DFS
-> `src/neural/enumeration.py:80-88` — the branching logic (no-flip always; flip only if directed)
+**Multi-ordering enumeration:** Because the DFS tree depends on the loop ordering, a single ordering may miss reachable states (the "autoregressive ordering gap"). When ordering randomization is enabled, `enumerate_multi_ordering()` runs DFS with K random orderings (default 200) and unions all discovered states. This gives a tighter lower bound on the reachable ice manifold. For example, square 4×4 periodic discovers 52 states with a fixed ordering but 299 across 200 random orderings (5.8× more).
+
+> `src/neural/enumeration.py:28-96` — `enumerate_reachable_ice_states()` DFS
+> `src/neural/enumeration.py:89-93` — the branching logic (no-flip always; flip only if directed)
+> `src/neural/enumeration.py:149-225` — `enumerate_multi_ordering()` multi-ordering union
 
 ---
 
@@ -132,10 +137,10 @@ After the EIGN stack produces per-edge features (X_equ, X_inv), the output head 
 
 ## 4. Autoregressive Sampling
 
-For each sample, the model processes loops one at a time in the fixed ordering. Starting from σ_seed:
+For each sample, the model processes loops one at a time in a given ordering. The ordering is either a random permutation (during training) or a specified/default ordering (during inference). Starting from σ_seed:
 
 ```
-For each loop i in ordering:
+For each loop i in ordering:                  # ordering is a permutation of [0, β₁)
     1. Is loop i a directed cycle in current σ?
        - Check: at every vertex on the cycle, one cycle edge flows in, one flows out
        - If NO: skip this loop (α_i = 0, no contribution to log_prob)
@@ -155,11 +160,12 @@ For each loop i in ordering:
 Return: final σ (guaranteed valid ice state), log_prob
 ```
 
-> `src/neural/loop_mpvan.py:209-265` — `sample()` method
-> `src/neural/loop_mpvan.py:239-245` — directed-cycle check and skip
-> `src/neural/loop_mpvan.py:248-253` — EIGN stack → pool → p_i
-> `src/neural/loop_mpvan.py:256-257` — Bernoulli sample, log_prob accumulation
-> `src/neural/loop_mpvan.py:259-260` — conditional flip
+The `ordering` parameter is accepted by all sampling and log-prob methods. When `None`, it defaults to the spatial_bfs ordering stored in `loop_basis.ordering`. During training, a fresh random permutation is generated per batch (see Section 5b).
+
+> `src/neural/loop_mpvan.py:232-291` — `sample()` method
+> `src/neural/loop_mpvan.py:254-255` — ordering defaults to `self.loop_basis.ordering`
+> `src/neural/loop_mpvan.py:265-271` — directed-cycle check and skip
+> `src/neural/loop_mpvan.py:412-483` — `sample_batch()`: batched version with ordering param
 > `src/neural/loop_basis.py:313-332` — `flip_single_loop()`: mask → sign_flip → σ * sign_flip
 > `src/neural/loop_basis.py:103-143` — `is_directed_cycle()`: check flow at each cycle vertex
 
@@ -183,13 +189,26 @@ Minimizing F_θ = maximizing entropy H(q_θ) = learning to sample **uniformly**.
 
 ### 5b. One epoch step-by-step
 
-> `src/neural/training.py:139-197` — main training loop
+> `src/neural/training.py:146-268` — main training loop
+
+**Step 0: Generate batch ordering**
+
+If ordering randomization is enabled (default), generate a fresh random permutation of the β₁ loop indices for this batch. This is the key mechanism for closing the autoregressive ordering gap — each batch explores different parts of the ice manifold by processing loops in a different sequence.
+
+```python
+if config.randomize_ordering:
+    batch_ordering = np.random.permutation(n_loops).tolist()
+else:
+    batch_ordering = None  # uses model's default ordering
+```
+
+> `src/neural/training.py:150-154` — per-batch ordering generation
 
 **Step 1: Sample a batch (no gradients)**
 
-Generate B ice states by running the autoregressive sampler B times.
+Generate B ice states by running the autoregressive sampler B times, using the batch ordering.
 
-> `src/neural/training.py:143-147` — `model.sample(seed, inv_features, n_samples=batch_size)` under `torch.no_grad()`
+> `src/neural/training.py:156-161` — `model.sample_batch(seed, inv_features, n_samples=batch_size, ordering=batch_ordering)` under `torch.no_grad()`
 
 **Step 2: Recover α vectors**
 
@@ -200,22 +219,24 @@ diff[e] = 1 if σ[e] ≠ σ_seed[e], else 0
 Solve: L^T · α = diff  (mod 2)    where L = loop_indicators
 ```
 
-> `src/neural/training.py:149-150` — `recover_alpha(sigmas, seed_tensor, indicators)`
+Note: α recovery is ordering-independent — it recovers the same α regardless of what ordering was used during sampling.
+
+> `src/neural/training.py:163-164` — `recover_alpha(sigmas, seed_tensor, indicators)`
 > `src/neural/loop_basis.py:410-451` — `recover_alpha()`: compute diff, call GF(2) solver per sample
 > `src/neural/loop_basis.py:453-481` — `_solve_gf2()`: Gaussian elimination over GF(2)
 
 **Step 3: Teacher-forced log_prob (with gradients)**
 
-Re-run the autoregressive model with the *known* α sequence (teacher forcing). This time gradients flow through the EIGN stack and output head.
+Re-run the autoregressive model with the *known* α sequence (teacher forcing), using the **same batch ordering** as Step 1. This is critical — the log probability depends on the ordering because directedness checks happen in sequence. Using a different ordering would compute incorrect log_probs.
 
 For each sample b:
-- Walk through loops in order
+- Walk through loops in the batch ordering
 - At each directed loop: compute p_i, accumulate log q = Σ [α_i·log(p_i) + (1-α_i)·log(1-p_i)]
 - At each non-directed loop: skip (contributes 0)
 
-> `src/neural/training.py:152-160` — loop over batch, call `model.forward_log_prob(alpha, seed, inv_features)`
-> `src/neural/loop_mpvan.py:158-207` — `forward_log_prob()`: teacher forcing with directed-cycle checks
-> `src/neural/loop_mpvan.py:184-206` — the autoregressive loop (same structure as sampling, but uses known α instead of Bernoulli)
+> `src/neural/training.py:166-171` — `model.forward_log_prob_batch(alphas, seed, inv_features, ordering=batch_ordering)`
+> `src/neural/loop_mpvan.py:342-410` — `forward_log_prob_batch()`: batched teacher forcing with ordering param
+> `src/neural/loop_mpvan.py:178-230` — `forward_log_prob()`: single-sample version
 
 **Step 4: REINFORCE gradient**
 
@@ -265,7 +286,8 @@ After gradient clipping, the total gradient norm and advantage variance are reco
 
 ### 5c. Evaluation checkpoints
 
-Every `eval_every` epochs, generate fresh samples and compute:
+Every `eval_every` epochs, generate fresh samples and compute metrics. When ordering randomization is enabled, eval samples also use a fresh random ordering to measure coverage across the full manifold.
+
 - **Ice violations:** should always be 0.0 (Mode A guarantee)
 - **Mean Hamming distance:** pairwise distance between samples (~0.5 for uniform)
 - **ESS:** effective sample size from importance weights (higher = more diverse)
@@ -273,7 +295,8 @@ Every `eval_every` epochs, generate fresh samples and compute:
 - **Gradient norm:** post-clip gradient norm (logged with eval metrics)
 - **Advantage variance:** variance of REINFORCE advantages (logged with eval metrics)
 
-> `src/neural/training.py:202-238` — evaluation block
+> `src/neural/training.py:213-255` — evaluation block
+> `src/neural/training.py:217-221` — random ordering for eval sampling
 > `src/neural/metrics.py` — all metric implementations
 
 ---
@@ -285,11 +308,17 @@ The complete data flow for one training epoch:
 ```
 σ_seed ──────────────────────────────────────────────────────────────┐
                                                                      │
+┌── ORDERING (per batch) ────────────────────────────────────────┐   │
+│  batch_ordering = random_permutation([0, β₁))                  │   │
+│  (closes autoregressive gap — each batch explores differently)  │   │
+└── batch_ordering ──────────────────────────────────────────────┘   │
+         │                                                            │
+         ▼                                                            │
 ┌── SAMPLING (no grad) ──────────────────────────────────────────┐   │
 │                                                                 │   │
 │  For each of B samples:                                         │   │
 │    σ = σ_seed                                                   │   │
-│    For each loop i in ordering:                                 │   │
+│    For each loop i in batch_ordering:                           │   │
 │      if is_directed_cycle(σ, loop_i):                           │   │
 │        σ → [equ_input] → [EIGN×K] → [pool loop_i] → [MLP] → p_i│  │
 │        α_i ~ Bernoulli(p_i)                                     │   │
@@ -299,18 +328,18 @@ The complete data flow for one training epoch:
 └── B samples: {σ_1, ..., σ_B} ─────────────────────────────────┘   │
          │                                                            │
          ▼                                                            │
-┌── ALPHA RECOVERY ──────────────────────────────────────────────┐   │
+┌── ALPHA RECOVERY (ordering-independent) ───────────────────────┐   │
 │  For each σ_b:                                                  │   │
 │    diff = (σ_b ≠ σ_seed)                                        │   │
 │    Solve L^T · α_b = diff over GF(2)                            │   │
 └── {α_1, ..., α_B} ────────────────────────────────────────────┘   │
          │                                                            │
          ▼                                                            │
-┌── TEACHER FORCING (with grad) ─────────────────────────────────┐   │
+┌── TEACHER FORCING (with grad, SAME batch_ordering) ────────────┐   │
 │  For each α_b:                                                  │   │
 │    σ = σ_seed                                                   │◄──┘
 │    log_q = 0                                                    │
-│    For each loop i in ordering:                                 │
+│    For each loop i in batch_ordering:   ◄── must match sampling │
 │      if is_directed_cycle(σ, loop_i):                           │
 │        σ → [equ_input] → [EIGN×K] → [pool loop_i] → [MLP] → p_i│
 │        log_q += α_i·log(p_i) + (1-α_i)·log(1-p_i)  ◄── GRAD   │
@@ -361,6 +390,14 @@ The complete data flow for one training epoch:
 - This constraint means the reachable state space is often much smaller than 2^β₁ (e.g., tetris 3×3: only 4 out of 2^22 ≈ 4M).
 - The model learns to assign p ≈ 0.5 for flippable loops and never sees non-flippable ones.
 
+### Why randomize the loop ordering per batch?
+
+- **The autoregressive ordering gap:** With a fixed loop ordering, the DFS decision tree can only reach a subset of all valid ice states. Whether a loop is directed depends on all prior flip decisions — a different ordering changes the set of states reachable through the directed-cycle gates. On square 4×4 periodic, a single fixed ordering discovers only 52 of the 299 reachable states (17%).
+- **XLNet-style permutation training:** Each batch uses a fresh random permutation of the β₁ loop indices. Over many training batches, the model is exposed to many different orderings, learning to handle any permutation. This is analogous to XLNet's permutation language modeling.
+- **Empirical impact:** Multi-ordering enumeration (200 orderings) discovers 1.5-5.8× more states than a single ordering. Training with randomized ordering achieves 2-3× more unique states in final evaluation.
+- **Consistency requirement:** The same ordering must be used for both sampling (Step 1) and teacher forcing (Step 3) within each batch. The α recovery (Step 2) is ordering-independent.
+- Controlled via `TrainingConfig.randomize_ordering` (default `True`) and the `--no-randomize-ordering` CLI flag.
+
 ---
 
 ## 8. Inference: Using the Trained Model
@@ -403,7 +440,7 @@ To generate new samples from a saved run, rebuild the model from the checkpoint:
 9. Build invariant features from edge_list + coordination
 ```
 
-Steps 2–5 are deterministic given the lattice parameters, so the loop basis and ordering will be identical to the ones used during training. This is essential — the model's weights are tied to a specific loop ordering.
+Steps 2–5 are deterministic given the lattice parameters, so the loop basis will be identical to the one used during training. With ordering randomization (default), the model is trained on all orderings, so inference can use any ordering — the default spatial_bfs ordering or random permutations for better coverage.
 
 > `scripts/train_lattice.py:97-121` — the same setup pipeline used before training
 > `src/neural/training.py` — `build_inv_features(edge_list, coordination)` for step 9
@@ -418,16 +455,30 @@ seed_tensor = torch.from_numpy(sigma_seed.astype(np.float32))
 inv_features = build_inv_features(edge_list, coordination)
 
 with torch.no_grad():
-    sigmas, log_probs = model.sample(seed_tensor, inv_features, n_samples=N)
+    # Single ordering (fast, uses default spatial_bfs ordering):
+    sigmas, log_probs = model.sample_batch(seed_tensor, inv_features, n_samples=N)
+
+    # Multi-ordering (better coverage, especially for periodic lattices):
+    n_orderings = 20
+    samples_per = N // n_orderings
+    all_sigmas, all_lp = [], []
+    for _ in range(n_orderings):
+        ordering = np.random.permutation(loop_basis.n_loops).tolist()
+        s, lp = model.sample_batch(seed_tensor, inv_features,
+                                    n_samples=samples_per, ordering=ordering)
+        all_sigmas.append(s); all_lp.append(lp)
+    sigmas = torch.cat(all_sigmas)
+    log_probs = torch.cat(all_lp)
 ```
 
 This returns:
 - `sigmas`: (N, n₁) tensor of ice state configurations, each ±1
 - `log_probs`: (N,) tensor of log q_θ(σ) for each sample
 
-Every sample is a valid ice state by construction. The samples are **independent** (no autocorrelation, unlike MCMC) — each one is a fresh forward pass through the autoregressive loop.
+Every sample is a valid ice state by construction. The samples are **independent** (no autocorrelation, unlike MCMC) — each one is a fresh forward pass through the autoregressive loop. Multi-ordering sampling at inference improves state coverage by exploring different parts of the ice manifold (the same mechanism that helps during training).
 
-> `src/neural/loop_mpvan.py:209-265` — `sample()` method (runs under `@torch.no_grad()`)
+> `src/neural/loop_mpvan.py:412-483` — `sample_batch()` method with ordering parameter
+> `src/neural/loop_mpvan.py:232-291` — `sample()` single-sample version
 
 ### 8d. What you can compute from samples
 
