@@ -56,6 +56,8 @@ class TrainingResult:
     hamming_history: List[float] = field(default_factory=list)
     ess_history: List[float] = field(default_factory=list)
     eval_epochs: List[int] = field(default_factory=list)
+    grad_norm_history: List[float] = field(default_factory=list)
+    advantage_var_history: List[float] = field(default_factory=list)
     final_model_state: Optional[Dict] = None
 
 
@@ -125,7 +127,7 @@ def train(
     else:
         scheduler = None
 
-    baseline = 0.0  # Running mean baseline for REINFORCE
+    baseline = None  # Initialize from first batch (C5 cold-start fix)
     result = TrainingResult()
 
     logger.info(
@@ -161,7 +163,10 @@ def train(
         # Reward = -log_q (lower log_q = higher entropy = better)
         # Advantage = reward - baseline = -log_q - baseline
         rewards = -log_probs.detach()
-        baseline = config.baseline_momentum * baseline + (1 - config.baseline_momentum) * rewards.mean().item()
+        if baseline is None:
+            baseline = rewards.mean().item()
+        else:
+            baseline = config.baseline_momentum * baseline + (1 - config.baseline_momentum) * rewards.mean().item()
         advantages = rewards - baseline
 
         # Policy gradient loss
@@ -177,6 +182,15 @@ def train(
 
         # Gradient clipping
         torch.nn.utils.clip_grad_norm_(model.parameters(), config.grad_clip)
+
+        # Record gradient diagnostics (C2)
+        total_norm = 0.0
+        for p in model.parameters():
+            if p.grad is not None:
+                total_norm += p.grad.data.norm(2).item() ** 2
+        total_norm = total_norm ** 0.5
+        result.grad_norm_history.append(total_norm)
+        result.advantage_var_history.append(advantages.var().item())
 
         optimizer.step()
         if scheduler is not None:
@@ -219,7 +233,8 @@ def train(
                 f"Epoch {epoch+1}/{config.n_epochs}: "
                 f"loss={loss.item():.4f}, entropy={entropy.item():.4f}, "
                 f"hamming={h_mean:.4f}, ESS={ess:.1f}, "
-                f"violation={violation:.4f}, KL={kl:.4f}"
+                f"violation={violation:.4f}, KL={kl:.4f}, "
+                f"grad_norm={total_norm:.4f}, adv_var={advantages.var().item():.4f}"
             )
 
     # Save final model state

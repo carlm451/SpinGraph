@@ -110,6 +110,8 @@ def save_training_run(
         "hamming_history": np.array(result.hamming_history, dtype=np.float64),
         "ess_history": np.array(result.ess_history, dtype=np.float64),
         "eval_epochs": np.array(result.eval_epochs, dtype=np.int64),
+        "grad_norm_history": np.array(result.grad_norm_history, dtype=np.float64),
+        "advantage_var_history": np.array(result.advantage_var_history, dtype=np.float64),
     }
     np.savez_compressed(metrics_path, **metrics_dict)
 
@@ -166,6 +168,9 @@ def load_training_run(run_dir: str) -> dict:
         "hamming_history": metrics["hamming_history"],
         "ess_history": metrics["ess_history"],
         "eval_epochs": metrics["eval_epochs"],
+        # Backward-compatible: old runs won't have these fields
+        "grad_norm_history": metrics["grad_norm_history"] if "grad_norm_history" in metrics else np.array([]),
+        "advantage_var_history": metrics["advantage_var_history"] if "advantage_var_history" in metrics else np.array([]),
     }
 
     # final_samples, final_log_probs, seed_state

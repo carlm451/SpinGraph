@@ -101,6 +101,18 @@ class EIGNLayer(nn.Module):
         X_equ_new : (n1, equ_dim)
         X_inv_new : (n1, inv_dim)
         """
+        # NOTE on "deaf Hamiltonian" (C1 from physics review):
+        # For ice states sigma, L_equ @ sigma = B1^T B1 @ sigma = B1^T Q = 0 since
+        # Q = B1 @ sigma = 0 (ice rule). So the equ->equ channel (W1) and the
+        # equ->inv channel (W4) receive zero input in layer 1 when X_equ = sigma.
+        # However, training still works because:
+        #   1. Skip connection W5 passes sigma through unchanged
+        #   2. GELU activation makes layer-1 output nonlinear in sigma
+        #   3. From layer 2 onward, L_equ @ GELU(...) != 0 — Hamiltonian is active
+        #   4. inv->inv (W3) and inv->equ (W2) channels are active in all layers
+        # If periodic BC + even coordination causes training failure, consider
+        # adding depth (n_layers=5) or a nonlinear input expansion.
+
         # Message-passing terms (sparse @ dense)
         # L_equ @ X_equ @ W1: Hamiltonian MP in equivariant channel
         msg_equ_equ = torch.sparse.mm(self.ops.L_equ, X_equ)

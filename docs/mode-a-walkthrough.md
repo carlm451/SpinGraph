@@ -99,12 +99,15 @@ X_inv^(ℓ+1) = GELU(LayerNorm(L_inv·X_inv·W3 + equ_to_inv·X_equ·W4 + X_inv�
 
 The sparse operator multiply (e.g. L_equ · X_equ) is the message-passing step — it aggregates features from neighboring edges via the Laplacian. The linear transforms (W1-W4) are learned projections. W5, W6 are skip connections initialized near identity.
 
-> `src/neural/eign_layer.py:23-133` — full `EIGNLayer` class
+> `src/neural/eign_layer.py:23-145` — full `EIGNLayer` class
 > `src/neural/eign_layer.py:51-58` — 6 weight matrices
-> `src/neural/eign_layer.py:106-119` — 4 message-passing terms (sparse @ dense @ linear)
-> `src/neural/eign_layer.py:122-123` — skip connections
-> `src/neural/eign_layer.py:126-131` — combine, LayerNorm, GELU
+> `src/neural/eign_layer.py:104-114` — "deaf Hamiltonian" note (see below)
+> `src/neural/eign_layer.py:118-131` — 4 message-passing terms (sparse @ dense @ linear)
+> `src/neural/eign_layer.py:134-135` — skip connections
+> `src/neural/eign_layer.py:138-143` — combine, LayerNorm, GELU
 > `src/neural/eign_layer.py:74-85` — weight init: Xavier for MP, near-identity for skip
+
+**Deaf Hamiltonian (C1):** For ice states σ, `L_equ @ σ = B₁ᵀB₁σ = B₁ᵀQ = 0` since Q = B₁σ = 0 (ice rule). This means the equ→equ (W1) and equ→inv (W4) channels receive zero input in layer 1 when X_equ = σ. Training still works because: (1) skip connection W5 passes σ through unchanged, (2) GELU makes layer-1 output nonlinear, (3) from layer 2 onward L_equ operates on GELU output which is non-zero, and (4) the inv→inv and inv→equ channels are active in all layers.
 
 **Critical design point:** No causal masking. Unlike Mode B (planned), the EIGN stack sees the **fully-assigned** spin configuration at every autoregressive step. This works because each step operates on a complete valid ice state — the autoregression is over loop-flip decisions, not individual edge assignments.
 
@@ -178,13 +181,13 @@ Minimizing F_θ = maximizing entropy H(q_θ) = learning to sample **uniformly**.
 
 ### 5b. One epoch step-by-step
 
-> `src/neural/training.py:137-183` — main training loop
+> `src/neural/training.py:139-197` — main training loop
 
 **Step 1: Sample a batch (no gradients)**
 
 Generate B ice states by running the autoregressive sampler B times.
 
-> `src/neural/training.py:141-145` — `model.sample(seed, inv_features, n_samples=batch_size)` under `torch.no_grad()`
+> `src/neural/training.py:143-147` — `model.sample(seed, inv_features, n_samples=batch_size)` under `torch.no_grad()`
 
 **Step 2: Recover α vectors**
 
@@ -195,7 +198,7 @@ diff[e] = 1 if σ[e] ≠ σ_seed[e], else 0
 Solve: L^T · α = diff  (mod 2)    where L = loop_indicators
 ```
 
-> `src/neural/training.py:147-148` — `recover_alpha(sigmas, seed_tensor, indicators)`
+> `src/neural/training.py:149-150` — `recover_alpha(sigmas, seed_tensor, indicators)`
 > `src/neural/loop_basis.py:410-451` — `recover_alpha()`: compute diff, call GF(2) solver per sample
 > `src/neural/loop_basis.py:453-481` — `_solve_gf2()`: Gaussian elimination over GF(2)
 
@@ -208,7 +211,7 @@ For each sample b:
 - At each directed loop: compute p_i, accumulate log q = Σ [α_i·log(p_i) + (1-α_i)·log(1-p_i)]
 - At each non-directed loop: skip (contributes 0)
 
-> `src/neural/training.py:150-158` — loop over batch, call `model.forward_log_prob(alpha, seed, inv_features)`
+> `src/neural/training.py:152-160` — loop over batch, call `model.forward_log_prob(alpha, seed, inv_features)`
 > `src/neural/loop_mpvan.py:158-207` — `forward_log_prob()`: teacher forcing with directed-cycle checks
 > `src/neural/loop_mpvan.py:184-206` — the autoregressive loop (same structure as sampling, but uses known α instead of Bernoulli)
 
@@ -216,14 +219,19 @@ For each sample b:
 
 ```python
 rewards     = -log_probs.detach()           # lower log_prob = higher entropy = better
-baseline    = 0.99 * baseline + 0.01 * mean(rewards)   # running mean
+if baseline is None:                         # C5 fix: init from first batch
+    baseline = mean(rewards)
+else:
+    baseline = 0.99 * baseline + 0.01 * mean(rewards)   # running mean
 advantages  = rewards - baseline            # centered rewards
 policy_loss = -mean(advantages * log_probs) # REINFORCE estimator
 ```
 
+The baseline is initialized to `None` and set from the first batch's mean reward (C5 fix). This avoids the cold-start problem where `baseline = 0` causes a large initial spike in advantages and loss.
+
 The key identity: ∇_θ E_q[f(σ)] = E_q[f(σ) · ∇_θ log q_θ(σ)]. Here f(σ) = -log q_θ(σ) (the reward), so the gradient pushes the model to increase probability of high-entropy samples.
 
-> `src/neural/training.py:160-170` — REINFORCE: rewards, baseline update, advantages, policy_loss
+> `src/neural/training.py:162-175` — REINFORCE: rewards, baseline init/update, advantages, policy_loss
 
 **Step 5: Entropy bonus**
 
@@ -234,18 +242,24 @@ entropy = -log_probs.mean()
 loss = policy_loss - entropy_bonus * entropy
 ```
 
-> `src/neural/training.py:172-174` — entropy bonus and final loss
+> `src/neural/training.py:177-179` — entropy bonus and final loss
 
-**Step 6: Backprop and update**
+**Step 6: Backprop, gradient diagnostics, and update**
 
 ```python
 loss.backward()
 clip_grad_norm_(model.parameters(), 1.0)
+# C2: Record gradient diagnostics (post-clip)
+total_norm = sqrt(sum(p.grad.norm(2)^2 for p in parameters))
+grad_norm_history.append(total_norm)
+advantage_var_history.append(var(advantages))
 optimizer.step()
 scheduler.step()
 ```
 
-> `src/neural/training.py:176-183` — backward, clip, step, schedule
+After gradient clipping, the total gradient norm and advantage variance are recorded each epoch (C2 gradient diagnostics). These are saved to `metrics.npz` and plotted in Panel 5 of the diagnostic plots. High advantage variance signals high REINFORCE gradient variance, which may require larger batch sizes.
+
+> `src/neural/training.py:181-197` — backward, clip, gradient diagnostics, step, schedule
 
 ### 5c. Evaluation checkpoints
 
@@ -254,8 +268,10 @@ Every `eval_every` epochs, generate fresh samples and compute:
 - **Mean Hamming distance:** pairwise distance between samples (~0.5 for uniform)
 - **ESS:** effective sample size from importance weights (higher = more diverse)
 - **KL divergence:** KL(empirical || uniform) if exact states available
+- **Gradient norm:** post-clip gradient norm (logged with eval metrics)
+- **Advantage variance:** variance of REINFORCE advantages (logged with eval metrics)
 
-> `src/neural/training.py:188-223` — evaluation block
+> `src/neural/training.py:202-238` — evaluation block
 > `src/neural/metrics.py` — all metric implementations
 
 ---
@@ -303,10 +319,13 @@ The complete data flow for one training epoch:
          ▼
 ┌── REINFORCE UPDATE ────────────────────────────────────────────┐
 │  rewards    = -log_q.detach()                                   │
-│  baseline   = 0.99·baseline + 0.01·mean(rewards)               │
+│  if baseline is None:  baseline = mean(rewards)   # C5: 1st batch│
+│  else: baseline = 0.99·baseline + 0.01·mean(rewards)           │
 │  advantages = rewards - baseline                                │
 │  loss       = -mean(advantages · log_q) - 0.01·mean(-log_q)    │
-│  loss.backward() → clip_grad_norm → Adam step → cosine LR      │
+│  loss.backward() → clip_grad_norm                               │
+│  record grad_norm, advantage_var  ◄── C2 diagnostics            │
+│  Adam step → cosine LR                                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 

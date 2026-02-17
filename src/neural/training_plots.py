@@ -164,7 +164,8 @@ def plot_training_curves(
 ) -> str:
     """Panel 1: 2x2 grid of training curves.
 
-    (a) Loss vs epoch (log scale y)
+    (a) Loss vs epoch (linear scale — loss goes negative at convergence
+        because the entropy bonus term dominates the near-zero policy gradient)
     (b) Entropy vs epoch (target = ln(n_reachable_states))
     (c) KL divergence vs epoch (target = 0)
     (d) ESS vs epoch (target = batch_size)
@@ -173,10 +174,10 @@ def plot_training_curves(
     epochs_loss = np.arange(1, len(loss_history) + 1)
     epochs_ent = np.arange(1, len(entropy_history) + 1)
 
-    # (a) Loss
+    # (a) Loss (linear scale — expected to go negative as entropy bonus dominates)
     ax = axes[0, 0]
     ax.plot(epochs_loss, loss_history, color=_BLUE, linewidth=0.8, alpha=0.8)
-    ax.set_yscale("log")
+    ax.axhline(0, color=_GRAY, linestyle="--", linewidth=1.0, alpha=0.5)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Loss")
     ax.set_title("(a) Policy Loss", fontweight="bold")
@@ -605,6 +606,58 @@ def plot_summary_card(
     return fpath
 
 
+def plot_gradient_diagnostics(
+    grad_norm_history: np.ndarray,
+    advantage_var_history: np.ndarray,
+    output_path: str,
+) -> str:
+    """Panel 5: Gradient diagnostics (C2).
+
+    (a) Gradient norm (post-clip) vs epoch
+    (b) Advantage variance vs epoch
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+
+    epochs = np.arange(1, len(grad_norm_history) + 1)
+
+    # (a) Gradient norm
+    ax = axes[0]
+    ax.plot(epochs, grad_norm_history, color=_BLUE, linewidth=0.6, alpha=0.7)
+    # Smoothed trend (rolling mean, window=50)
+    if len(grad_norm_history) >= 50:
+        kernel = np.ones(50) / 50
+        smoothed = np.convolve(grad_norm_history, kernel, mode="valid")
+        ax.plot(np.arange(25, 25 + len(smoothed)), smoothed,
+                color=_RED, linewidth=1.5, label="50-epoch avg")
+        ax.legend()
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Gradient norm (post-clip)")
+    ax.set_title("(a) Gradient Norm", fontweight="bold")
+    ax.grid(True, alpha=0.3)
+
+    # (b) Advantage variance
+    ax = axes[1]
+    ax.plot(epochs[:len(advantage_var_history)], advantage_var_history,
+            color=_BLUE, linewidth=0.6, alpha=0.7)
+    if len(advantage_var_history) >= 50:
+        kernel = np.ones(50) / 50
+        smoothed = np.convolve(advantage_var_history, kernel, mode="valid")
+        ax.plot(np.arange(25, 25 + len(smoothed)), smoothed,
+                color=_RED, linewidth=1.5, label="50-epoch avg")
+        ax.legend()
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Var(advantage)")
+    ax.set_title("(b) Advantage Variance", fontweight="bold")
+    ax.grid(True, alpha=0.3)
+
+    fig.suptitle("Gradient Diagnostics", fontsize=13, fontweight="bold")
+    fig.tight_layout()
+    fpath = os.path.join(output_path, "panel5_gradient_diagnostics.png")
+    fig.savefig(fpath)
+    plt.close(fig)
+    return fpath
+
+
 def generate_all_panels(
     run_data: dict,
     output_dir: str,
@@ -668,6 +721,16 @@ def generate_all_panels(
         exact_states=run_data.get("exact_states"),
         output_path=output_dir,
     ))
+
+    # Panel 5: Gradient diagnostics (skip if data unavailable from old runs)
+    grad_norm = run_data.get("grad_norm_history", np.array([]))
+    adv_var = run_data.get("advantage_var_history", np.array([]))
+    if len(grad_norm) > 0 and len(adv_var) > 0:
+        paths.append(plot_gradient_diagnostics(
+            grad_norm_history=grad_norm,
+            advantage_var_history=adv_var,
+            output_path=output_dir,
+        ))
 
     # Individual sample PNGs with ice-rule validation
     samples_dir = os.path.join(output_dir, "samples")
