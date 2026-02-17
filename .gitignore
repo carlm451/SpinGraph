@@ -43,6 +43,9 @@ Thumbs.db
 # Results — large/generated files
 # =========================
 
+# Neural training runs (model weights, samples, plots, configs)
+results/neural_training/
+
 # Computed spectral catalog (npz can be huge at L/XL sizes)
 results/catalog/*.npz
 
