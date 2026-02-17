@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDL ↔ Spin Ice Mathematical Correspondence</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams',
+    tagSide: 'right',
+    macros: {
+      bm: ['{\\boldsymbol{#1}}', 1],
+      R: '{\\mathbb{R}}',
+      Z: '{\\mathbb{Z}}',
+      ker: '\\operatorname{ker}',
+      im: '\\operatorname{im}',
+      rank: '\\operatorname{rank}',
+      diag: '\\operatorname{diag}',
+      tr: '\\operatorname{tr}',
+      div: '\\operatorname{div}',
+      grad: '\\operatorname{grad}'
+    }
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+:root {
+  --tdl-color: #1a5276;
+  --nisoli-color: #922b21;
+  --highlight-bg: #fef9e7;
+  --key-result-bg: #eaf2f8;
+  --example-bg: #f4f6f6;
+  --border-color: #d5d8dc;
+  --link-color: #2471a3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.7;
+  color: #2c3e50;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  background: #fdfdfd;
+}
+h1 {
+  font-size: 1.9rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  color: #1a1a2e;
+  line-height: 1.3;
+}
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+.authors {
+  text-align: center;
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+h2 {
+  font-size: 1.45rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--border-color);
+  color: #1a1a2e;
+}
+h3 {
+  font-size: 1.15rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
+  color: #2c3e50;
+}
+h4 {
+  font-size: 1.0rem;
+  margin-top: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+}
+p { margin-bottom: 1rem; }
+a { color: var(--link-color); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Table of Contents */
+nav#toc {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+nav#toc h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.8rem;
+  border: none;
+  padding: 0;
+}
+nav#toc ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+nav#toc li {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+/* Correspondence highlight boxes */
+.key-result {
+  background: var(--key-result-bg);
+  border-left: 4px solid var(--tdl-color);
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.key-result .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tdl-color);
+  margin-bottom: 0.4rem;
+}
+
+/* Worked examples */
+.example {
+  background: var(--example-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.example .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #27ae60;
+  margin-bottom: 0.4rem;
+}
+
+/* Convention/warning boxes */
+.convention {
+  background: #fdf2e9;
+  border-left: 4px solid #e67e22;
+  padding: 0.8rem 1.2rem;
+  margin: 1rem 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+}
+.convention .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #e67e22;
+  margin-bottom: 0.3rem;
+}
+.footnote {
+  font-size: 0.85rem;
+  color: #555;
+  border-top: 1px solid #ccc;
+  margin-top: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #f2f3f4;
+  font-weight: bold;
+  color: #2c3e50;
+}
+tr:nth-child(even) { background: #fafafa; }
+.tdl-label { color: var(--tdl-color); font-weight: bold; }
+.nisoli-label { color: var(--nisoli-color); font-weight: bold; }
+
+/* Matrix display */
+.matrix-block {
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+}
+
+/* SVG diagram containers */
+.diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.diagram svg {
+  max-width: 100%;
+}
+.diagram .caption {
+  font-size: 0.88rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* Equation references */
+.eqref { color: var(--link-color); }
+
+/* Print styles */
+@media print {
+  body { max-width: 100%; padding: 1rem; }
+  .key-result, .example, .convention { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<h1>Topological Deep Learning &harr; Spin Ice:<br>A Mathematical Correspondence</h1>
+<p class="subtitle">Exact mappings between simplicial complex TDL and Nisoli's charge framework for artificial spin ice</p>
+<p class="authors">SpinIceTDL Project &mdash; Reference Document v3.0</p>
+
+<nav id="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#sec1">Introduction &amp; Motivation</a></li>
+  <li><a href="#sec2">Notation &amp; Setup</a></li>
+  <li><a href="#sec3">The $S_{vv'}$ Matrix as Incidence &times; Spin Configuration</a></li>
+  <li><a href="#sec4">Topological Charge = Divergence of 1-Cochain</a></li>
+  <li><a href="#sec5">Coulomb Classes, the Ice Manifold, and Degeneracy</a>
+    <ol style="list-style-type: none; padding-left: 1rem; margin-top: 0.2rem;">
+      <li><a href="#sec5.7">5.7 Loop-Basis Parameterization of the Ice Manifold</a></li>
+      <li><a href="#sec5.8">5.8 The Directed-Cycle Constraint and Reachable States</a></li>
+    </ol>
+  </li>
+  <li><a href="#sec6">The Hodge Decomposition</a></li>
+  <li><a href="#sec7">Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</a></li>
+  <li><a href="#sec8">Entropic Field Theory and the Graph Laplacian</a></li>
+  <li><a href="#sec9">Gauge Freedom and Orientation Equivariance</a></li>
+  <li><a href="#sec10">Worked Example &mdash; 3&times;3 Periodic Square Lattice</a></li>
+  <li><a href="#sec11">Master Correspondence Table</a></li>
+  <li><a href="#sec12">Summary of Established Results</a></li>
+</ol>
+</nav>

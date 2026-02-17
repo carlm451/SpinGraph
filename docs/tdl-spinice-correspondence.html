@@ -1452,7 +1452,7 @@ The Coulomb class framework provides a clean separation of two types of spin dyn
 
 <div class="convention">
 <div class="label">Convention (Face-Filling for This Subsection)</div>
-Mode A neural sampling operates exclusively with $n_2 = 0$ (no faces filled), so $B_2$ is vacuous and $\beta_1 = \dim(\ker B_1)$ throughout &sect;5.7&ndash;5.8. The upper Hodge Laplacian vanishes ($L_1^{\text{up}} = 0$), and $\ker(B_1) = \ker(L_1^{\text{down}}) = \ker(L_1)$.
+The loop-basis counting analysis operates with $n_2 = 0$ (no faces filled), so $B_2$ is vacuous and $\beta_1 = \dim(\ker B_1)$ throughout &sect;5.7&ndash;5.8. The upper Hodge Laplacian vanishes ($L_1^{\text{up}} = 0$), and $\ker(B_1) = \ker(L_1^{\text{down}}) = \ker(L_1)$.
 </div>
 
 <p>
@@ -1513,7 +1513,7 @@ This is a <strong>per-sector bound</strong>: it limits the number of ice states 
 </p>
 
 <p>
-<strong>The hierarchy for even-degree periodic lattices.</strong> When all vertices have even degree and periodic BCs ensure a single charge sector, the full chain of inequalities is $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}| \leq 2^{\beta_1} \leq |\mathcal{P}| = 2^{n_1}$. For a $z=4$ periodic square lattice, $\beta_1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. The exact count (Lieb, 1967) gives $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$, and the Pauling approximation $\eqref{eq:pauling_approx}$ gives $W_{\text{P}} = 3/2 = 1.500$. The ratio:
+<strong>The hierarchy for even-degree periodic lattices.</strong> When all vertices have even degree and periodic BCs ensure a single charge sector, the full chain of inequalities is $|\varepsilon_{\mathbf{q}}| \leq |\mathcal{I}| \leq 2^{\beta_1} \leq |\mathcal{P}| = 2^{n_1}$. For a $z=4$ periodic square lattice, $\beta_1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. The exact count (Lieb, 1967) gives $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$, and the Pauling approximation $\eqref{eq:pauling_approx}$ gives $W_{\text{P}} = 3/2 = 1.500$. The ratio:
 </p>
 
 $$
@@ -1545,13 +1545,13 @@ Crucially, whether cycle $\mathbf{l}_i$ is directed depends on the <em>current</
 <div class="key-result">
 <div class="label">Key Result 10 &mdash; Directed-Cycle Reduction (Within a Charge Sector)</div>
 <p>
-The directed-cycle constraint further reduces the reachable states within a single charge sector. The autoregressive DFS count satisfies:
+The directed-cycle constraint further reduces the reachable states within a single charge sector. The <strong>multi-ordering reachable set</strong> $\varepsilon_{\mathbf{q}}$ &mdash; the union of all states found by DFS across $K = 200$ random autoregressive orderings &mdash; satisfies:
 </p>
 $$
-|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}
+|\varepsilon_{\mathbf{q}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}
 $$
 <p>
-where $|\mathcal{I}_{\mathbf{q}}|$ is the number of ice states in the seed's charge sector. The first inequality is due to the autoregressive ordering limitation; the second is Key Result 9. The ratio $|\mathcal{I}_{\text{DFS}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by more than five orders of magnitude across the Morrison et al. lattice zoo.
+where $|\mathcal{I}_{\mathbf{q}}|$ is the number of ice states in the seed's charge sector. The first inequality reflects the fact that multi-ordering enumeration is a lower bound on the true sector size (some states may require orderings not sampled); the second is Key Result 9. The ratio $|\varepsilon_{\mathbf{q}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by five orders of magnitude across the Morrison et al. lattice zoo (from 53% on kagome to $6 \times 10^{-4}\%$ on tetris&nbsp;3&times;3).
 </p>
 <p>
 <strong>Important:</strong> The total ice manifold $|\mathcal{I}| = \sum_{\mathbf{q}} |\mathcal{I}_{\mathbf{q}}|$ can exceed $2^{\beta_1}$ when multiple charge sectors exist (odd-degree vertices). See discussion in &sect;5.7.
@@ -1559,17 +1559,19 @@ where $|\mathcal{I}_{\mathbf{q}}|$ is the number of ice states in the seed's cha
 </div>
 
 <p>
-<strong>Counting DFS-reachable states by exhaustive tree search.</strong> The $|\mathcal{I}_{\text{DFS}}|$ column in the table below is computed by exact enumeration (see <code>src/neural/enumeration.py</code>). The algorithm works as follows: starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, it performs a depth-first search through the $\beta_1$ loop decisions in a <em>fixed autoregressive order</em> $(l_1, l_2, \ldots, l_{\beta_1})$. At decision step $i$, it checks whether loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$. If directed, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of this pruned tree are collected and deduplicated (different decision paths can produce the same final $\bm{\sigma}$). This is the same autoregressive ordering used by the LoopMPVAN sampler, so $|\mathcal{I}_{\text{DFS}}|$ is exactly the set of states that Mode&nbsp;A training can discover.
+<strong>Counting reachable states by multi-ordering enumeration.</strong> The $|\varepsilon_{\mathbf{q}}|$ column in the table below is computed by exact enumeration across $K = 200$ random autoregressive orderings (see <code>src/neural/enumeration.py:enumerate_multi_ordering()</code>). For each ordering, starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, a depth-first search explores the $\beta_1$ loop decisions. At decision step $i$, if loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of the pruned tree are collected and deduplicated. The final count $|\varepsilon_{\mathbf{q}}|$ is the union of distinct states found across all $K$ orderings. This closes the <em>autoregressive ordering gap</em>: states unreachable under one ordering may be reachable under another.
 </p>
 
 <p>
-Three mechanisms make $|\mathcal{I}_{\text{DFS}}|$ much smaller than $2^{\beta_1}$:
+Two irreducible mechanisms make $|\varepsilon_{\mathbf{q}}|$ much smaller than $2^{\beta_1}$:
 </p>
 <ol>
 <li><strong>Directedness gating:</strong> At each node of the decision tree, if the loop is not directed in the current $\bm{\sigma}$, the flip branch is pruned entirely. This removes exponentially many paths. On lattices with tight coordination constraints (e.g., tetris), most loops are non-directed in most configurations, leaving very few open branches.</li>
 <li><strong>Path convergence:</strong> Different sequences of flip decisions can produce the same final spin configuration. For example, flipping loops $A$ then $B$ may yield the same $\bm{\sigma}$ as flipping $B$ then $A$ (or neither), especially when the loops share edges. The algorithm deduplicates by tracking the set of distinct $\bm{\sigma}$ vectors encountered.</li>
-<li><strong>Autoregressive ordering limitation:</strong> The fixed processing order $(l_1, \ldots, l_{\beta_1})$ means that whether loop $l_i$ is directed depends only on which of $l_1, \ldots, l_{i-1}$ were flipped. Some ice states may require flip sequences that violate this ordering &mdash; e.g., a state reachable by flipping $l_5$ then $l_3$ may be invisible to the DFS because $l_3$ was not directed when it was processed at step 3 (before $l_5$ was flipped at step 5). This is the dominant cause of undercounting on even-degree periodic lattices (see independent verification below).</li>
 </ol>
+<p>
+A third mechanism &mdash; the <em>autoregressive ordering limitation</em> &mdash; restricted the old fixed-ordering DFS, where the processing order $(l_1, \ldots, l_{\beta_1})$ meant that some states requiring out-of-order flips were invisible. Multi-ordering enumeration addresses this by trying $K = 200$ random permutations: states unreachable under one ordering are typically found under another. The multi-ordering counts in the table below show substantial gains over any single ordering (e.g., shakti&nbsp;2&times;2 open: 248 states vs. 112&ndash;186 per single ordering; square&nbsp;4&times;4 periodic: 299 vs. 27&ndash;40). Only directedness gating and path convergence remain as irreducible sources of reduction.
+</p>
 
 <table>
 <thead>
@@ -1578,49 +1580,58 @@ Three mechanisms make $|\mathcal{I}_{\text{DFS}}|$ much smaller than $2^{\beta_1
   <th>Size</th>
   <th>BC</th>
   <th>$n_1$</th>
+  <th>$n_{\text{odd}}$</th>
   <th>$|\mathcal{P}| = 2^{n_1}$</th>
   <th>$\beta_1$</th>
   <th>$2^{\beta_1}$</th>
+  <th>$|\mathcal{Q}_{\min}|$</th>
   <th>$|\mathcal{I}_{\text{P}}|$</th>
   <th>$|\mathcal{I}|$</th>
-  <th>$|\mathcal{I}_{\text{DFS}}|$</th>
+  <th>$|\varepsilon_{\mathbf{q}}|$</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>Square</td><td>4&times;4</td><td>open</td><td>24</td><td>$1.7 \times 10^7$</td><td>9</td><td>512</td><td>2,076</td><td>2,768</td><td>25</td></tr>
-<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>32</td><td>$4.3 \times 10^9$</td><td>17</td><td>131,072</td><td>657</td><td>2,970</td><td>40</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>17</td><td>131,072</td><td>6</td><td>64</td><td>68</td><td>172</td><td>32</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>24</td><td>$1.7 \times 10^7$</td><td>13</td><td>8,192</td><td>130</td><td>600</td><td>172</td></tr>
-<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>30</td><td>$1.1 \times 10^9$</td><td>7</td><td>128</td><td>923</td><td>1,312</td><td>8</td></tr>
-<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>81</td><td>$2.4 \times 10^{24}$</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>112</td></tr>
-<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>38</td><td>$2.7 \times 10^{11}$</td><td>7</td><td>128</td><td>74,734</td><td>86,560</td><td>12</td></tr>
-<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>93</td><td>$9.9 \times 10^{27}$</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>4</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>open</td><td>24</td><td>8</td><td>$1.7 \times 10^7$</td><td>9</td><td>512</td><td>70</td><td>2,076</td><td>2,768</td><td>38</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>32</td><td>0</td><td>$4.3 \times 10^9$</td><td>17</td><td>131,072</td><td>1</td><td>657</td><td>2,970</td><td>299*</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>17</td><td>4</td><td>131,072</td><td>6</td><td>64</td><td>6</td><td>68</td><td>172</td><td>34</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>24</td><td>0</td><td>$1.7 \times 10^7$</td><td>13</td><td>8,192</td><td>1</td><td>130</td><td>600</td><td>355*</td></tr>
+<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>30</td><td>8</td><td>$1.1 \times 10^9$</td><td>7</td><td>128</td><td>68</td><td>923</td><td>1,312</td><td>23</td></tr>
+<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>81</td><td>26</td><td>$2.4 \times 10^{24}$</td><td>18</td><td>262,144</td><td>&ge;1,881&Dagger;</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>248</td></tr>
+<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>38</td><td>16</td><td>$2.7 \times 10^{11}$</td><td>7</td><td>128</td><td>9,232</td><td>74,734</td><td>86,560</td><td>17</td></tr>
+<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>93</td><td>36</td><td>$9.9 \times 10^{27}$</td><td>22</td><td>4,194,304</td><td>&ge;1,984&Dagger;</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>25</td></tr>
 </tbody>
 </table>
 <p style="font-size: 0.9em;">&dagger; Lower bound only; backtracking search timed out at 120s.</p>
+<p style="font-size: 0.9em;">&Dagger; Lower bound from random sampling (2,000 ice states); exact enumeration infeasible ($\binom{n_{\text{odd}}}{n_{\text{odd}}/2}$ exceeds $10^7$).</p>
+<p style="font-size: 0.9em;">* Lower bound; $K = 200$ random orderings may not saturate. Values vary by 5&ndash;15% across different random seeds.</p>
+
+<p>
+<strong>Charge sectors: the $n_{\text{odd}}$ and $|\mathcal{Q}_{\min}|$ columns.</strong> Under open boundary conditions, vertices at the lattice boundary may have odd coordination number $z_v$. At such vertices the ice rule requires $|Q_v| = 1$ rather than $Q_v = 0$, admitting two possible charge values $\pm 1$. The ice manifold therefore splits into <strong>charge sectors</strong> indexed by the pattern of $\pm 1$ charges at the $n_{\text{odd}}$ odd-degree vertices, subject to the global neutrality constraint $\sum_v Q_v = 0$. The number of candidate patterns is $\binom{n_{\text{odd}}}{n_{\text{odd}}/2}$; the actual number of <em>feasible</em> sectors $|\mathcal{Q}_{\min}|$ &mdash; those admitting at least one ice state &mdash; may be smaller. For periodic lattices all vertices are even-degree ($n_{\text{odd}} = 0$), giving a single sector. The sector count explains why $|\mathcal{I}|$ can exceed $2^{\beta_1}$: the bound $2^{\beta_1}$ applies <em>per sector</em> (Key Result&nbsp;9), but total states sum across all $|\mathcal{Q}_{\min}|$ sectors. For example, square 4&times;4 open has $|\mathcal{I}| = 2{,}768 = \sum_{i=1}^{70} |\mathcal{I}_{\mathbf{q}_i}|$ across all 70 feasible sectors, each individually satisfying $|\mathcal{I}_{\mathbf{q}_i}| \leq 2^{\beta_1} = 512$. The sector counts were computed by <code>scripts/count_charge_sectors.py</code>: exact for rows with $n_1 \leq 38$ (full constraint-propagation backtracking), and lower bounds from random sampling for shakti&nbsp;2&times;2 and tetris&nbsp;3&times;3.
+</p>
 
 <p>
 <strong>Independent verification: the $|\mathcal{I}|$ column.</strong> The $|\mathcal{I}|$ column shows the total number of ice states counted by an independent constraint-propagation backtracking algorithm (<code>scripts/verify_ice_counts.py</code>) that does not use the loop basis at all. It directly enumerates all $\bm{\sigma} \in \{+1,-1\}^{n_1}$ satisfying the ice rule $B_1 \bm{\sigma} = \mathbf{Q}_{\text{target}}$ for each valid charge sector, using BFS edge ordering and forward-checking to prune the search tree. For small lattices ($n_1 \leq 24$), brute-force enumeration of all $2^{n_1}$ configurations confirms exact agreement with the backtracking counts.
 </p>
 
 <p>
-<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice: independent verification finds $|\mathcal{I}| = 2{,}768$ total ice states across all charge sectors, with the largest sector containing 64 states. Yet the autoregressive DFS finds only $|\mathcal{I}_{\text{DFS}}| = 25$ &mdash; just 39% of its own charge sector. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state. The 25 states found are independently confirmed by Mode&nbsp;A training achieving 25/25 state coverage with zero ice-rule violations.
+<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice: independent verification finds $|\mathcal{I}| = 2{,}768$ total ice states across all charge sectors, with the largest sector containing 64 states. Multi-ordering enumeration finds $|\varepsilon_{\mathbf{q}}| = 38$ states in the seed's sector &mdash; 59% of the sector's 64 states. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state.
 </p>
 
 <p>
-<strong>The autoregressive ordering gap.</strong> Comparing $|\mathcal{I}|$ with $|\mathcal{I}_{\text{DFS}}|$ reveals a systematic pattern: the autoregressive DFS explores only a fraction of the true ice manifold, with the gap most dramatic for <strong>even-degree periodic lattices</strong>:
+<strong>Multi-ordering gains.</strong> Multi-ordering enumeration finds substantially more states than any single ordering, confirming that the autoregressive ordering limitation was the dominant source of undercounting for periodic lattices:
 </p>
 <ul>
-<li><strong>Square 4&times;4 periodic:</strong> $|\mathcal{I}| = 2{,}970$ total states, but the DFS finds only 40 (1.3%). Since all vertices have $z = 4$ on the torus, there is only one charge sector &mdash; the 2,930 missing states are topologically reachable via loop flips but invisible to the fixed autoregressive ordering.</li>
-<li><strong>Kagome 2&times;2 periodic:</strong> $|\mathcal{I}| = 600$ total, DFS finds 172 (29%). Again one charge sector on this even-degree torus.</li>
-<li><strong>Odd-degree lattices (open BC):</strong> For kagome 2&times;2 open, the DFS reaches 32 states, matching exactly the 32-state charge sector of its seed. The 6 charge sectors (34, 34, 32, 32, 20, 20 states) sum to $|\mathcal{I}| = 172$. This sector-matching pattern also holds for shakti&nbsp;1&times;1 (3/3) and tetris&nbsp;2&times;2 (12 matching a sector of 34).</li>
+<li><strong>Square 4&times;4 periodic:</strong> $|\varepsilon_{\mathbf{q}}| = 299$ vs. 27&ndash;40 per single ordering ($|\mathcal{I}| = 2{,}970$ total in the single charge sector).</li>
+<li><strong>Kagome 2&times;2 periodic:</strong> $|\varepsilon_{\mathbf{q}}| = 355$ vs. 172&ndash;178 per single ordering ($|\mathcal{I}| = 600$ total).</li>
+<li><strong>Shakti 2&times;2 open:</strong> $|\varepsilon_{\mathbf{q}}| = 248$ vs. 112&ndash;186 per single ordering.</li>
+<li><strong>Odd-degree open-BC lattices:</strong> Multi-ordering finds 34 states for kagome (vs. 32 single-ordering), 23 for Santa Fe (vs. 8&ndash;12), 17 for tetris&nbsp;2&times;2 (vs. 12&ndash;17), and 25 for tetris&nbsp;3&times;3 (vs. 4&ndash;6). The gains range from modest (kagome) to dramatic (tetris&nbsp;3&times;3: 6&times; increase).</li>
 </ul>
 <p>
-The implication for Mode&nbsp;A training is significant: LoopMPVAN uses the same fixed autoregressive ordering as the DFS, so it can discover at most $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality. On even-degree periodic lattices, this represents a <em>fundamental sampling limitation of the autoregressive architecture</em>, not a training failure. Addressing it would require either (a)&nbsp;multiple passes with different loop orderings, (b)&nbsp;a non-autoregressive architecture, or (c)&nbsp;MCMC post-processing to escape the ordering constraint.
+A remaining gap persists between $|\varepsilon_{\mathbf{q}}|$ and $|\mathcal{I}|$ on even-degree periodic lattices (e.g., 299 of 2,970 for square periodic, 355 of 600 for kagome periodic). Since these lattices have a single charge sector and all states are topologically connected by loop flips, the gap reflects states that require directed-cycle sequences not found across 200 random orderings. Whether higher $K$ would close this gap, or whether directedness gating and path convergence impose a hard ceiling below $|\mathcal{I}_{\mathbf{q}}|$, remains an open question.
 </p>
 
 <p>
-Across lattices where the DFS count is reliable (open-BC with sector matching), the $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ ratio varies from 50% (kagome 2&times;2 open, where half of all $2^{\beta_1}$ combinations within a sector yield valid states) down to 0.0001% (tetris 3&times;3 open, where $\beta_1 = 22$ but only 4 of 4.2 million candidate states are found). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice.
+The $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ ratio varies from 53% (kagome 2&times;2 open, $34/64$) down to $6 \times 10^{-4}\%$ (tetris 3&times;3 open, $25/4{,}194{,}304$). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends, even when explored across 200 random orderings. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice.
 </p>
 
 <p>
@@ -1632,70 +1643,16 @@ Across lattices where the DFS count is reliable (open-BC with sector matching), 
 <li><strong>Pauling tracks $|\mathcal{I}|$ better than $2^{\beta_1}$ does</strong> &mdash; for uniform-$z$ periodic lattices, Pauling is within an order of magnitude of the verified $|\mathcal{I}|$: Pauling gives 657 vs. $|\mathcal{I}| = 2{,}970$ for square 4&times;4 periodic, and 130 vs. 600 for kagome 2&times;2 periodic. By contrast, $2^{\beta_1}$ overshoots $|\mathcal{I}|$ by 44&times; and 14&times; respectively. For open-BC mixed-coordination lattices, both Pauling and $2^{\beta_1}$ overestimate $|\mathcal{I}|$ by large factors.</li>
 </ol>
 <p>
-The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices that are tractable for Mode&nbsp;A training, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count $|\mathcal{I}|$. The independent backtracking enumeration (<code>scripts/verify_ice_counts.py</code>) is currently the most reliable method at these sizes.
+The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices in the counting table above, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count $|\mathcal{I}|$. The independent backtracking enumeration (<code>scripts/verify_ice_counts.py</code>) is currently the most reliable method at these sizes.
 </p>
 
 <p>
-<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $|\mathcal{I}| = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states. For even-degree graphs (all $z_v$ even), every ice state is topologically reachable from any other via some sequence of loop flips &mdash; the ice manifold forms a single connected component under loop moves. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and loop flips connect only states within the same sector. The autoregressive DFS count $|\mathcal{I}_{\text{DFS}}|$ is a further restriction: it counts only states reachable via loop flips <em>in the fixed autoregressive order</em>. As the $|\mathcal{I}|$ column demonstrates, $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\text{sector}}| \leq |\mathcal{I}|$, with the first inequality strict whenever the autoregressive ordering misses states that require out-of-order flips.
+<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $|\mathcal{I}| = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states. For even-degree graphs (all $z_v$ even), every ice state is topologically reachable from any other via some sequence of loop flips &mdash; the ice manifold forms a single connected component under loop moves. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and loop flips connect only states within the same sector. The multi-ordering reachable set $|\varepsilon_{\mathbf{q}}|$ is a lower bound on the sector size: $|\varepsilon_{\mathbf{q}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq |\mathcal{I}|$, with the first inequality potentially strict if 200 random orderings do not saturate the reachable set (observed primarily on periodic lattices).
 </p>
 
 <p>
-<strong>Implications for neural sampling.</strong> For Mode&nbsp;A (LoopMPVAN), the autoregressive network must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\mathcal{I}_{\text{DFS}}|$ states is uniform. When $|\mathcal{I}_{\text{DFS}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task that REINFORCE training must solve. The training difficulty correlates with the DFS-reachable state count and the structure of the decision tree, not with $\beta_1$ alone. Crucially, Mode&nbsp;A can never discover more than $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality &mdash; sampling the full $|\mathcal{I}|$ requires breaking the autoregressive ordering constraint. See <a href="mode-a-walkthrough.md">Mode A Walkthrough</a> and <a href="training-experiments.md">Training Experiments</a> for detailed results.
+<strong>Implications for neural sampling.</strong> An autoregressive sampler operating over the loop basis must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\varepsilon_{\mathbf{q}}|$ states is uniform. When $|\varepsilon_{\mathbf{q}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task. The sampling difficulty correlates with the structure of the decision tree and the directedness-gating pattern, not with $\beta_1$ alone. Multi-ordering enumeration provides $|\varepsilon_{\mathbf{q}}|$ as a target: the set of states reachable in principle by any autoregressive loop-flip sampler with ordering randomization.
 </p>
-
-<h3>5.9 Three Levels of Edge-Signal Capacity</h3>
-
-<p>
-The BP computation of ice degeneracy and GNN message passing share a deep structural parallel:
-</p>
-
-<table>
-<thead>
-<tr><th>Belief Propagation (Ice Degeneracy)</th><th>GNN Message Passing</th></tr>
-</thead>
-<tbody>
-<tr>
-  <td>Messages $m_{i \to j}(x_j)$ between variable/factor nodes</td>
-  <td>Hidden states $\mathbf{h}_v^{(\ell)}$ aggregated from neighbors</td>
-</tr>
-<tr>
-  <td>Update: product of incoming messages</td>
-  <td>Update: sum/mean of neighbor features + nonlinearity</td>
-</tr>
-<tr>
-  <td>Bethe free energy $F_{\text{Bethe}}$ minimized at convergence</td>
-  <td>Loss function minimized during training</td>
-</tr>
-<tr>
-  <td>Exact on trees, approximate on loopy graphs</td>
-  <td>Perfect propagation on trees, oversmoothing on loopy graphs</td>
-</tr>
-<tr>
-  <td>Convergence $\to$ Bethe permanent $\to$ degeneracy bound</td>
-  <td>Convergence $\to$ learned representations $\to$ task predictions</td>
-</tr>
-</tbody>
-</table>
-
-<p>
-The parallel extends to the <strong>role of graph structure</strong>: on trees, BP converges to exact marginals and GNNs propagate information perfectly (but have $\dim(\ker B_1) = 0$ &mdash; no protection). On loopy graphs, BP becomes approximate and GNNs suffer oversmoothing, but the loops create $\ker(B_1) \neq \{0\}$ &mdash; a protected subspace.
-</p>
-
-<p>
-This suggests a precise interpretation of the Pauling entropy for GNNs:
-</p>
-
-<div class="key-result">
-<div class="label">Key Result 8 &mdash; Three Levels of Edge-Signal Capacity</div>
-<p>
-The capacity of a graph $G$ for edge-level representation learning under $L_1^{\text{down}}$-smoothing has three distinct levels:
-</p>
-<ol>
-<li><strong>Topological capacity</strong> $= \dim(\ker B_1) = n_1 - n_0 + \beta_0$: the dimension of the protected subspace. Depends only on $n_1, n_0$ (equivalently, $\bar{z}$). Same for all graphs with the same degree sequence.</li>
-<li><strong>Combinatorial capacity</strong> $= |\mathcal{I}|$, the Pauling degeneracy: how many discrete $\pm 1$-valued configurations fit in $\ker(B_1)$. <em>Varies across graph structures</em> with the same degree sequence. Computable (bounded) via the Bethe permanent / belief propagation. This is the level at which frustrated lattices differ from degree-matched random controls.</li>
-<li><strong>Spectral capacity</strong> $=$ eigenvalue distribution of $L_1^{\text{down}}$: how fast non-protected modes decay. Spectral gaps, flat bands, and near-zero eigenvalue clustering provide "soft" protection beyond the exact kernel. Also structure-dependent.</li>
-</ol>
-</div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 6 -->
@@ -2617,7 +2574,7 @@ $$
 where $A$ is the $9 \times 9$ adjacency matrix of our torus graph and the denominator uses $(z_v/2)! = 2! = 2$ at each of the 9 vertices, squared. Computing $\operatorname{perm}(A)$ exactly requires enumeration (or Ryser's formula), which we defer to the Stage 1 computational pipeline. The Bethe permanent provides a tractable lower bound (&sect;5.5).
 </p>
 
-<p><strong>Key observation for the lattice zoo.</strong> Two lattices with the <em>same</em> degree sequence and the same $\dim(\ker B_1)$ can have <em>very different</em> $|\mathcal{I}|$ values because the permanent depends on the detailed graph structure (which edges connect which vertices), not just on the degree sequence. This is the combinatorial level of the three-level capacity framework (&sect;5, Key Result 8). The Stage 1 computational pipeline will compute these values numerically across the Morrison et al. lattice zoo.</p>
+<p><strong>Key observation for the lattice zoo.</strong> Two lattices with the <em>same</em> degree sequence and the same $\dim(\ker B_1)$ can have <em>very different</em> $|\mathcal{I}|$ values because the permanent depends on the detailed graph structure (which edges connect which vertices), not just on the degree sequence. This is the combinatorial level of the capacity framework (&sect;5). The Stage 1 computational pipeline will compute these values numerically across the Morrison et al. lattice zoo.</p>
 
 <h3>10.14 Loop Basis and Reachable States on the 3&times;3 Torus</h3>
 
@@ -2797,14 +2754,7 @@ The following table summarizes all correspondences established in this document.
   <td>Bethe permanent (BP fixed point)</td>
   <td>GNN message-passing equilibrium</td>
   <td>$\operatorname{Bethe\text{-}perm}(A) \leq \operatorname{perm}(A)$ (Gurvits bound)</td>
-  <td>&sect;5.5, &sect;5.9</td>
-</tr>
-<tr>
-  <td>20</td>
-  <td>Belief propagation on ice graph</td>
-  <td>GNN message passing on line graph</td>
-  <td>$m_{e \to v}^{(t+1)} = f\!\big(\sum_{e' \in \mathcal{N}(e)\setminus v} m_{e' \to v}^{(t)}\big)$</td>
-  <td>&sect;5.9</td>
+  <td>&sect;5.5</td>
 </tr>
 <tr>
   <td>21</td>
@@ -2812,13 +2762,6 @@ The following table summarizes all correspondences established in this document.
   <td>Orientation equivariance in SCNNs</td>
   <td>$B_1 \mapsto B_1 G$, $\bm{\sigma} \mapsto G^{-1}\bm{\sigma}$, with $G = \text{diag}(\pm1)$</td>
   <td>&sect;9</td>
-</tr>
-<tr>
-  <td>22</td>
-  <td>Three levels of ice-manifold structure</td>
-  <td>Three levels of edge-signal capacity</td>
-  <td>Topological ($\dim \ker B_1$), Combinatorial ($|\mathcal{I}|$), Spectral ($\{\lambda_i(L_1^{\text{down}})\}$)</td>
-  <td>&sect;5.9</td>
 </tr>
 <tr>
   <td>23</td>
@@ -2831,14 +2774,14 @@ The following table summarizes all correspondences established in this document.
   <td>24</td>
   <td>Directed-cycle constraint</td>
   <td>Decision-tree pruning of loop-flip space</td>
-  <td>$|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ (per sector); total $|\mathcal{I}|$ can exceed $2^{\beta_1}$</td>
+  <td>$|\varepsilon_{\mathbf{q}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ (per sector); total $|\mathcal{I}|$ can exceed $2^{\beta_1}$</td>
   <td>&sect;5.8</td>
 </tr>
 <tr>
   <td>25</td>
-  <td>Autoregressive ordering gap</td>
-  <td>Fixed-order DFS undercounts ice manifold</td>
-  <td>$|\mathcal{I}_{\text{DFS}}|/|\mathcal{I}|$ ranges from 1.3% (periodic) to 100% (open, sector-matched)</td>
+  <td>Multi-ordering reachability</td>
+  <td>Ordering randomization partially closes the autoregressive ordering gap</td>
+  <td>$|\varepsilon_{\mathbf{q}}|/|\mathcal{I}|$: 10% (square periodic) to 100% (open-BC sector match)</td>
   <td>&sect;5.8</td>
 </tr>
 </tbody>
@@ -2879,14 +2822,14 @@ This document has established a precise, equation-level bridge between two indep
 
 <li><strong>Entropic field theory = discrete Poisson</strong> (&sect;8). Nisoli's gradient and Poisson equation map exactly to $B_1^T$ and $L_0 = B_1 B_1^T$ (Key Result 5).</li>
 
-<li><strong>Coulomb classes, degeneracy, and capacity</strong> (&sect;5). Nisoli's charge equivalence partitions configuration space into Coulomb classes (affine cosets of $\ker(B_1)$). The three-level capacity framework (Key Result 8, &sect;5.9) distinguishes topological ($\dim\ker B_1$), combinatorial ($|\mathcal{I}|$, Pauling entropy), and spectral capacity.</li>
+<li><strong>Coulomb classes and degeneracy</strong> (&sect;5). Nisoli's charge equivalence partitions configuration space into Coulomb classes (affine cosets of $\ker(B_1)$). The ice manifold structure has three independently measurable aspects: topological ($\dim\ker B_1$), combinatorial ($|\mathcal{I}|$, Pauling entropy), and spectral (eigenvalue distribution of $L_1^{\text{down}}$).</li>
 
-<li><strong>Loop-basis parameterization, directed-cycle bound, and autoregressive gap</strong> (&sect;5.7&ndash;5.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving a per-sector bound $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ (Key Results 9, 10). The directed-cycle constraint prunes the upper bound exponentially. Note that the total $|\mathcal{I}| = \sum_{\mathbf{q}} |\mathcal{I}_{\mathbf{q}}|$ can exceed $2^{\beta_1}$ when multiple charge sectors exist (odd-degree vertices). The fixed autoregressive ordering introduces a further gap: independently verified total counts $|\mathcal{I}|$ exceed the DFS-reachable count by up to 74&times; on even-degree periodic lattices.</li>
+<li><strong>Loop-basis parameterization, directed-cycle bound, and multi-ordering reachability</strong> (&sect;5.7&ndash;5.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving a per-sector bound $|\varepsilon_{\mathbf{q}}| \leq |\mathcal{I}_{\mathbf{q}}| \leq 2^{\beta_1}$ (Key Results 9, 10). The directed-cycle constraint prunes the upper bound exponentially. Note that the total $|\mathcal{I}| = \sum_{\mathbf{q}} |\mathcal{I}_{\mathbf{q}}|$ can exceed $2^{\beta_1}$ when multiple charge sectors exist (odd-degree vertices). Multi-ordering enumeration ($K = 200$ random orderings) partially closes the autoregressive ordering gap; the remaining gap between $|\varepsilon_{\mathbf{q}}|$ and $|\mathcal{I}|$ is up to $10\times$ on even-degree periodic lattices.</li>
 </ol>
 
 <h3>12.2 Quantitative Framework</h3>
 
-<p>The three-level capacity framework (&sect;5.9, Key Result 8) organizes the structure of the ice manifold $\ker(B_1) \cap \{+1,-1\}^{n_1}$ into three independently measurable quantities:</p>
+<p>The structure of the ice manifold $\ker(B_1) \cap \{+1,-1\}^{n_1}$ can be organized into three independently measurable quantities:</p>
 
 <table>
 <thead>
@@ -2912,10 +2855,10 @@ This document has established a precise, equation-level bridge between two indep
   <td><strong>Yes</strong> &mdash; flat bands, gaps, and density of states vary</td>
 </tr>
 <tr>
-  <td><strong>Directed-cycle + autoregressive</strong></td>
-  <td>$|\mathcal{I}_{\text{DFS}}| / |\mathcal{I}|$</td>
-  <td>Fraction of total ice states reachable by fixed-order autoregressive DFS</td>
-  <td><strong>Yes</strong> &mdash; ranges from 100% (open-BC sector match) to 1.3% (even-degree periodic); determines Mode&nbsp;A sampling ceiling</td>
+  <td><strong>Directed-cycle + multi-ordering</strong></td>
+  <td>$|\varepsilon_{\mathbf{q}}| / |\mathcal{I}|$</td>
+  <td>Fraction of total ice states reachable by multi-ordering DFS ($K = 200$)</td>
+  <td><strong>Yes</strong> &mdash; ranges from 100% (open-BC small lattices) to 10% (even-degree periodic)</td>
 </tr>
 </tbody>
 </table>
@@ -2930,10 +2873,9 @@ The mathematical bridge established here is <em>structural</em>: it translates o
 <ul>
 <li><strong>Does higher Pauling entropy (combinatorial level) confer advantages in GNNs?</strong> Two graphs with identical degree sequences and identical $\dim(\ker B_1)$ can have very different $|\mathcal{I}|$. Does this matter for learning?</li>
 <li><strong>Does spectral structure (flat bands, small gaps) affect feature propagation?</strong> The eigenvalue distribution of $L_1^{\text{down}}$ governs both the energy landscape of spin ice excitations and the filtering behavior of Hodge-domain neural networks. Frustrated lattices tend to have richer spectral structure (more flat bands, smaller gaps). The computational catalog from Stage 1 will quantify this across the Morrison et al. lattice zoo.</li>
-<li><strong>Is the BP &harr; GNN message-passing parallel actionable?</strong> The structural similarity between belief propagation on the ice graph and message passing on the line graph (&sect;5.9) suggests that physical insights about convergence, fixed points, and approximation quality might transfer. This remains speculative.</li>
 <li><strong>What role does orientation equivariance play?</strong> The gauge freedom of spin ice (&sect;9) maps to orientation equivariance in simplicial neural networks. Architectures that respect this symmetry may generalize better on edge-signal tasks.</li>
-<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;5.8), from 50% on kagome to $10^{-6}$ on tetris. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
-<li><strong>Can the autoregressive ordering gap be closed?</strong> Independent verification (&sect;5.8) shows that the fixed-order autoregressive DFS misses the majority of ice states on even-degree periodic lattices (e.g., 40 of 2,970 for square 4&times;4 periodic). Since all states are topologically connected by loop flips, a multi-pass or non-autoregressive architecture could in principle reach the full $|\mathcal{I}|$. What is the minimal modification to the LoopMPVAN architecture that achieves this?</li>
+<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;5.8), from 53% on kagome to $6 \times 10^{-4}\%$ on tetris&nbsp;3&times;3. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
+<li><strong>Can multi-ordering enumeration saturate the sector on periodic lattices?</strong> Multi-ordering enumeration ($K = 200$) partially closes the autoregressive ordering gap (e.g., 299 of 2,970 for square 4&times;4 periodic, up from 40 with a single ordering), but a gap to $|\mathcal{I}|$ remains. Does higher $K$ close this gap, or do directedness gating and path convergence impose a hard reachability ceiling below $|\mathcal{I}_{\mathbf{q}}|$?</li>
 </ul>
 
 <p>
