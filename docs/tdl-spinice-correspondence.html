@@ -527,7 +527,7 @@ Throughout this document, derivations hold for <em>any</em> choice of $n_2$. Whe
   <td>Pauling entropy</td>
   <td>$s(G)$</td>
   <td>Entropy per vertex of ice manifold</td>
-  <td>$s = \ln|\mathcal{I}| / N_v$; see &sect;5.5</td>
+  <td>$s = \ln|\mathcal{I}| / n_0$; see &sect;5.5</td>
 </tr>
 <tr>
   <td>Screening parameter</td>
@@ -1285,7 +1285,7 @@ The <strong>Pauling entropy</strong> (entropy per vertex of the ice manifold) is
 </p>
 
 $$\begin{equation}
-s(G) = \frac{\ln |\mathcal{I}|}{N_v}
+s(G) = \frac{\ln |\mathcal{I}|}{n_0}
 \label{eq:pauling_entropy}
 \end{equation}$$
 
@@ -1299,7 +1299,7 @@ Crucially, $s(G)$ varies across lattice types <em>even when $\dim(\ker B_1)$ is 
 
 <table>
 <thead>
-<tr><th>Graph</th><th>$\bar{z}$</th><th>$\dim(\ker B_1)/N_v$</th><th>Pauling entropy $s$</th><th>Source</th></tr>
+<tr><th>Graph</th><th>$\bar{z}$</th><th>$\dim(\ker B_1)/n_0$</th><th>Pauling entropy $s$</th><th>Source</th></tr>
 </thead>
 <tbody>
 <tr><td>1D ring</td><td>2</td><td>$\to 0$</td><td>0 (only 2 states)</td><td>Remark 2.3</td></tr>
@@ -1352,7 +1352,7 @@ which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
 
 
 <p>
-<strong>The gap is exponential.</strong> The binary constraint $\{\pm 1\}$ is a discrete lattice embedded in the continuous subspace $\ker(B_1)$. Most real-valued points in $\ker(B_1)$ do not correspond to valid spin configurations. The number $2^{\dim(\ker B_1)}$ is always an upper bound on $|\mathcal{I}|$, but the ratio $|\mathcal{I}|/2^{\dim}$ decays exponentially in $N_v$ for $z = 4$ lattices: the Lieb per-vertex factor is $W_{\text{Lieb}} \approx 1.540$, compared to $W = 2$ for the topological bound, giving a ratio of $(1.540/2)^{N_v} = (0.770)^{N_v}$ that vanishes exponentially.
+<strong>The gap is exponential.</strong> The binary constraint $\{\pm 1\}$ is a discrete lattice embedded in the continuous subspace $\ker(B_1)$. Most real-valued points in $\ker(B_1)$ do not correspond to valid spin configurations. The number $2^{\dim(\ker B_1)}$ is always an upper bound on $|\mathcal{I}|$, but the ratio $|\mathcal{I}|/2^{\dim}$ decays exponentially in $n_0$ for $z = 4$ lattices: the Lieb per-vertex factor is $W_{\text{Lieb}} \approx 1.540$, compared to $W = 2$ for the topological bound, giving a ratio of $(1.540/2)^{n_0} = (0.770)^{n_0}$ that vanishes exponentially.
 </p>
 
 <p>
@@ -1376,13 +1376,13 @@ which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
 </table>
 
 <p>
-Each gap is exponential in $N_v$. This hierarchy makes explicit that the topological capacity $\dim(\ker B_1)$ and the combinatorial capacity $|\mathcal{I}|$ are separated by exponential factors controlled by the lattice structure.
+Each gap is exponential in $n_0$. This hierarchy makes explicit that the topological capacity $\dim(\ker B_1)$ and the combinatorial capacity $|\mathcal{I}|$ are separated by exponential factors controlled by the lattice structure.
 </p>
 
 <div class="key-result">
 <div class="label">Continuous vs. Discrete Capacity</div>
 <p>
-$\dim(\ker B_1) = n_1 - n_0 + 1$ is a <strong>topological capacity</strong>: the same for all graphs with the same degree sequence. $|\mathcal{I}| = |\ker(B_1) \cap \{\pm 1\}^{n_1}|$ is a <strong>combinatorial capacity</strong>: it varies with graph structure even among degree-matched graphs. The <strong>Pauling entropy</strong> $s(\mathcal{G}) = \ln|\mathcal{I}| / N_v$ measures the information content per vertex of the ice manifold. Computing $|\mathcal{I}|$ exactly is #P-complete (reduces to a matrix permanent), but it can be bounded via the Bethe permanent.
+$\dim(\ker B_1) = n_1 - n_0 + 1$ is a <strong>topological capacity</strong>: the same for all graphs with the same degree sequence. $|\mathcal{I}| = |\ker(B_1) \cap \{\pm 1\}^{n_1}|$ is a <strong>combinatorial capacity</strong>: it varies with graph structure even among degree-matched graphs. The <strong>Pauling entropy</strong> $s(G) = \ln|\mathcal{I}| / n_0$ measures the information content per vertex of the ice manifold. Computing $|\mathcal{I}|$ exactly is #P-complete (reduces to a matrix permanent), but it can be bounded via the Bethe permanent.
 </p>
 </div>
 
@@ -2556,7 +2556,7 @@ $$
 
 <p>The Pauling entropy per vertex:</p>
 $$
-s_{\text{Pauling}} = \frac{1}{N_v}\ln |\mathcal{I}_{\text{P}}| = \frac{1}{9}\ln(38.4) \approx \frac{3.65}{9} \approx 0.405
+s_{\text{Pauling}} = \frac{1}{n_0}\ln |\mathcal{I}_{\text{P}}| = \frac{1}{9}\ln(38.4) \approx \frac{3.65}{9} \approx 0.405
 $$
 
 <p>
@@ -2741,7 +2741,7 @@ The following table summarizes all correspondences established in this document.
 </tr>
 <tr>
   <td>18</td>
-  <td>Pauling entropy $s(G) = \ln|\mathcal{I}| / N_v$</td>
+  <td>Pauling entropy $s(G) = \ln|\mathcal{I}| / n_0$</td>
   <td>Combinatorial density of ice states in $\ker(B_1)$</td>
   <td>$s_{\text{square}} \approx 0.431$; $s_{\text{kagome}} \approx 0.502$; varies by lattice</td>
   <td>&sect;5.5</td>
