@@ -1314,6 +1314,44 @@ Crucially, $s(G)$ varies across lattice types <em>even when $\dim(\ker B_1)$ is 
 The Pauling entropy provides a <strong>new axis of comparison beyond $\beta_1$ and dim$(\ker B_1)$</strong>: two graphs with the same degree sequence have the same $\dim(\ker B_1)$, but they can have vastly different $s(G)$ depending on their cycle structure and frustration pattern. This is the quantity that distinguishes a structured frustrated lattice from a degree-matched random graph.
 </p>
 
+<h4>The Pauling Approximation</h4>
+
+<p>
+Computing $|\mathcal{I}|$ exactly is intractable for large graphs (see below), but Pauling's mean-field approximation gives a useful estimate. The idea is simple: start with the full phase space $|\mathcal{P}| = 2^{n_1}$ and multiply by the probability that a random spin assignment satisfies the ice rule at each vertex, treating the vertex constraints as <strong>independent</strong>:
+</p>
+
+$$\begin{equation}
+|\mathcal{I}_{\text{P}}| = 2^{n_1} \prod_{v \in V} f(z_v)
+\label{eq:pauling_approx}
+\end{equation}$$
+
+<p>
+where the <strong>per-vertex ice-rule fraction</strong> $f(z_v)$ is the probability that $z_v$ independent $\pm 1$ spins satisfy $|Q_v| = z_v \bmod 2$:
+</p>
+
+$$
+f(z_v) = \begin{cases}
+\displaystyle\frac{\binom{z_v}{z_v/2}}{2^{z_v}} & \text{if } z_v \text{ even (require } Q_v = 0\text{)} \\[8pt]
+\displaystyle\frac{2\,\binom{z_v}{\lfloor z_v/2\rfloor}}{2^{z_v}} & \text{if } z_v \text{ odd (require } |Q_v| = 1\text{)}
+\end{cases}
+$$
+
+<p>
+The key values are: $f(2) = 1/2$, $f(3) = 3/4$, $f(4) = 3/8$, $f(6) = 5/16$. For the square lattice (all $z_v = 4$):
+</p>
+
+$$
+|\mathcal{I}_{\text{P}}| = 2^{n_1}\left(\tfrac{3}{8}\right)^{n_0} = 2^{2n_0}\left(\tfrac{3}{8}\right)^{n_0} = \left(\tfrac{3}{2}\right)^{n_0}
+$$
+
+<p>
+giving the Pauling per-vertex factor $W_{\text{P}} = 3/2 = 1.500$. This is remarkably close to Lieb's exact result $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$ for the square lattice in the thermodynamic limit &mdash; the independent-vertex assumption is only 2.6% off in the exponent.
+</p>
+
+<p>
+The Pauling approximation is accurate when vertex constraints are nearly independent, which holds for large, uniform-coordination, periodic lattices. It breaks down at small sizes, mixed coordinations, and open boundaries, where constraint correlations between neighboring vertices become important. Its relationship to the exact count $|\mathcal{I}|$ and the topological bound $2^{\beta_1}$ is explored empirically in the counting table of &sect;5.8.
+</p>
+
 <h4>The Permanent Formula and Computational Hardness</h4>
 
 <p>
@@ -1368,10 +1406,10 @@ which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
 </tr>
 </thead>
 <tbody>
-<tr><td>$2^{n_1}$ (all configurations)</td><td>$4.000$</td><td>Trivial upper bound</td></tr>
+<tr><td>$|\mathcal{P}| = 2^{n_1}$ (all configurations)</td><td>$4.000$</td><td>Trivial upper bound</td></tr>
 <tr><td>$2^{\beta_1}$ (cycle-space dimension)</td><td>$2.000$</td><td>Topological upper bound (Key Result 9)</td></tr>
 <tr><td>Lieb exact: $(4/3)^{3n_0/2}$</td><td>$1.540$</td><td>Exact in TDL (square ice only)</td></tr>
-<tr><td>Pauling: $(3/2)^{n_0}$</td><td>$1.500$</td><td>Lower bound (Bethe permanent)</td></tr>
+<tr><td>Pauling $|\mathcal{I}_{\text{P}}|$: $(3/2)^{n_0}$ $\eqref{eq:pauling_approx}$</td><td>$1.500$</td><td>Mean-field approximation (Bethe permanent lower bound)</td></tr>
 </tbody>
 </table>
 
