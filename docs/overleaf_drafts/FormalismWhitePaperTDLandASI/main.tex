@@ -89,6 +89,181 @@ investing further in implementation.
 \maketitle
 
 % ===================================================================
+% FIGURES PAGE: LATTICE GALLERY
+% ===================================================================
+\clearpage
+
+\begin{figure*}[p]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{square_4x4_open_graph}
+  \caption{Graph structure (open)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{square_4x4_open_orientation}
+  \caption{$B_1$ orientation (open)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{square_4x4_open_ice_state}
+  \caption{Ice state (open)}
+\end{subfigure}
+
+\medskip
+
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{square_4x4_periodic_graph}
+  \caption{Graph structure (periodic)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{square_4x4_periodic_orientation}
+  \caption{$B_1$ orientation (periodic)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{square_4x4_periodic_ice_state}
+  \caption{Ice state (periodic)}
+\end{subfigure}
+\caption{Square lattice ($4\!\times\!4$). Top row: open boundary conditions
+  ($n_0 = 16$, $n_1 = 24$, $\beta_1 = 9$). Bottom row: periodic boundary
+  conditions ($n_0 = 16$, $n_1 = 32$, $\beta_1 = 17$). Left: graph
+  structure with vertices colored by coordination number. Center: reference
+  edge orientations defining $B_1$. Right: a representative ice-rule
+  configuration.}
+\label{fig:square}
+\end{figure*}
+
+\begin{figure*}[p]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{kagome_2x2_open_graph}
+  \caption{Graph structure (open)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{kagome_2x2_open_orientation}
+  \caption{$B_1$ orientation (open)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{kagome_2x2_open_ice_state}
+  \caption{Ice state (open)}
+\end{subfigure}
+
+\medskip
+
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{kagome_2x2_periodic_graph}
+  \caption{Graph structure (periodic)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{kagome_2x2_periodic_orientation}
+  \caption{$B_1$ orientation (periodic)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{kagome_2x2_periodic_ice_state}
+  \caption{Ice state (periodic)}
+\end{subfigure}
+\caption{Kagome lattice ($2\!\times\!2$). All vertices have coordination
+  $z = 3$ (odd), so the ice rule allows $|Q_v| = 1$. Top: open BC
+  ($n_1 = 17$, $\beta_1 = 6$, 6 charge sectors). Bottom: periodic BC
+  ($n_1 = 24$, $\beta_1 = 13$, single sector).}
+\label{fig:kagome}
+\end{figure*}
+
+\begin{figure*}[p]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{santa_fe_2x2_open_graph}
+  \caption{Graph structure}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{santa_fe_2x2_open_orientation}
+  \caption{$B_1$ orientation}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{santa_fe_2x2_open_ice_state}
+  \caption{Ice state}
+\end{subfigure}
+\caption{Santa Fe lattice ($2\!\times\!2$, open BC). Mixed coordination
+  $z \in \{2,3,4\}$. $n_1 = 30$, $\beta_1 = 7$, 68 feasible charge sectors.
+  Polymer-like strings of unhappy vertices are characteristic of this geometry.}
+\label{fig:santa_fe}
+\end{figure*}
+
+\begin{figure*}[p]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{shakti_2x2_open_graph}
+  \caption{Graph structure}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{shakti_2x2_open_orientation}
+  \caption{$B_1$ orientation}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth]{shakti_2x2_open_ice_state}
+  \caption{Ice state}
+\end{subfigure}
+\caption{Shakti lattice ($2\!\times\!2$, open BC). Mixed coordination
+  $z \in \{2,3,4\}$ with maximal vertex frustration. $n_1 = 81$,
+  $\beta_1 = 18$, $\geq 1{,}881$ charge sectors. Extensive degeneracy and
+  topological order~\cite{morrison2013}.}
+\label{fig:shakti}
+\end{figure*}
+
+\begin{figure*}[p]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth, height=0.18\textheight, keepaspectratio]{tetris_2x2_open_graph}
+  \caption{Graph structure ($2\!\times\!2$)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth, height=0.18\textheight, keepaspectratio]{tetris_2x2_open_orientation}
+  \caption{$B_1$ orientation ($2\!\times\!2$)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth, height=0.18\textheight, keepaspectratio]{tetris_2x2_open_ice_state}
+  \caption{Ice state ($2\!\times\!2$)}
+\end{subfigure}
+
+\medskip
+
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth, height=0.18\textheight, keepaspectratio]{tetris_3x3_open_graph}
+  \caption{Graph structure ($3\!\times\!3$)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth, height=0.18\textheight, keepaspectratio]{tetris_3x3_open_orientation}
+  \caption{$B_1$ orientation ($3\!\times\!3$)}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+  \includegraphics[width=\linewidth, height=0.18\textheight, keepaspectratio]{tetris_3x3_open_ice_state}
+  \caption{Ice state ($3\!\times\!3$)}
+\end{subfigure}
+\caption{Tetris lattice (open BC). Mixed coordination $z \in \{2,3,4\}$ with
+  maximal vertex frustration. Top: $2\!\times\!2$ ($n_1 = 38$, $\beta_1 = 7$).
+  Bottom: $3\!\times\!3$ ($n_1 = 93$, $\beta_1 = 22$). Tetris exhibits the
+  most extreme directed-cycle reduction: $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}
+  = 6 \times 10^{-4}\%$ at $3\!\times\!3$.}
+\label{fig:tetris}
+\end{figure*}
+
+\clearpage
+
+% ===================================================================
 % SECTION 1: INTRODUCTION
 % ===================================================================
 \section{Introduction}
@@ -793,178 +968,6 @@ from 53\% (kagome $2\!\times\!2$ open, $34/64$) to
 $6 \times 10^{-4}\%$ (tetris $3\!\times\!3$ open, $25/4{,}194{,}304$).
 This five-order-of-magnitude range---invisible from $\beta_1$ alone---is a
 fundamental structural property of the lattice.
-
-% ===================================================================
-% FIGURES: LATTICE GALLERY
-% ===================================================================
-
-\begin{figure*}[p]
-\centering
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{square_4x4_open_graph}
-  \caption{Graph structure (open)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{square_4x4_open_orientation}
-  \caption{$B_1$ orientation (open)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{square_4x4_open_ice_state}
-  \caption{Ice state (open)}
-\end{subfigure}
-
-\medskip
-
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{square_4x4_periodic_graph}
-  \caption{Graph structure (periodic)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{square_4x4_periodic_orientation}
-  \caption{$B_1$ orientation (periodic)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{square_4x4_periodic_ice_state}
-  \caption{Ice state (periodic)}
-\end{subfigure}
-\caption{Square lattice ($4\!\times\!4$). Top row: open boundary conditions
-  ($n_0 = 16$, $n_1 = 24$, $\beta_1 = 9$). Bottom row: periodic boundary
-  conditions ($n_0 = 16$, $n_1 = 32$, $\beta_1 = 17$). Left: graph
-  structure with vertices colored by coordination number. Center: reference
-  edge orientations defining $B_1$. Right: a representative ice-rule
-  configuration.}
-\label{fig:square}
-\end{figure*}
-
-\begin{figure*}[p]
-\centering
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{kagome_2x2_open_graph}
-  \caption{Graph structure (open)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{kagome_2x2_open_orientation}
-  \caption{$B_1$ orientation (open)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{kagome_2x2_open_ice_state}
-  \caption{Ice state (open)}
-\end{subfigure}
-
-\medskip
-
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{kagome_2x2_periodic_graph}
-  \caption{Graph structure (periodic)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{kagome_2x2_periodic_orientation}
-  \caption{$B_1$ orientation (periodic)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{kagome_2x2_periodic_ice_state}
-  \caption{Ice state (periodic)}
-\end{subfigure}
-\caption{Kagome lattice ($2\!\times\!2$). All vertices have coordination
-  $z = 3$ (odd), so the ice rule allows $|Q_v| = 1$. Top: open BC
-  ($n_1 = 17$, $\beta_1 = 6$, 6 charge sectors). Bottom: periodic BC
-  ($n_1 = 24$, $\beta_1 = 13$, single sector).}
-\label{fig:kagome}
-\end{figure*}
-
-\begin{figure*}[p]
-\centering
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{santa_fe_2x2_open_graph}
-  \caption{Graph structure}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{santa_fe_2x2_open_orientation}
-  \caption{$B_1$ orientation}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{santa_fe_2x2_open_ice_state}
-  \caption{Ice state}
-\end{subfigure}
-\caption{Santa Fe lattice ($2\!\times\!2$, open BC). Mixed coordination
-  $z \in \{2,3,4\}$. $n_1 = 30$, $\beta_1 = 7$, 68 feasible charge sectors.
-  Polymer-like strings of unhappy vertices are characteristic of this geometry.}
-\label{fig:santa_fe}
-\end{figure*}
-
-\begin{figure*}[p]
-\centering
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{shakti_2x2_open_graph}
-  \caption{Graph structure}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{shakti_2x2_open_orientation}
-  \caption{$B_1$ orientation}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{shakti_2x2_open_ice_state}
-  \caption{Ice state}
-\end{subfigure}
-\caption{Shakti lattice ($2\!\times\!2$, open BC). Mixed coordination
-  $z \in \{2,3,4\}$ with maximal vertex frustration. $n_1 = 81$,
-  $\beta_1 = 18$, $\geq 1{,}881$ charge sectors. Extensive degeneracy and
-  topological order~\cite{morrison2013}.}
-\label{fig:shakti}
-\end{figure*}
-
-\begin{figure*}[p]
-\centering
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{tetris_2x2_open_graph}
-  \caption{Graph structure ($2\!\times\!2$)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{tetris_2x2_open_orientation}
-  \caption{$B_1$ orientation ($2\!\times\!2$)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{tetris_2x2_open_ice_state}
-  \caption{Ice state ($2\!\times\!2$)}
-\end{subfigure}
-
-\medskip
-
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{tetris_3x3_open_graph}
-  \caption{Graph structure ($3\!\times\!3$)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{tetris_3x3_open_orientation}
-  \caption{$B_1$ orientation ($3\!\times\!3$)}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.32\textwidth}
-  \includegraphics[width=\linewidth]{tetris_3x3_open_ice_state}
-  \caption{Ice state ($3\!\times\!3$)}
-\end{subfigure}
-\caption{Tetris lattice (open BC). Mixed coordination $z \in \{2,3,4\}$ with
-  maximal vertex frustration. Top: $2\!\times\!2$ ($n_1 = 38$, $\beta_1 = 7$).
-  Bottom: $3\!\times\!3$ ($n_1 = 93$, $\beta_1 = 22$). Tetris exhibits the
-  most extreme directed-cycle reduction: $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}
-  = 6 \times 10^{-4}\%$ at $3\!\times\!3$.}
-\label{fig:tetris}
-\end{figure*}
 
 % ===================================================================
 % SECTION 6: HODGE DECOMPOSITION
