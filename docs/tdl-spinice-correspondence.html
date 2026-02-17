@@ -232,7 +232,7 @@ tr:nth-child(even) { background: #fafafa; }
 
 <h1>Topological Deep Learning &harr; Spin Ice:<br>A Mathematical Correspondence</h1>
 <p class="subtitle">Exact mappings between simplicial complex TDL and Nisoli's charge framework for artificial spin ice</p>
-<p class="authors">SpinIceTDL Project &mdash; Reference Document v2.0</p>
+<p class="authors">SpinIceTDL Project &mdash; Reference Document v3.0</p>
 
 <nav id="toc">
 <h2>Contents</h2>
@@ -241,18 +241,19 @@ tr:nth-child(even) { background: #fafafa; }
   <li><a href="#sec2">Notation &amp; Setup</a></li>
   <li><a href="#sec3">The $S_{vv'}$ Matrix as Incidence &times; Spin Configuration</a></li>
   <li><a href="#sec4">Topological Charge = Divergence of 1-Cochain</a></li>
-  <li><a href="#sec5">Ice Manifold, $\ker(B_1)$, and the Hodge Decomposition</a></li>
-  <li><a href="#sec6">Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</a></li>
-  <li><a href="#sec7">Entropic Field Theory and the Graph Laplacian</a></li>
-  <li><a href="#sec8">Line Graph Dual, Degeneracy, and the Bethe Permanent</a>
+  <li><a href="#sec5">Coulomb Classes, the Ice Manifold, and Degeneracy</a>
     <ol style="list-style-type: none; padding-left: 1rem; margin-top: 0.2rem;">
-      <li><a href="#sec8.7">8.7 Loop-Basis Parameterization of the Ice Manifold</a></li>
-      <li><a href="#sec8.8">8.8 The Directed-Cycle Constraint and Reachable States</a></li>
+      <li><a href="#sec5.7">5.7 Loop-Basis Parameterization of the Ice Manifold</a></li>
+      <li><a href="#sec5.8">5.8 The Directed-Cycle Constraint and Reachable States</a></li>
     </ol>
   </li>
-  <li><a href="#sec9">Worked Example &mdash; 3&times;3 Periodic Square Lattice</a></li>
-  <li><a href="#sec10">Master Correspondence Table</a></li>
-  <li><a href="#sec11">Summary of Established Results</a></li>
+  <li><a href="#sec6">The Hodge Decomposition</a></li>
+  <li><a href="#sec7">Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</a></li>
+  <li><a href="#sec8">Entropic Field Theory and the Graph Laplacian</a></li>
+  <li><a href="#sec9">Gauge Freedom and Orientation Equivariance</a></li>
+  <li><a href="#sec10">Worked Example &mdash; 3&times;3 Periodic Square Lattice</a></li>
+  <li><a href="#sec11">Master Correspondence Table</a></li>
+  <li><a href="#sec12">Summary of Established Results</a></li>
 </ol>
 </nav>
 
@@ -275,11 +276,11 @@ The connection between these frameworks is <strong>structural, not analogical</s
 </p>
 
 <p>
-The ice manifold (the degenerate ground-state manifold of a frustrated spin ice) is structurally governed by $\ker(B_1)$ &mdash; either as the ice manifold itself (for even-degree vertices) or as the space of fluctuations within it (for odd-degree vertices). The dimension of this space, its combinatorial density (Pauling entropy), and its spectral structure all vary across lattice types in ways that ASI physics has characterized in detail. This document establishes the precise mathematical identities that make these quantities accessible to TDL and GNN analysis. The question of <em>how</em> this structure can best be exploited in machine learning remains an active direction of investigation.
+The ice manifold (the degenerate ground-state manifold of a frustrated spin ice) is structurally governed by $\ker(B_1)$ &mdash; either as the ice manifold itself (for even-degree vertices) or as the space of fluctuations within it (for odd-degree vertices). The dimension of this space, its combinatorial density (Pauling entropy, &sect;5.5), and its spectral structure all vary across lattice types in ways that ASI physics has characterized in detail. This document establishes the precise mathematical identities that make these quantities accessible to TDL and GNN analysis. The question of <em>how</em> this structure can best be exploited in machine learning remains an active direction of investigation.
 </p>
 
 <p>
-A particular focus of this document is the precise relationship between $\beta_1$ and the degeneracy of the ice manifold. While $\beta_1$ determines the dimension of the topologically protected subspace (&sect;5) and sets an upper bound of $2^{\beta_1}$ on the number of reachable ice states (&sect;8.7), the actual count is controlled by a <strong>directed-cycle constraint</strong> that can reduce it by orders of magnitude (&sect;8.8). This distinction is critical for neural sampling, where training difficulty depends on the reachable state count, not on $\beta_1$ alone.
+A particular focus of this document is the precise relationship between $\beta_1$ and the degeneracy of the ice manifold. While $\beta_1$ determines the dimension of the topologically protected subspace (&sect;6) and sets an upper bound of $2^{\beta_1}$ on the number of reachable ice states (&sect;5.7), the actual count is controlled by a <strong>directed-cycle constraint</strong> that can reduce it by orders of magnitude (&sect;5.8). This distinction is critical for neural sampling, where training difficulty depends on the reachable state count, not on $\beta_1$ alone.
 </p>
 
 <p>
@@ -338,7 +339,7 @@ The specific polygon types vary across the lattice zoo: squares for the square l
 </p>
 
 <p>
-The <strong>first Betti number $\beta_1$</strong> counts the number of independent cycles in the complex that are not the boundary of any filled face &mdash; informally, "holes that haven't been filled in." Here <em>independent</em> means no cycle in the set can be expressed as a combination (symmetric difference) of the others; a set of independent cycles forms a basis for the <strong>cycle space</strong> of the graph. For example, a square lattice has many closed loops, but most can be built by combining smaller loops around individual squares &mdash; the independent ones are those that cannot be decomposed further. Just as $\beta_0$ counts connected components (&sect;2.1), $\beta_1$ counts these independent loop-shaped features in the topology. Its precise definition in terms of the boundary operators $B_1$ and $B_2$ is developed in &sect;5.5, and its connection to ice-manifold degeneracy and edge-signal capacity is the subject of &sect;8. For now, the key intuition is: <em>filling a face kills a cycle</em>, so more faces means smaller $\beta_1$.
+The <strong>first Betti number $\beta_1$</strong> counts the number of independent cycles in the complex that are not the boundary of any filled face &mdash; informally, "holes that haven't been filled in." Here <em>independent</em> means no cycle in the set can be expressed as a combination (symmetric difference) of the others; a set of independent cycles forms a basis for the <strong>cycle space</strong> of the graph. For example, a square lattice has many closed loops, but most can be built by combining smaller loops around individual squares &mdash; the independent ones are those that cannot be decomposed further. Just as $\beta_0$ counts connected components (&sect;2.1), $\beta_1$ counts these independent loop-shaped features in the topology. Its precise definition in terms of the boundary operators $B_1$ and $B_2$ is developed in &sect;6.3, and its connection to ice-manifold degeneracy and edge-signal capacity is the subject of &sect;5. For now, the key intuition is: <em>filling a face kills a cycle</em>, so more faces means smaller $\beta_1$.
 </p>
 
 <table>
@@ -362,7 +363,7 @@ The <strong>first Betti number $\beta_1$</strong> counts the number of independe
 </table>
 
 <p>
-These two choices bracket the range of $\beta_1$ for any given graph. Intermediate strategies (filling some faces but not others) give intermediate values. Since $\beta_1$ is tied to ice-manifold structure and edge-signal capacity (&sect;8), the face-filling strategy is a tunable parameter in our framework &mdash; not merely a bookkeeping choice.
+These two choices bracket the range of $\beta_1$ for any given graph. Intermediate strategies (filling some faces but not others) give intermediate values. Since $\beta_1$ is tied to ice-manifold structure and edge-signal capacity (&sect;5), the face-filling strategy is a tunable parameter in our framework &mdash; not merely a bookkeeping choice.
 </p>
 
 <p>
@@ -394,12 +395,12 @@ The periodic case is especially instructive. On the 3&times;3 torus, one can tra
 </p>
 
 <p>
-In the open case, every cycle on the planar patch bounds a region of faces, so with all faces filled, $\beta_1 = 0$ &mdash; there is no topological protection at all. This makes boundary conditions a critical experimental parameter: <strong>periodic BCs guarantee a nonzero $\beta_1$ floor</strong> (at least 2 for a torus), while open BCs can drive $\beta_1$ to zero even on frustrated lattices. All results in &sect;9 use periodic BCs for this reason.<sup><a href="#fn1" id="fnref1">1</a></sup>
+In the open case, every cycle on the planar patch bounds a region of faces, so with all faces filled, $\beta_1 = 0$ &mdash; there is no topological protection at all. This makes boundary conditions a critical experimental parameter: <strong>periodic BCs guarantee a nonzero $\beta_1$ floor</strong> (at least 2 for a torus), while open BCs can drive $\beta_1$ to zero even on frustrated lattices. All results in &sect;10 use periodic BCs for this reason.<sup><a href="#fn1" id="fnref1">1</a></sup>
 </p>
 
 <div class="convention">
 <div class="label">Convention (Face-Filling)</div>
-Throughout this document, derivations hold for <em>any</em> choice of $n_2$. Where a specific choice matters (e.g., in the worked example of &sect;9), we state it explicitly. The spectral catalog of Stage 1 will compute $\beta_1$ under both strategies for every lattice in the zoo.
+Throughout this document, derivations hold for <em>any</em> choice of $n_2$. Where a specific choice matters (e.g., in the worked example of &sect;10), we state it explicitly. The spectral catalog of Stage 1 will compute $\beta_1$ under both strategies for every lattice in the zoo.
 </div>
 
 <h3>2.3 Notation Correspondence Table</h3>
@@ -502,25 +503,37 @@ Throughout this document, derivations hold for <em>any</em> choice of $n_2$. Whe
   <td>Ice manifold</td>
   <td>$\ker(B_1)$</td>
   <td>$\mathcal{I} = \{\sigma : Q_v = 0\;\forall v\}$</td>
-  <td>See &sect;5</td>
+  <td>See &sect;5.3</td>
 </tr>
 <tr>
   <td>Harmonic subspace</td>
   <td>$\ker(L_1)$, dimension $= \beta_1$</td>
   <td>Topological winding modes of ice</td>
-  <td>Protected channel; see &sect;5</td>
+  <td>Protected channel; see &sect;6</td>
 </tr>
 <tr>
   <td>Pseudoinverse of Laplacian</td>
   <td>$L_0^+$</td>
   <td>$\hat{L}^{-1}$ (on constant-free subspace)</td>
-  <td>Charge interaction kernel; see &sect;7</td>
+  <td>Charge interaction kernel; see &sect;8</td>
+</tr>
+<tr>
+  <td>Coulomb class</td>
+  <td>$C_{\mathbf{q}}$</td>
+  <td>Charge sector (Nisoli 2020)</td>
+  <td>$\{\bm{\sigma} : B_1\bm{\sigma} = \mathbf{q}\}$; see &sect;5.2</td>
+</tr>
+<tr>
+  <td>Pauling entropy</td>
+  <td>$s(G)$</td>
+  <td>Entropy per vertex of ice manifold</td>
+  <td>$s = \ln|\mathcal{I}| / N_v$; see &sect;5.5</td>
 </tr>
 <tr>
   <td>Screening parameter</td>
   <td>&mdash;</td>
   <td>$\xi^{-2} = T/\epsilon$ (inverse correlation length$^2$)</td>
-  <td>Controls interaction range; see &sect;7</td>
+  <td>Controls interaction range; see &sect;8</td>
 </tr>
 </tbody>
 </table>
@@ -1047,13 +1060,100 @@ For the ice rule to hold on $K_3$, we would need $B_1 \bm{\sigma} = 0$. Since $\
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 5 -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec5">5. Ice Manifold, $\ker(B_1)$, and the Hodge Decomposition</h2>
+<h2 id="sec5">5. Coulomb Classes, the Ice Manifold, and Degeneracy</h2>
 
 <p style="font-style:italic; color:#666; margin-bottom:1rem;">
-Key Correspondence #3: The ice manifold decomposes via the Hodge theorem into curl and harmonic components, with the harmonic dimension equal to $\beta_1$.
+Key Correspondence #3: Nisoli's charge equivalence partitions spin configuration space into Coulomb classes &mdash; affine cosets of $\ker(B_1)$. The ice manifold is a union of minimal-charge Coulomb classes. The continuous dimension $\dim(\ker B_1)$ sets the topological capacity, while the discrete cardinality $|\mathcal{I}|$ (Pauling entropy) measures combinatorial capacity &mdash; and these differ by exponential factors controlled by lattice structure.
 </p>
 
-<h3>5.1 The Ice Manifold &mdash; General Definition</h3>
+<h3>5.1 Phase Space and Charge Equivalence</h3>
+
+<p>
+Following Nisoli (2020, &sect;II.B.2), the <strong>phase space</strong> of a spin ice on graph $G$ is the set of all possible spin configurations:
+</p>
+
+$$
+\mathcal{P} = \{+1, -1\}^{n_1}
+$$
+
+<p>
+which has $|\mathcal{P}| = 2^{n_1}$. In Nisoli's language, each element of $\mathcal{P}$ is a "digraph" on $G$ &mdash; an assignment of a direction to every edge.
+</p>
+
+<p>
+Two configurations $\bm{\sigma}, \bm{\sigma}' \in \mathcal{P}$ are <strong>charge-equivalent</strong> if they produce the same charge at every vertex:
+</p>
+
+$$\begin{equation}
+\bm{\sigma} \sim \bm{\sigma}' \quad \iff \quad B_1 \bm{\sigma} = B_1 \bm{\sigma}' \quad \iff \quad B_1(\bm{\sigma} - \bm{\sigma}') = \mathbf{0} \quad \iff \quad \bm{\sigma} - \bm{\sigma}' \in \ker(B_1)
+\label{eq:charge_equiv}
+\end{equation}$$
+
+<p>
+In Nisoli's notation, this reads: $S \sim S'$ if and only if the difference $(S_{vv'} - S'_{vv'})/2$ has zero charge at every vertex. The equivalence of Nisoli's formulation with ours follows immediately from Key Result 2: since $\mathbf{Q} = B_1 \bm{\sigma}$, equal charges means $B_1(\bm{\sigma} - \bm{\sigma}') = \mathbf{0}$, i.e., the difference lies in $\ker(B_1)$.
+</p>
+
+<div class="convention">
+<div class="label">Convention (Terminology)</div>
+We use "Coulomb class" and "charge sector" as synonyms throughout this document. Both refer to the equivalence class of configurations sharing the same charge vector $\mathbf{q}$. Nisoli reserves "Coulomb phase" for the Coulomb class representing the low-energy (ice-rule) state; we use it in the same sense.
+</div>
+
+<h3>5.2 Coulomb Classes</h3>
+
+<p>
+The charge equivalence relation $\eqref{eq:charge_equiv}$ partitions the phase space $\mathcal{P}$ into equivalence classes labeled by the charge vector $\mathbf{q} = B_1 \bm{\sigma}$:
+</p>
+
+$$\begin{equation}
+C_{\mathbf{q}} = \{\bm{\sigma} \in \{+1,-1\}^{n_1} : B_1 \bm{\sigma} = \mathbf{q}\}
+\label{eq:coulomb_class}
+\end{equation}$$
+
+<p>
+Each Coulomb class $C_{\mathbf{q}}$ is an <strong>affine coset</strong> of $\ker(B_1)$ restricted to binary spins: if $\bm{\sigma}_0 \in C_{\mathbf{q}}$ is any representative, then
+</p>
+
+$$
+C_{\mathbf{q}} = (\bm{\sigma}_0 + \ker(B_1)) \cap \{+1,-1\}^{n_1}
+$$
+
+<p>
+The phase space partitions as a disjoint union over all achievable charge vectors:
+</p>
+
+$$\begin{equation}
+\mathcal{P} = \bigsqcup_{\mathbf{q} \in \mathcal{Q}} C_{\mathbf{q}}
+\label{eq:phase_space_partition}
+\end{equation}$$
+
+<p>
+where $\mathcal{Q} = \{B_1 \bm{\sigma} : \bm{\sigma} \in \{+1,-1\}^{n_1}\}$ is the set of achievable charge vectors. <strong>Charge conservation</strong> always holds: $\sum_v q_v = 0$ for every $\mathbf{q} \in \mathcal{Q}$, since $\mathbf{1}^T B_1 = \mathbf{0}^T$.
+</p>
+
+<div class="key-result">
+<div class="label">Coulomb Class as Affine Coset of $\ker(B_1)$</div>
+<p>
+Each Coulomb class $C_{\mathbf{q}} = \{\bm{\sigma} \in \{+1,-1\}^{n_1} : B_1\bm{\sigma} = \mathbf{q}\}$ is an affine coset of $\ker(B_1)$ restricted to binary configurations. Two configurations belong to the same Coulomb class if and only if their difference is divergence-free: $\bm{\sigma} - \bm{\sigma}' \in \ker(B_1)$. The phase space $\mathcal{P} = \{+1,-1\}^{n_1}$ partitions into a finite number of Coulomb classes, one for each achievable charge vector.
+</p>
+</div>
+
+<div class="example">
+<div class="label">Example 5.1 &mdash; Coulomb Classes on $K_3$</div>
+<p>
+On the triangle graph $K_3$ from &sect;3 ($n_0 = 3$, $n_1 = 3$, $\dim\ker B_1 = 1$), there are $2^3 = 8$ total configurations. Since $\ker(B_1) = \text{span}(1, -1, -1)^T$ (one-dimensional), configurations within the same Coulomb class differ by multiples of this basis vector restricted to $\{+1,-1\}^3$.
+</p>
+<p>
+The two circulations $\bm{\sigma} = (+1, -1, +1)$ and $\bm{\sigma}' = (-1, +1, -1)$ are in the <em>same</em> Coulomb class $C_{\mathbf{0}}$: both satisfy $B_1\bm{\sigma} = \mathbf{0}$. Their difference $(+2, -2, +2)$ is proportional to the kernel basis vector.
+</p>
+<p>
+The "source" configuration $\bm{\sigma}_s = (+1, +1, -1)$ from Example 3.1 has charge $\mathbf{q} = (-2, 0, +2)$ and belongs to a <em>different</em> Coulomb class $C_{(-2,0,+2)}$. The configuration $\bm{\sigma}_t = (-1, -1, +1)$ with charge $(+2, 0, -2)$ belongs to yet another class $C_{(+2,0,-2)}$.
+</p>
+<p>
+In total, $K_3$ has four Coulomb classes: $C_{\mathbf{0}} = \{(+1,-1,+1), (-1,+1,-1)\}$ (the ice states), and three monopole classes of two configurations each.
+</p>
+</div>
+
+<h3>5.3 The Ice Manifold as a Union of Coulomb Classes</h3>
 
 <p>
 The <strong>ice rule</strong> at vertex $v$ requires that the topological charge $|Q_v|$ be minimized. Since $Q_v = \#(\text{in}) - \#(\text{out})$ and there are $z_v$ edges incident to $v$, parity dictates:
@@ -1132,7 +1232,15 @@ $$
 So <strong>fluctuations within the ice manifold</strong> are always divergence-free, and the Hodge decomposition applies to these fluctuations. The subspace $\ker(B_1)$ is the "tangent space" to the ice manifold regardless of the charge sector.
 </p>
 
-<h3>5.2 The Divergence-Free Subspace $\ker(B_1)$</h3>
+<p>
+In Coulomb class language: for <strong>even-degree graphs</strong>, the ice manifold is a single Coulomb class, $\mathcal{I} = C_{\mathbf{0}}$ &mdash; this is what Nisoli calls the <strong>Coulomb phase</strong>. For <strong>odd-degree graphs</strong>, the ice manifold is a union of Coulomb classes over the minimal-charge vectors: $\mathcal{I} = \bigcup_{\mathbf{q} \in \mathcal{Q}_{\min}} C_{\mathbf{q}}$.
+</p>
+
+<p>
+<strong>Not all ice manifolds are single Coulomb classes.</strong> Nisoli (2020) emphasizes this distinction using the kagome lattice: because all vertices have odd degree $z = 3$, the ice rule allows $Q_v = \pm 1$. The pattern of $\pm 1$ charges defines the Coulomb class, and multiple such patterns can achieve the same total charge minimization. The ice manifold is therefore a union of several Coulomb classes &mdash; not a single "Coulomb phase."
+</p>
+
+<h3>5.4 The Fluctuation Space $\ker(B_1)$: Continuous Dimension</h3>
 
 <p>
 Whether or not odd-degree vertices are present, the space of divergence-free edge flows is:
@@ -1156,7 +1264,403 @@ $$\begin{equation}
 where $\beta_0$ is the number of connected components (= 1 for connected graphs). So $\dim(\ker B_1) = n_1 - n_0 + 1$. For even-degree graphs, this is the ice manifold directly. For odd-degree graphs, it is the space of ice-manifold fluctuations and the common translate of all charge sectors.
 </p>
 
-<h3>5.3 The Hodge Decomposition Theorem</h3>
+<p>
+In the Coulomb class framework, $\ker(B_1)$ is the <strong>intra-Coulomb-class fluctuation space</strong>: moving within $\ker(B_1)$ preserves charge at every vertex, hence stays within the same Coulomb class. Two graphs with the same degree sequence (and hence the same $n_0, n_1$) have the same $\dim(\ker B_1) = n_1 - n_0 + 1$ &mdash; this is a topological invariant determined solely by vertex and edge counts, equivalently by the mean coordination $\bar{z}$.
+</p>
+
+<h3>5.5 Continuous Dimension vs. Discrete Degeneracy</h3>
+
+<p>
+We now arrive at a distinction that is central to the entire framework: the difference between the <strong>continuous dimension</strong> $\dim(\ker B_1)$ and the <strong>discrete degeneracy</strong> $|\mathcal{I}| = |\ker(B_1) \cap \{\pm 1\}^{n_1}|$.
+</p>
+
+<p>
+The continuous dimension $\dim(\ker B_1) = n_1 - n_0 + 1$ is the dimension of a real vector space &mdash; the space of all divergence-free edge flows, whether or not they take binary $\pm 1$ values. It depends only on $n_1$ and $n_0$ (equivalently, the mean coordination $\bar{z}$). The discrete degeneracy $|\mathcal{I}|$ is the number of binary spin configurations in that space &mdash; a combinatorial quantity that depends on the full graph structure. These are fundamentally different.
+</p>
+
+<h4>Pauling Entropy</h4>
+
+<p>
+The <strong>Pauling entropy</strong> (entropy per vertex of the ice manifold) is:
+</p>
+
+$$\begin{equation}
+s(G) = \frac{\ln |\mathcal{I}|}{N_v}
+\label{eq:pauling_entropy}
+\end{equation}$$
+
+<p>
+where $|\mathcal{I}| = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ is the number of Ising spin configurations satisfying the ice rule. This quantity measures the <strong>combinatorial density</strong> of discrete ice states within the continuous subspace $\ker(B_1)$.
+</p>
+
+<p>
+Crucially, $s(G)$ varies across lattice types <em>even when $\dim(\ker B_1)$ is the same</em>:
+</p>
+
+<table>
+<thead>
+<tr><th>Graph</th><th>$\bar{z}$</th><th>$\dim(\ker B_1)/N_v$</th><th>Pauling entropy $s$</th><th>Source</th></tr>
+</thead>
+<tbody>
+<tr><td>1D ring</td><td>2</td><td>$\to 0$</td><td>0 (only 2 states)</td><td>Remark 2.3</td></tr>
+<tr><td>Square lattice</td><td>4</td><td>1</td><td>$\approx 1.54$ (Lieb exact: $(4/3)^{3/2}$)</td><td>Table 1, Lieb [3]</td></tr>
+<tr><td>Triangular tiling</td><td>6</td><td>2</td><td>$\geq 2.33$ (Bethe lower bound)</td><td>Table 1</td></tr>
+<tr><td>Cubic lattice</td><td>6</td><td>2</td><td>$\approx 2.41$ (Bethe)</td><td>Table 1</td></tr>
+<tr><td>Complete graph $K_L$</td><td>$L-1$</td><td>$(L-2)/2$</td><td>$\sim \ln(2^{L+1}/\pi eL)$</td><td>McKay [73]</td></tr>
+</tbody>
+</table>
+
+<p>
+The Pauling entropy provides a <strong>new axis of comparison beyond $\beta_1$ and dim$(\ker B_1)$</strong>: two graphs with the same degree sequence have the same $\dim(\ker B_1)$, but they can have vastly different $s(G)$ depending on their cycle structure and frustration pattern. This is the quantity that distinguishes a structured frustrated lattice from a degree-matched random graph.
+</p>
+
+<h4>The Permanent Formula and Computational Hardness</h4>
+
+<p>
+For even-degree graphs, Caravelli et al. establish an exact formula for the ice degeneracy in terms of a <strong>matrix permanent</strong>:
+</p>
+
+$$\begin{equation}
+|\mathcal{I}| = \frac{\operatorname{perm}(A)}{\prod_{v \in V} (d_v/2)!}
+\label{eq:permanent}
+\end{equation}$$
+
+<p>
+where $A$ is the incidence matrix of a hypergraph constructed from the unsigned incidence matrix $|B_1|$ (each row of $|B_1|$ is duplicated $d_v/2$ times, creating a square matrix). Computing $\operatorname{perm}(A)$ is <strong>#P-complete</strong> &mdash; this is a provably hard counting problem. The ice degeneracy is not merely large; it is <em>computationally intractable to determine exactly</em> for general graphs.
+</p>
+
+<p>
+The <strong>Bethe permanent</strong> $B\text{perm}(A)$ provides a certified lower bound (Vontobel&ndash;Gurvits theorem):
+</p>
+
+$$\begin{equation}
+B\text{perm}(A) \leq \operatorname{perm}(A) \leq \sqrt{2}^{\,n}\; B\text{perm}(A)
+\label{eq:bethe_bound}
+\end{equation}$$
+
+<p>
+The Bethe permanent is computed via <strong>belief propagation</strong> (BP) &mdash; an iterative message-passing algorithm on the factor graph associated with the permanent calculation. The BP messages are:
+</p>
+
+$$
+m_{x_i}^{t+1}(y_j) = \sum_{x_i} \phi(x_i)\,\psi(x_i, y_j) \prod_{k \neq j} m_{y_k}^t(x_i)
+$$
+
+<p>
+which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
+</p>
+
+
+<p>
+<strong>The gap is exponential.</strong> The binary constraint $\{\pm 1\}$ is a discrete lattice embedded in the continuous subspace $\ker(B_1)$. Most real-valued points in $\ker(B_1)$ do not correspond to valid spin configurations. The number $2^{\dim(\ker B_1)}$ is always an upper bound on $|\mathcal{I}|$, but the ratio $|\mathcal{I}|/2^{\dim}$ decays exponentially in $N_v$ for $z = 4$ lattices: the Lieb per-vertex factor is $W_{\text{Lieb}} \approx 1.540$, compared to $W = 2$ for the topological bound, giving a ratio of $(1.540/2)^{N_v} = (0.770)^{N_v}$ that vanishes exponentially.
+</p>
+
+<p>
+<strong>Hierarchy of bounds</strong> for $z=4$ periodic square lattices in the thermodynamic limit:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Estimate</th>
+  <th>Per-vertex factor $W$</th>
+  <th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>$2^{n_1}$ (all configurations)</td><td>$4.000$</td><td>Trivial upper bound</td></tr>
+<tr><td>$2^{\beta_1}$ (cycle-space dimension)</td><td>$2.000$</td><td>Topological upper bound (Key Result 9)</td></tr>
+<tr><td>Lieb exact: $(4/3)^{3n_0/2}$</td><td>$1.540$</td><td>Exact in TDL (square ice only)</td></tr>
+<tr><td>Pauling: $(3/2)^{n_0}$</td><td>$1.500$</td><td>Lower bound (Bethe permanent)</td></tr>
+</tbody>
+</table>
+
+<p>
+Each gap is exponential in $N_v$. This hierarchy makes explicit that the topological capacity $\dim(\ker B_1)$ and the combinatorial capacity $|\mathcal{I}|$ are separated by exponential factors controlled by the lattice structure.
+</p>
+
+<div class="key-result">
+<div class="label">Continuous vs. Discrete Capacity</div>
+<p>
+$\dim(\ker B_1) = n_1 - n_0 + 1$ is a <strong>topological capacity</strong>: the same for all graphs with the same degree sequence. $|\mathcal{I}| = |\ker(B_1) \cap \{\pm 1\}^{n_1}|$ is a <strong>combinatorial capacity</strong>: it varies with graph structure even among degree-matched graphs. The <strong>Pauling entropy</strong> $s(\mathcal{G}) = \ln|\mathcal{I}| / N_v$ measures the information content per vertex of the ice manifold. Computing $|\mathcal{I}|$ exactly is #P-complete (reduces to a matrix permanent), but it can be bounded via the Bethe permanent.
+</p>
+</div>
+
+<h3>5.6 Coulomb Class Kinetics: Single Flips vs. Loop Flips</h3>
+
+<p>
+The Coulomb class framework provides a clean separation of two types of spin dynamics:
+</p>
+
+<p>
+<strong>Single spin flip</strong> (flipping one edge $e$): The charge changes at both endpoints of $e$: $Q_v \mapsto Q_v \pm 2$ for the two vertices incident to $e$. This moves the configuration to a <em>different</em> Coulomb class. In Nisoli's language, a single flip creates or annihilates a monopole-antimonopole pair.
+</p>
+
+<p>
+<strong>Loop flip</strong> (flipping all edges along a cycle $\mathbf{c} \in \ker(B_1)$): Since $B_1 \mathbf{c} = \mathbf{0}$, the charge at every vertex is unchanged: $B_1(\bm{\sigma} \oplus \mathbf{c}) = B_1\bm{\sigma}$. The configuration stays in the <em>same</em> Coulomb class.
+</p>
+
+<div class="convention">
+<div class="label">Kinetics Dichotomy</div>
+<p>
+<strong>Intra-class dynamics</strong> ($T = 0$, within the ice manifold): Loop flips explore configurations within a single Coulomb class. This is the domain of Mode&nbsp;A neural sampling.
+</p>
+<p>
+<strong>Inter-class dynamics</strong> ($T > 0$, monopole excitations): Single spin flips change the Coulomb class, creating charge excitations at energy cost $\sim \epsilon \cdot \Delta$ where $\Delta$ is the spectral gap of $L_1^{\text{down}}$. This is the domain of Mode&nbsp;B neural sampling.
+</p>
+</div>
+
+<h3 id="sec5.7">5.7 Loop-Basis Parameterization of the Ice Manifold</h3>
+
+<div class="convention">
+<div class="label">Convention (Face-Filling for This Subsection)</div>
+Mode A neural sampling operates exclusively with $n_2 = 0$ (no faces filled), so $B_2$ is vacuous and $\beta_1 = \dim(\ker B_1)$ throughout &sect;5.7&ndash;5.8. The upper Hodge Laplacian vanishes ($L_1^{\text{up}} = 0$), and $\ker(B_1) = \ker(L_1^{\text{down}}) = \ker(L_1)$.
+</div>
+
+<p>
+<strong>The cycle-space basis.</strong> For a connected graph $G$ with $n_0$ vertices and $n_1$ edges, the kernel of $B_1$ (the vertex-edge incidence matrix) has dimension
+</p>
+
+$$
+\dim(\ker B_1) = n_1 - \rank(B_1) = n_1 - (n_0 - \beta_0) = n_1 - n_0 + 1
+$$
+
+<p>
+since $\beta_0 = 1$ for a connected graph and $\rank(B_1) = n_0 - \beta_0$. With $n_2 = 0$, there is no $B_2$ contribution, so $\beta_1 = \dim(\ker B_1) = n_1 - n_0 + 1$. A basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ of $\ker(B_1)$ consists of $\beta_1$ independent <strong>oriented cycles</strong> &mdash; vectors $\mathbf{l}_i \in \R^{n_1}$ with $B_1 \mathbf{l}_i = \mathbf{0}$, meaning the flow around each cycle is divergence-free at every vertex.
+</p>
+
+<p>
+The dimension chain for $n_2 = 0$ is:
+</p>
+
+$$
+\boxed{\dim(\ker B_1) = n_1 - n_0 + 1 = \beta_1 \qquad (\text{when } n_2 = 0)}
+$$
+
+<p>
+<strong>$\mathrm{GF}(2)$ parameterization.</strong> Given a seed ice state $\bm{\sigma}_{\text{seed}} \in \ker(B_1) \cap \{+1,-1\}^{n_1}$ and a cycle basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$, each independent cycle $\mathbf{l}_i$ defines a potential <strong>loop flip</strong>: reversing all spins along the cycle. Flipping loop $i$ sends $\sigma_e \mapsto -\sigma_e$ for every edge $e$ in the cycle. Since $B_1 \mathbf{l}_i = \mathbf{0}$, the flipped configuration remains in $\ker(B_1)$ &mdash; flipping a cycle preserves the ice rule at every vertex.
+</p>
+
+<p>
+Every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via a sequence of loop flips can be written as:
+</p>
+
+$$
+\bm{\sigma} = \bm{\sigma}_{\text{seed}} \odot (-1)^{\sum_i \alpha_i \mathbf{l}_i}
+$$
+
+<p>
+where $\bm{\alpha} = (\alpha_1, \ldots, \alpha_{\beta_1}) \in \{0,1\}^{\beta_1}$ records which loops have been flipped, and the operations are understood component-wise over $\mathrm{GF}(2)$. More precisely, on each edge $e$:
+</p>
+
+$$
+\sigma_e = \sigma_{\text{seed},e} \cdot (-1)^{\sum_{i:\, e \in \text{supp}(\mathbf{l}_i)} \alpha_i}
+$$
+
+<div class="key-result">
+<div class="label">Key Result 9 &mdash; Loop-Basis Parameterization of the Ice Manifold</div>
+<p>
+Let $G$ be a connected graph with $n_2 = 0$, $\bm{\sigma}_{\text{seed}}$ an ice state, and $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ a basis of $\ker(B_1)$. Then every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via loop flips is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$. This gives:
+</p>
+$$
+|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
+$$
+<p>
+with equality if and only if every combination of loop flips produces a distinct, valid ice state. In practice, equality is rare &mdash; the directed-cycle constraint (&sect;5.8) typically reduces the count substantially.
+</p>
+</div>
+
+<p>
+<strong>Relationship to topological capacity.</strong> Key Result 9 makes explicit how the topological capacity $\dim(\ker B_1) = \beta_1$ from Key Result 8 translates into an upper bound on the number of discrete ice states. The $2^{\beta_1}$ bound arises because the cycle space is $\beta_1$-dimensional over $\R$, and $\mathrm{GF}(2)$ decisions (flip or not) select one of $2^{\beta_1}$ possible binary labelings of the basis.
+</p>
+
+<p>
+<strong>Why $2^{\beta_1}$ is exponentially loose.</strong> The bound $2^{\beta_1}$ counts the number of binary loop-flip decisions &mdash; the dimension of the <em>decision space</em> &mdash; not the number of achievable ice states. For a $z=4$ periodic square lattice, $\beta_1 = n_1 - n_0 + 1 = 2n_0 - n_0 + 1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. Meanwhile, the exact count in the thermodynamic limit (Lieb, 1967) grows as $|\mathcal{I}| \sim W_{\text{Lieb}}^{n_0}$ with $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$ per vertex, and the Pauling approximation (which treats vertex constraints as independent) gives $W_{\text{Pauling}} = 3/2 = 1.500$. The ratio of any of these to $2^{\beta_1}$ is:
+</p>
+
+$$
+\frac{|\mathcal{I}|}{2^{\beta_1}} \sim \left(\frac{W}{2}\right)^{n_0} = \begin{cases} (3/4)^{n_0} & \text{(Pauling)} \\ (0.770)^{n_0} & \text{(Lieb)} \end{cases}
+$$
+
+<p>
+Both decay <strong>exponentially</strong> in $n_0$. For a 10&times;10 lattice ($n_0 = 100$), the Pauling/Lieb count is $\sim 10^{12}$ times smaller than $2^{\beta_1}$. The full hierarchy of per-vertex factors ($W = 4, 2, 1.540, 1.500$) is tabulated in &sect;5.5.
+</p>
+
+<h3 id="sec5.8">5.8 The Directed-Cycle Constraint and Reachable States</h3>
+
+<p>
+<strong>Definition.</strong> A cycle $\mathbf{c}$ is <em>directed</em> in configuration $\bm{\sigma}$ if, at every vertex of the cycle, exactly one cycle edge carries spin flowing into the vertex along the cycle direction and exactly one carries spin flowing out. Equivalently, traversing the cycle, every edge spin is aligned with the traversal direction &mdash; the cycle carries a consistent "current."
+</p>
+
+<p>
+<strong>Why directedness matters.</strong> A loop flip reverses all spins along a cycle. For the flipped configuration to remain in $\{+1,-1\}^{n_1}$, each edge must change from $+1$ to $-1$ or vice versa &mdash; this is always possible since spins are binary. But for the flip to correspond to a <em>distinct</em> state (not just the same state re-encoded), the cycle must be <strong>directed</strong> in the current configuration. Flipping a non-directed cycle can violate the ice rule at vertices where the cycle edges don't carry consistent flow.
+</p>
+
+<p>
+Crucially, whether cycle $\mathbf{l}_i$ is directed depends on the <em>current</em> spin configuration $\bm{\sigma}$, which in turn depends on which earlier loops have been flipped. This creates a <strong>pruned decision tree</strong>, not a flat $2^{\beta_1}$ product space. Each path through the tree (choosing to flip or skip each loop in sequence) encounters different sets of directed vs. non-directed cycles, and many branches collapse to the same final state or become inaccessible.
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 10 &mdash; Directed-Cycle Reduction of the Ice Manifold</div>
+<p>
+The number of ice states reachable from a seed via loop flips satisfies:
+</p>
+$$
+|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
+$$
+<p>
+with equality rare in practice. The ratio $|\mathcal{I}_{\text{reachable}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by more than five orders of magnitude across the Morrison et al. lattice zoo.
+</p>
+</div>
+
+<p>
+<strong>Counting DFS-reachable states by exhaustive tree search.</strong> The $|\mathcal{I}_{\text{DFS}}|$ column in the table below is computed by exact enumeration (see <code>src/neural/enumeration.py</code>). The algorithm works as follows: starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, it performs a depth-first search through the $\beta_1$ loop decisions in a <em>fixed autoregressive order</em> $(l_1, l_2, \ldots, l_{\beta_1})$. At decision step $i$, it checks whether loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$. If directed, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of this pruned tree are collected and deduplicated (different decision paths can produce the same final $\bm{\sigma}$). This is the same autoregressive ordering used by the LoopMPVAN sampler, so $|\mathcal{I}_{\text{DFS}}|$ is exactly the set of states that Mode&nbsp;A training can discover.
+</p>
+
+<p>
+Three mechanisms make $|\mathcal{I}_{\text{DFS}}|$ much smaller than $2^{\beta_1}$:
+</p>
+<ol>
+<li><strong>Directedness gating:</strong> At each node of the decision tree, if the loop is not directed in the current $\bm{\sigma}$, the flip branch is pruned entirely. This removes exponentially many paths. On lattices with tight coordination constraints (e.g., tetris), most loops are non-directed in most configurations, leaving very few open branches.</li>
+<li><strong>Path convergence:</strong> Different sequences of flip decisions can produce the same final spin configuration. For example, flipping loops $A$ then $B$ may yield the same $\bm{\sigma}$ as flipping $B$ then $A$ (or neither), especially when the loops share edges. The algorithm deduplicates by tracking the set of distinct $\bm{\sigma}$ vectors encountered.</li>
+<li><strong>Autoregressive ordering limitation:</strong> The fixed processing order $(l_1, \ldots, l_{\beta_1})$ means that whether loop $l_i$ is directed depends only on which of $l_1, \ldots, l_{i-1}$ were flipped. Some ice states may require flip sequences that violate this ordering &mdash; e.g., a state reachable by flipping $l_5$ then $l_3$ may be invisible to the DFS because $l_3$ was not directed when it was processed at step 3 (before $l_5$ was flipped at step 5). This is the dominant cause of undercounting on even-degree periodic lattices (see independent verification below).</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+  <th>Lattice</th>
+  <th>Size</th>
+  <th>BC</th>
+  <th>$\beta_1$</th>
+  <th>$2^{\beta_1}$</th>
+  <th>$|\mathcal{I}_{\text{P}}|$</th>
+  <th>$|\mathcal{I}|$</th>
+  <th>$|\mathcal{I}_{\text{DFS}}|$</th>
+  <th>$|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>4&times;4</td><td>open</td><td>9</td><td>512</td><td>2,076</td><td>2,768</td><td>25</td><td>4.9%</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>17</td><td>131,072</td><td>657</td><td>2,970</td><td>40</td><td>0.03%</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>6</td><td>64</td><td>68</td><td>172</td><td>32</td><td>50%</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>13</td><td>8,192</td><td>130</td><td>600</td><td>172</td><td>2.1%</td></tr>
+<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>923</td><td>1,312</td><td>8</td><td>6.3%</td></tr>
+<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>112</td><td>0.04%</td></tr>
+<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>74,734</td><td>86,560</td><td>12</td><td>9.4%</td></tr>
+<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>4</td><td>0.0001%</td></tr>
+</tbody>
+</table>
+<p style="font-size: 0.9em;">&dagger; Lower bound only; backtracking search timed out at 120s.</p>
+
+<p>
+<strong>Independent verification: the $|\mathcal{I}|$ column.</strong> The $|\mathcal{I}|$ column shows the total number of ice states counted by an independent constraint-propagation backtracking algorithm (<code>scripts/verify_ice_counts.py</code>) that does not use the loop basis at all. It directly enumerates all $\bm{\sigma} \in \{+1,-1\}^{n_1}$ satisfying the ice rule $B_1 \bm{\sigma} = \mathbf{Q}_{\text{target}}$ for each valid charge sector, using BFS edge ordering and forward-checking to prune the search tree. For small lattices ($n_1 \leq 24$), brute-force enumeration of all $2^{n_1}$ configurations confirms exact agreement with the backtracking counts.
+</p>
+
+<p>
+<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice: independent verification finds $|\mathcal{I}| = 2{,}768$ total ice states across all charge sectors, with the largest sector containing 64 states. Yet the autoregressive DFS finds only $|\mathcal{I}_{\text{DFS}}| = 25$ &mdash; just 39% of its own charge sector. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state. The 25 states found are independently confirmed by Mode&nbsp;A training achieving 25/25 state coverage with zero ice-rule violations.
+</p>
+
+<p>
+<strong>The autoregressive ordering gap.</strong> Comparing $|\mathcal{I}|$ with $|\mathcal{I}_{\text{DFS}}|$ reveals a systematic pattern: the autoregressive DFS explores only a fraction of the true ice manifold, with the gap most dramatic for <strong>even-degree periodic lattices</strong>:
+</p>
+<ul>
+<li><strong>Square 4&times;4 periodic:</strong> $|\mathcal{I}| = 2{,}970$ total states, but the DFS finds only 40 (1.3%). Since all vertices have $z = 4$ on the torus, there is only one charge sector &mdash; the 2,930 missing states are topologically reachable via loop flips but invisible to the fixed autoregressive ordering.</li>
+<li><strong>Kagome 2&times;2 periodic:</strong> $|\mathcal{I}| = 600$ total, DFS finds 172 (29%). Again one charge sector on this even-degree torus.</li>
+<li><strong>Odd-degree lattices (open BC):</strong> For kagome 2&times;2 open, the DFS reaches 32 states, matching exactly the 32-state charge sector of its seed. The 6 charge sectors (34, 34, 32, 32, 20, 20 states) sum to $|\mathcal{I}| = 172$. This sector-matching pattern also holds for shakti&nbsp;1&times;1 (3/3) and tetris&nbsp;2&times;2 (12 matching a sector of 34).</li>
+</ul>
+<p>
+The implication for Mode&nbsp;A training is significant: LoopMPVAN uses the same fixed autoregressive ordering as the DFS, so it can discover at most $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality. On even-degree periodic lattices, this represents a <em>fundamental sampling limitation of the autoregressive architecture</em>, not a training failure. Addressing it would require either (a)&nbsp;multiple passes with different loop orderings, (b)&nbsp;a non-autoregressive architecture, or (c)&nbsp;MCMC post-processing to escape the ordering constraint.
+</p>
+
+<p>
+Across lattices where the DFS count is reliable (open-BC with sector matching), the $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ ratio varies from 50% (kagome 2&times;2 open, where half of all $2^{\beta_1}$ combinations within a sector yield valid states) down to 0.0001% (tetris 3&times;3 open, where $\beta_1 = 22$ but only 4 of 4.2 million candidate states are found). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice.
+</p>
+
+<p>
+<strong>The Pauling column: why neither bound is tight at small sizes.</strong> The $|\mathcal{I}_{\text{P}}|$ column (computed from <code>src/topology/ice_sampling.pauling_estimate()</code>) shows the Pauling approximation $|\mathcal{I}_{\text{P}}| = 2^{n_1} \prod_v f(z_v)$, where $f(z_v) = \binom{z_v}{z_v/2}/2^{z_v}$ for even $z_v$ and $f(z_v) = 2\binom{z_v}{\lfloor z_v/2\rfloor}/2^{z_v}$ for odd $z_v$. The Pauling estimate counts from a <em>different starting point</em> than $2^{\beta_1}$: it starts with $2^{n_1}$ total edge configurations and filters by independent vertex constraints, while $2^{\beta_1}$ starts from the cycle-space dimension. For these small lattices, three surprises emerge:
+</p>
+<ol>
+<li><strong>Pauling can exceed $2^{\beta_1}$</strong> &mdash; dramatically so for shakti ($1.6 \times 10^9$ vs. 262k) and tetris 3&times;3 ($1.9 \times 10^{12}$ vs. 4.2M). These lattices have many low-coordination boundary vertices ($z = 1, 2$), which contribute weak per-vertex constraints to the Pauling product while not adding proportionally to $\beta_1$.</li>
+<li><strong>Pauling can be below $2^{\beta_1}$</strong> &mdash; for square 4&times;4 periodic (657 vs. 131k) and kagome 2&times;2 periodic (130 vs. 8,192). These uniform-$z$ periodic lattices have strong per-vertex constraints and large $\beta_1$ from the periodic topology.</li>
+<li><strong>Pauling tracks $|\mathcal{I}|$ better than $2^{\beta_1}$ does</strong> &mdash; for uniform-$z$ periodic lattices, Pauling is within an order of magnitude of the verified $|\mathcal{I}|$: Pauling gives 657 vs. $|\mathcal{I}| = 2{,}970$ for square 4&times;4 periodic, and 130 vs. 600 for kagome 2&times;2 periodic. By contrast, $2^{\beta_1}$ overshoots $|\mathcal{I}|$ by 44&times; and 14&times; respectively. For open-BC mixed-coordination lattices, both Pauling and $2^{\beta_1}$ overestimate $|\mathcal{I}|$ by large factors.</li>
+</ol>
+<p>
+The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices that are tractable for Mode&nbsp;A training, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count $|\mathcal{I}|$. The independent backtracking enumeration (<code>scripts/verify_ice_counts.py</code>) is currently the most reliable method at these sizes.
+</p>
+
+<p>
+<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $|\mathcal{I}| = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states. For even-degree graphs (all $z_v$ even), every ice state is topologically reachable from any other via some sequence of loop flips &mdash; the ice manifold forms a single connected component under loop moves. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and loop flips connect only states within the same sector. The autoregressive DFS count $|\mathcal{I}_{\text{DFS}}|$ is a further restriction: it counts only states reachable via loop flips <em>in the fixed autoregressive order</em>. As the $|\mathcal{I}|$ column demonstrates, $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}_{\text{sector}}| \leq |\mathcal{I}|$, with the first inequality strict whenever the autoregressive ordering misses states that require out-of-order flips.
+</p>
+
+<p>
+<strong>Implications for neural sampling.</strong> For Mode&nbsp;A (LoopMPVAN), the autoregressive network must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\mathcal{I}_{\text{DFS}}|$ states is uniform. When $|\mathcal{I}_{\text{DFS}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task that REINFORCE training must solve. The training difficulty correlates with the DFS-reachable state count and the structure of the decision tree, not with $\beta_1$ alone. Crucially, Mode&nbsp;A can never discover more than $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality &mdash; sampling the full $|\mathcal{I}|$ requires breaking the autoregressive ordering constraint. See <a href="mode-a-walkthrough.md">Mode A Walkthrough</a> and <a href="training-experiments.md">Training Experiments</a> for detailed results.
+</p>
+
+<h3>5.9 Three Levels of Edge-Signal Capacity</h3>
+
+<p>
+The BP computation of ice degeneracy and GNN message passing share a deep structural parallel:
+</p>
+
+<table>
+<thead>
+<tr><th>Belief Propagation (Ice Degeneracy)</th><th>GNN Message Passing</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Messages $m_{i \to j}(x_j)$ between variable/factor nodes</td>
+  <td>Hidden states $\mathbf{h}_v^{(\ell)}$ aggregated from neighbors</td>
+</tr>
+<tr>
+  <td>Update: product of incoming messages</td>
+  <td>Update: sum/mean of neighbor features + nonlinearity</td>
+</tr>
+<tr>
+  <td>Bethe free energy $F_{\text{Bethe}}$ minimized at convergence</td>
+  <td>Loss function minimized during training</td>
+</tr>
+<tr>
+  <td>Exact on trees, approximate on loopy graphs</td>
+  <td>Perfect propagation on trees, oversmoothing on loopy graphs</td>
+</tr>
+<tr>
+  <td>Convergence $\to$ Bethe permanent $\to$ degeneracy bound</td>
+  <td>Convergence $\to$ learned representations $\to$ task predictions</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The parallel extends to the <strong>role of graph structure</strong>: on trees, BP converges to exact marginals and GNNs propagate information perfectly (but have $\dim(\ker B_1) = 0$ &mdash; no protection). On loopy graphs, BP becomes approximate and GNNs suffer oversmoothing, but the loops create $\ker(B_1) \neq \{0\}$ &mdash; a protected subspace.
+</p>
+
+<p>
+This suggests a precise interpretation of the Pauling entropy for GNNs:
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 8 &mdash; Three Levels of Edge-Signal Capacity</div>
+<p>
+The capacity of a graph $G$ for edge-level representation learning under $L_1^{\text{down}}$-smoothing has three distinct levels:
+</p>
+<ol>
+<li><strong>Topological capacity</strong> $= \dim(\ker B_1) = n_1 - n_0 + \beta_0$: the dimension of the protected subspace. Depends only on $n_1, n_0$ (equivalently, $\bar{z}$). Same for all graphs with the same degree sequence.</li>
+<li><strong>Combinatorial capacity</strong> $= |\mathcal{I}|$, the Pauling degeneracy: how many discrete $\pm 1$-valued configurations fit in $\ker(B_1)$. <em>Varies across graph structures</em> with the same degree sequence. Computable (bounded) via the Bethe permanent / belief propagation. This is the level at which frustrated lattices differ from degree-matched random controls.</li>
+<li><strong>Spectral capacity</strong> $=$ eigenvalue distribution of $L_1^{\text{down}}$: how fast non-protected modes decay. Spectral gaps, flat bands, and near-zero eigenvalue clustering provide "soft" protection beyond the exact kernel. Also structure-dependent.</li>
+</ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<h2 id="sec6">6. The Hodge Decomposition</h2>
+
+<p style="font-style:italic; color:#666; margin-bottom:1rem;">
+The edge signal space decomposes into three orthogonal components &mdash; gradient, curl, and harmonic &mdash; with the harmonic dimension equal to the first Betti number $\beta_1$.
+</p>
+
+<h3>6.1 The Hodge Decomposition Theorem</h3>
 
 <p>
 The <strong>Hodge decomposition</strong> for the edge space $\R^{n_1}$ of a simplicial complex $X$ with boundary operators $B_1$ ($n_0 \times n_1$) and $B_2$ ($n_1 \times n_2$) states:
@@ -1189,10 +1693,11 @@ where the three subspaces are mutually orthogonal and:
 Completeness follows from a dimension count: $\dim(\im B_1^T) + \dim(\im B_2) + \dim(\ker L_1) = (n_0 - \beta_0) + (n_2 - \beta_2) + \beta_1 = n_1$ (using the definitions of Betti numbers).
 </p>
 
-<h3>5.4 The Divergence-Free Subspace Splits</h3>
+
+<h3>6.2 The Divergence-Free Subspace Splits</h3>
 
 <p>
-The divergence-free subspace $\ker(B_1)$ &mdash; which is the ice manifold for even-degree graphs, and the fluctuation space for odd-degree graphs (&sect;5.1) &mdash; contains no gradient signals (except zero). The Hodge decomposition restricted to $\ker(B_1)$ gives:
+The divergence-free subspace $\ker(B_1)$ &mdash; which is the ice manifold (a single Coulomb class $C_{\mathbf{0}}$) for even-degree graphs, and the intra-Coulomb-class fluctuation space for odd-degree graphs (&sect;5.3) &mdash; contains no gradient signals (except zero). The Hodge decomposition restricted to $\ker(B_1)$ gives:
 </p>
 
 $$\begin{equation}
@@ -1210,7 +1715,7 @@ $(\supseteq)$: $\im(B_2) \subseteq \ker(B_1)$ because $B_1 B_2 = 0$. $\ker(L_1) 
 $(\subseteq)$: Take any $\mathbf{f} \in \ker(B_1)$. By the full Hodge decomposition, $\mathbf{f} = \mathbf{f}_{\text{grad}} + \mathbf{f}_{\text{curl}} + \mathbf{f}_{\text{harm}}$. Then $0 = B_1 \mathbf{f} = B_1 \mathbf{f}_{\text{grad}}$ (since $B_1 \mathbf{f}_{\text{curl}} = B_1 B_2 \mathbf{y} = 0$ and $B_1 \mathbf{f}_{\text{harm}} = 0$). But $\mathbf{f}_{\text{grad}} = B_1^T \mathbf{x}$, so $B_1 B_1^T \mathbf{x} = L_0 \mathbf{x} = 0$, meaning $\mathbf{x}$ is constant (for connected graphs). Thus $\mathbf{f}_{\text{grad}} = B_1^T (\text{const}) = \mathbf{0}$. So $\mathbf{f} = \mathbf{f}_{\text{curl}} + \mathbf{f}_{\text{harm}} \in \im(B_2) \oplus \ker(L_1)$. $\square$
 </p>
 
-<h3>5.5 Dimensions and Betti Numbers</h3>
+<h3>6.3 Dimensions and Betti Numbers</h3>
 
 <p>
 The dimensions of the three Hodge components define the <strong>Betti numbers</strong>:
@@ -1247,13 +1752,19 @@ $$\begin{equation}
 \label{eq:ice_dim}
 \end{equation}$$
 
-<h3>5.6 Physical Interpretation</h3>
+<h3>6.4 Physical Interpretation</h3>
 
 <table>
 <thead>
 <tr><th>Component</th><th>Subspace</th><th>Dimension</th><th>Physical Meaning (Spin Ice)</th></tr>
 </thead>
 <tbody>
+<tr>
+  <td><strong>Gradient</strong></td>
+  <td>$\im(B_1^T)$</td>
+  <td>$n_0 - \beta_0$</td>
+  <td>Monopole excitation modes &mdash; edge signals that are discrete gradients of vertex potentials. In the Coulomb class framework (&sect;5), gradient modes mediate inter-class transitions (monopole creation/annihilation).</td>
+</tr>
 <tr>
   <td><strong>Curl</strong></td>
   <td>$\im(B_2)$</td>
@@ -1291,18 +1802,21 @@ The divergence-free subspace decomposes into locally trivial circulations ($\im 
 <p>
 The total space $\ker(B_1)$ is the same in both cases; only its internal partition between "topologically trivial" and "topologically protected" shifts (see &sect;2.2).
 </p>
+<p>
+<strong>Coulomb class interpretation.</strong> In the Coulomb class framework (&sect;5): curl modes correspond to intra-class plaquette flips (local rearrangements within a Coulomb class), harmonic modes correspond to global winding modes (topology-changing operations on a torus), and gradient modes correspond to inter-class transitions (monopole creation/annihilation).
+</p>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 6 -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec6">6. Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</h2>
+<h2 id="sec7">7. Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</h2>
 
 <p style="font-style:italic; color:#666; margin-bottom:1rem;">
 Key Correspondence #4: The dumbbell Hamiltonian of spin ice is a quadratic form in the lower Hodge Laplacian.
 </p>
 
-<h3>6.1 The Dumbbell Hamiltonian</h3>
+<h3>7.1 The Dumbbell Hamiltonian</h3>
 
 <p>
 In the dumbbell model of spin ice (Castelnovo et al. 2008, adapted by Nisoli 2020), the energy of a spin configuration is determined by the topological charges at vertices. The <strong>nearest-neighbor charge Hamiltonian</strong> is:
@@ -1317,7 +1831,7 @@ $$\begin{equation}
 where $\epsilon > 0$ is the energy scale (related to the magnetic coupling) and $Q_v = (B_1 \bm{\sigma})_v$ from Key Result 2.
 </p>
 
-<h3>6.2 Derivation: Hamiltonian as Quadratic Form</h3>
+<h3>7.2 Derivation: Hamiltonian as Quadratic Form</h3>
 
 <p>
 <strong>Step 1.</strong> Write the sum of squared charges as a squared norm:
@@ -1358,7 +1872,7 @@ The spin ice energy is a quadratic form in the lower Hodge Laplacian. This is ex
 </p>
 </div>
 
-<h3>6.3 Spectral Consequences</h3>
+<h3>7.3 Spectral Consequences</h3>
 
 <p>
 Let $\{\lambda_i, \mathbf{u}_i\}_{i=1}^{n_1}$ be the eigenvalues and orthonormal eigenvectors of $L_1^{\text{down}}$. Expanding $\bm{\sigma}$ in this eigenbasis:
@@ -1416,7 +1930,7 @@ E_{\text{min monopole}} = \frac{\epsilon}{2}\, \Delta \cdot \min_{c_i \neq 0} c_
 For Ising spins with integer charges, $\Delta$ directly controls the monopole gap. Lattices with larger spectral gaps have more robust ice rules.
 </p>
 
-<h3>6.4 Nisoli's Interaction Matrix</h3>
+<h3>7.4 Nisoli's Interaction Matrix</h3>
 
 <p>
 Nisoli expresses the energy in terms of vertex charges:
@@ -1428,7 +1942,7 @@ $$\begin{equation}
 \end{equation}$$
 
 <p>
-This is the <em>nearest-neighbor</em> (on-site) charge interaction. Nisoli extends this to long-range interactions via the graph Green's function (see &sect;7), but the nearest-neighbor version already establishes the $L_1^{\text{down}}$ connection. Note the chain of equalities:
+This is the <em>nearest-neighbor</em> (on-site) charge interaction. Nisoli extends this to long-range interactions via the graph Green's function (see &sect;8), but the nearest-neighbor version already establishes the $L_1^{\text{down}}$ connection. Note the chain of equalities:
 </p>
 
 $$
@@ -1438,7 +1952,7 @@ $$
 = \frac{\epsilon}{2}\, \bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}
 $$
 
-<h3>6.5 Worked Example: Energy on the Triangle</h3>
+<h3>7.5 Worked Example: Energy on the Triangle</h3>
 
 <div class="example">
 <div class="label">Example 6.1 &mdash; Hamiltonian on $K_3$</div>
@@ -1472,7 +1986,7 @@ Physically: $\bm{\sigma}_{\text{ice}} = (1,-1,-1)^T$ means $e_0$ points $v_0 \to
 </p>
 </div>
 
-<h3>6.6 Computational Note: $L_1^{\text{down}}$ vs. $B_1$ for Null Space Computation</h3>
+<h3>7.6 Computational Note: $L_1^{\text{down}}$ vs. $B_1$ for Null Space Computation</h3>
 
 <p>
 Since $\ker(L_1^{\text{down}}) = \ker(B_1^T B_1) = \ker(B_1)$ (standard linear algebra: $B_1^T B_1 \mathbf{x} = 0 \Leftrightarrow \|B_1 \mathbf{x}\|^2 = 0 \Leftrightarrow B_1 \mathbf{x} = 0$), both matrices yield the same null space. For Stage 1 computations, $L_1^{\text{down}}$ is the preferred target:
@@ -1492,13 +2006,13 @@ For a <strong>one-off $\beta_1$ computation</strong> where the full spectrum is 
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 7 -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec7">7. Entropic Field Theory and the Graph Laplacian</h2>
+<h2 id="sec8">8. Entropic Field Theory and the Graph Laplacian</h2>
 
 <p style="font-style:italic; color:#666; margin-bottom:1rem;">
 Key Correspondence #5: Nisoli's entropic field theory is the discrete Poisson equation on the graph, mediated by $L_0$ and its pseudoinverse.
 </p>
 
-<h3>7.1 Nisoli's Entropic Field</h3>
+<h3>8.1 Nisoli's Entropic Field</h3>
 
 <p>
 Nisoli (2020, &sect;4) introduces a coarse-grained description of the spin ice in terms of a scalar <strong>entropic field</strong> $\varphi_v$ defined on vertices. This field mediates the effective interaction between topological charges. The key steps are:
@@ -1510,7 +2024,7 @@ Nisoli (2020, &sect;4) introduces a coarse-grained description of the spin ice i
 <li>The charge-charge correlation function is determined by the inverse (or pseudoinverse) of $L_0$.</li>
 </ol>
 
-<h3>7.2 The Discrete Gradient</h3>
+<h3>8.2 The Discrete Gradient</h3>
 
 <p>
 Nisoli defines the gradient of the entropic field along an edge connecting $v$ and $v'$ as:
@@ -1542,7 +2056,7 @@ $$
 <p>Nisoli's discrete gradient is the coboundary/discrete exterior derivative $d^0 = B_1^T$.</p>
 </div>
 
-<h3>7.3 The Discrete Poisson Equation</h3>
+<h3>8.3 The Discrete Poisson Equation</h3>
 
 <p>
 Nisoli's discrete divergence of the gradient gives the graph Laplacian acting on $\varphi$. Specifically, from Nisoli's framework, the entropic field satisfies:
@@ -1574,7 +2088,7 @@ $$\begin{equation}
 This is the <strong>discrete Poisson equation</strong> on the graph &mdash; the exact analogue of $\nabla^2 \varphi = \rho$ in continuum electrostatics. The graph Laplacian $L_0 = B_1 B_1^T$ plays the role of the Laplacian operator $\nabla^2$.
 </p>
 
-<h3>7.4 The TDL Derivation: $L_0 = B_1 B_1^T = D - A$</h3>
+<h3>8.4 The TDL Derivation: $L_0 = B_1 B_1^T = D - A$</h3>
 
 <p>
 We verify that $L_0 = B_1 B_1^T$ reproduces the standard graph Laplacian $D - A$. Compute element-by-element:
@@ -1605,479 +2119,42 @@ $$
 Therefore $L_0 = B_1 B_1^T = D - A$. &check;
 </p>
 
-<h3>7.5 Charge-Charge Correlations and $L_0^{-1}$</h3>
-
-<p>
-In Nisoli's field theory, the charge-charge correlation function at temperature $T$ with coupling $\epsilon$ involves the <strong>Green's function</strong> (propagator) of the graph. In the Coulomb limit ($T \ll \epsilon$, or equivalently, correlation length $\xi \to \infty$), this reduces to:
-</p>
-
-$$\begin{equation}
-\langle q_v\, q_{v'} \rangle_{\text{connected}} \;\propto\; [L_0^+]_{vv'}
-\label{eq:correlator}
-\end{equation}$$
-
-<p>
-where $L_0^+ = L_0^{-1}$ restricted to the subspace orthogonal to the constant vector (the pseudoinverse of $L_0$, since $L_0$ has a zero eigenvalue corresponding to the constant mode on connected graphs).
-</p>
-
-<p>
-More explicitly, let $\{\lambda_k, \mathbf{u}_k\}$ be the eigendecomposition of $L_0$ with $\lambda_0 = 0$ and $\mathbf{u}_0 = \frac{1}{\sqrt{n_0}}\mathbf{1}$. Then:
-</p>
-
-$$\begin{equation}
-L_0^+ = \sum_{k:\lambda_k > 0} \frac{1}{\lambda_k}\, \mathbf{u}_k \mathbf{u}_k^T
-\label{eq:L0_pinv}
-\end{equation}$$
-
-<p>
-This is the kernel of the effective charge interaction: charges at vertices $v$ and $v'$ interact with strength $[L_0^+]_{vv'}$. This is structurally identical to the effective resistance (commute distance) between $v$ and $v'$ in electrical network theory, and to the infinite-depth limit of certain GNN aggregation schemes.
-</p>
-
-<h3>7.6 The Screened Green Operator</h3>
-
-<p>
-At finite temperature, Nisoli introduces the <strong>screened Green operator</strong> with screening length $\xi = \sqrt{\epsilon / T}$:
-</p>
-
-$$\begin{equation}
-\hat{G} = \bigl(\hat{L}_0 + \xi^{-2}\bigr)^{-1}
-\label{eq:screened_green}
-\end{equation}$$
-
-<p>
-where $\hat{L}_0$ is the normalized Laplacian (Nisoli normalizes by dividing by the coordination: $\hat{L}_{vv'} = \delta_{vv'} - A_{vv'}/z_v$ in the uniform-coordination case). The screening parameter $\xi^{-2}$ regularizes the zero eigenvalue and introduces exponential decay in the interaction:
-</p>
-
-<ul>
-<li><strong>$\xi \to \infty$</strong> ($T \to 0$): $\hat{G} \to \hat{L}_0^+$ &mdash; the unscreened Coulomb propagator. Charges interact at all distances.</li>
-<li><strong>$\xi \to 0$</strong> ($T \to \infty$): $\hat{G} \to \xi^2 \mathbb{1}$ &mdash; purely local (on-site). No interaction between distinct vertices.</li>
-<li><strong>Intermediate $\xi$:</strong> Interaction decays exponentially over graph distance $\sim \xi$.</li>
-</ul>
-
-<p>
-The screened operator $\eqref{eq:screened_green}$ is a spectral filter applied to $L_0$: it transforms each eigenvalue $\lambda_k$ to $(\lambda_k + \xi^{-2})^{-1}$. This is a <strong>resolvent operator</strong>, structurally identical to the regularized filters that appear in spectral graph theory.
-</p>
 
 <div class="key-result">
 <div class="label">Key Result 5 &mdash; Entropic Field Theory = Discrete Poisson on Graph</div>
 $$
-L_0\, \bm{\varphi} = \mathbf{q}, \quad \langle q_v q_{v'}\rangle \propto [L_0^+]_{vv'}, \quad \hat{G} = (\hat{L}_0 + \xi^{-2})^{-1}
+L_0\, \bm{\varphi} = \mathbf{q}
 $$
 <p>
-Nisoli's entropic field theory is the discrete Poisson equation with $L_0 = B_1 B_1^T$ as the Laplacian. The charge interaction kernel is $L_0^+$ (pseudoinverse), and finite-temperature screening introduces the resolvent $(\hat{L}_0 + \xi^{-2})^{-1}$ &mdash; a spectral filter on the graph Laplacian.
+Nisoli's entropic field theory is the discrete Poisson equation with $L_0 = B_1 B_1^T$ as the Laplacian. The entropic field $\bm{\varphi}$ on vertices mediates the effective interaction between topological charges, with $L_0$ playing the role of the continuum Laplacian $\nabla^2$. The discrete gradient $(B_1^T \bm{\varphi})_e = \varphi_{\text{head}} - \varphi_{\text{tail}}$ is the coboundary operator $d^0 = B_1^T$.
 </p>
 </div>
+
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- SECTION 8: LINE GRAPH, DEGENERACY, BETHE PERMANENT -->
+<!-- SECTION 9 -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec8">8. Line Graph Dual, Degeneracy, and the Bethe Permanent</h2>
-
-<p style="font-style:italic; color:#666; margin-bottom:1rem;">
-Based on Caravelli, Saccone &amp; Nisoli (2021), <em>Proc. R. Soc. A</em> <strong>477</strong>, 20210108. This section maps the spin ice degeneracy problem to graph-theoretic quantities in our TDL formalism and identifies connections to GNN message passing.
-</p>
-
-<h3>8.1 The Line Graph Dual: $L_1^{\text{down}}$ as a Frustrated Ising Model</h3>
+<h2 id="sec9">9. Gauge Freedom and Orientation Equivariance</h2>
 
 <p>
-The <strong>line graph</strong> $\mathcal{L}(G)$ of a graph $G$ is constructed by making each edge of $G$ a vertex of $\mathcal{L}(G)$, and connecting two vertices of $\mathcal{L}(G)$ whenever the corresponding edges of $G$ share a vertex. Caravelli et al. show that the spin ice Hamiltonian on $G$ is equivalent to a frustrated Ising model on $\mathcal{L}(G)$.
-</p>
-
-<p>
-The key identity connects $L_1^{\text{down}}$ to the line graph adjacency:
-</p>
-
-$$\begin{equation}
-\boxed{L_1^{\text{down}} = 2I - A_{\mathcal{L}(G)}}
-\label{eq:linegraph}
-\end{equation}$$
-
-<p>
-where $A_{\mathcal{L}(G)}$ is the <strong>weighted adjacency matrix</strong> of the directed line graph &mdash; a signed matrix with entries $\pm 1$ depending on the spin orientation. Specifically, $[A_{\mathcal{L}(G)}]_{\beta\beta'} = +1$ if edges $\beta, \beta'$ both enter or both leave their shared vertex (ferromagnetic coupling), and $-1$ if one enters and the other leaves (antiferromagnetic coupling).
-</p>
-
-<p>
-This means: the eigenvalues of $L_1^{\text{down}}$ are exactly $\lambda_k = 2 - \mu_k$ where $\{\mu_k\}$ are the eigenvalues of the signed line graph adjacency. Ground states of the spin ice ($\sigma \in \ker B_1$) correspond to ground states of the frustrated Ising model on $\mathcal{L}(G)$.
-</p>
-
-<h3>8.2 Universal Frustration: All Spin Ices with $d > 2$ Are Frustrated</h3>
-
-<p>
-Caravelli et al. prove a striking result: <strong>every vertex of degree $d > 2$ in $G$ generates a fully frustrated clique $K_d$ in the line graph dual.</strong> The $d$ edges incident to that vertex become $d$ vertices of $\mathcal{L}(G)$ forming a complete subgraph with $d(d-1)/2$ interactions, ALL of which are antiferromagnetic. Since $K_d$ with all-AF couplings is frustrated for $d \geq 3$ (every triangle has product of signs $= -1$), frustration is <em>intrinsic to vertex coordination</em>.
-</p>
-
-<div class="convention">
-<div class="label">Theorem (Caravelli et al. 2021, Remark 2.3)</div>
-The only spin ice whose ground state is <strong>non-degenerate</strong> is the one-dimensional Ising model (a path or cycle with all vertices having $d = 2$). Every other connected spin ice graph &mdash; including all 2D lattices &mdash; has a degenerate ground state manifold.
-</div>
-
-<p>
-This theorem has a direct TDL translation:
-</p>
-
-<ul>
-<li><strong>$d = 2$ everywhere</strong> (1D chain/ring): $\dim(\ker B_1) \leq 1$. At most one divergence-free mode. The only graph where edge-level oversmoothing protection is trivial.</li>
-<li><strong>Any $d > 2$</strong>: $\ker B_1$ is nontrivial AND the ice manifold is degenerate. Protection and degeneracy are <em>simultaneously guaranteed</em> by having vertices of degree $> 2$.</li>
-</ul>
-
-<p>
-For <strong>planar</strong> spin ices, Caravelli et al. further show (Remark 2.5) that frustration occurs <em>only at the vertex level</em> &mdash; cycles in the original graph $G$ correspond to unfrustrated loops in the line graph dual. Frustration on non-contractible cycles (e.g., winding modes on a torus) requires non-planar topology.
-</p>
-
-<h3>8.3 Ice Manifold Degeneracy and the Pauling Entropy</h3>
-
-<p>
-The <strong>Pauling entropy</strong> (entropy per vertex of the ice manifold) is:
-</p>
-
-$$\begin{equation}
-s(\mathcal{G}) = \frac{\ln \epsilon(\mathcal{G})}{N_v}
-\label{eq:pauling_entropy}
-\end{equation}$$
-
-<p>
-where $\epsilon(\mathcal{G}) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ is the number of Ising spin configurations satisfying the ice rule. This quantity measures the <strong>combinatorial density</strong> of discrete ice states within the continuous subspace $\ker(B_1)$.
-</p>
-
-<p>
-Crucially, $s(\mathcal{G})$ varies across lattice types <em>even when $\dim(\ker B_1)$ is the same</em>:
-</p>
-
-<table>
-<thead>
-<tr><th>Graph</th><th>$\bar{z}$</th><th>$\dim(\ker B_1)/N_v$</th><th>Pauling entropy $s$</th><th>Source</th></tr>
-</thead>
-<tbody>
-<tr><td>1D ring</td><td>2</td><td>$\to 0$</td><td>0 (only 2 states)</td><td>Remark 2.3</td></tr>
-<tr><td>Square lattice</td><td>4</td><td>1</td><td>$\approx 1.54$ (Lieb exact: $(4/3)^{3/2}$)</td><td>Table 1, Lieb [3]</td></tr>
-<tr><td>Triangular tiling</td><td>6</td><td>2</td><td>$\geq 2.33$ (Bethe lower bound)</td><td>Table 1</td></tr>
-<tr><td>Cubic lattice</td><td>6</td><td>2</td><td>$\approx 2.41$ (Bethe)</td><td>Table 1</td></tr>
-<tr><td>Complete graph $K_L$</td><td>$L-1$</td><td>$(L-2)/2$</td><td>$\sim \ln(2^{L+1}/\pi eL)$</td><td>McKay [73]</td></tr>
-</tbody>
-</table>
-
-<p>
-The Pauling entropy provides a <strong>new axis of comparison beyond $\beta_1$ and dim$(\ker B_1)$</strong>: two graphs with the same degree sequence have the same $\dim(\ker B_1)$, but they can have vastly different $s(\mathcal{G})$ depending on their cycle structure and frustration pattern. This is the quantity that distinguishes a structured frustrated lattice from a degree-matched random graph.
-</p>
-
-<h3>8.4 The Permanent Formula and Bethe Approximation</h3>
-
-<p>
-For even-degree graphs, Caravelli et al. establish an exact formula for the ice degeneracy in terms of a <strong>matrix permanent</strong>:
-</p>
-
-$$\begin{equation}
-\epsilon(\mathcal{G}) = \frac{\operatorname{perm}(A)}{\prod_{v \in V} (d_v/2)!}
-\label{eq:permanent}
-\end{equation}$$
-
-<p>
-where $A$ is the incidence matrix of a hypergraph constructed from the unsigned incidence matrix $|B_1|$ (each row of $|B_1|$ is duplicated $d_v/2$ times, creating a square matrix). Computing $\operatorname{perm}(A)$ is <strong>#P-complete</strong> &mdash; this is a provably hard counting problem. The ice degeneracy is not merely large; it is <em>computationally intractable to determine exactly</em> for general graphs.
-</p>
-
-<p>
-The <strong>Bethe permanent</strong> $B\text{perm}(A)$ provides a certified lower bound (Vontobel&ndash;Gurvits theorem):
-</p>
-
-$$\begin{equation}
-B\text{perm}(A) \leq \operatorname{perm}(A) \leq \sqrt{2}^{\,n}\; B\text{perm}(A)
-\label{eq:bethe_bound}
-\end{equation}$$
-
-<p>
-The Bethe permanent is computed via <strong>belief propagation</strong> (BP) &mdash; an iterative message-passing algorithm on the factor graph associated with the permanent calculation. The BP messages are:
-</p>
-
-$$
-m_{x_i}^{t+1}(y_j) = \sum_{x_i} \phi(x_i)\,\psi(x_i, y_j) \prod_{k \neq j} m_{y_k}^t(x_i)
-$$
-
-<p>
-which converge to fixed points whose Bethe free energy gives $B\text{perm}(A)$.
-</p>
-
-<h3>8.5 Message Passing: From Bethe Permanent to GNN Aggregation</h3>
-
-<p>
-The BP computation of ice degeneracy and GNN message passing share a deep structural parallel:
-</p>
-
-<table>
-<thead>
-<tr><th>Belief Propagation (Ice Degeneracy)</th><th>GNN Message Passing</th></tr>
-</thead>
-<tbody>
-<tr>
-  <td>Messages $m_{i \to j}(x_j)$ between variable/factor nodes</td>
-  <td>Hidden states $\mathbf{h}_v^{(\ell)}$ aggregated from neighbors</td>
-</tr>
-<tr>
-  <td>Update: product of incoming messages</td>
-  <td>Update: sum/mean of neighbor features + nonlinearity</td>
-</tr>
-<tr>
-  <td>Bethe free energy $F_{\text{Bethe}}$ minimized at convergence</td>
-  <td>Loss function minimized during training</td>
-</tr>
-<tr>
-  <td>Exact on trees, approximate on loopy graphs</td>
-  <td>Perfect propagation on trees, oversmoothing on loopy graphs</td>
-</tr>
-<tr>
-  <td>Convergence $\to$ Bethe permanent $\to$ degeneracy bound</td>
-  <td>Convergence $\to$ learned representations $\to$ task predictions</td>
-</tr>
-</tbody>
-</table>
-
-<p>
-The parallel extends to the <strong>role of graph structure</strong>: on trees, BP converges to exact marginals and GNNs propagate information perfectly (but have $\dim(\ker B_1) = 0$ &mdash; no protection). On loopy graphs, BP becomes approximate and GNNs suffer oversmoothing, but the loops create $\ker(B_1) \neq \{0\}$ &mdash; a protected subspace.
-</p>
-
-<p>
-This suggests a precise interpretation of the Pauling entropy for GNNs:
-</p>
-
-<div class="key-result">
-<div class="label">Key Result 8 &mdash; Three Levels of Edge-Signal Capacity</div>
-<p>
-The capacity of a graph $G$ for edge-level representation learning under $L_1^{\text{down}}$-smoothing has three distinct levels:
-</p>
-<ol>
-<li><strong>Topological capacity</strong> $= \dim(\ker B_1) = n_1 - n_0 + \beta_0$: the dimension of the protected subspace. Depends only on $n_1, n_0$ (equivalently, $\bar{z}$). Same for all graphs with the same degree sequence.</li>
-<li><strong>Combinatorial capacity</strong> $= \epsilon(\mathcal{G})$, the Pauling entropy: how many discrete $\pm 1$-valued configurations fit in $\ker(B_1)$. <em>Varies across graph structures</em> with the same degree sequence. Computable (bounded) via the Bethe permanent / belief propagation. This is the level at which frustrated lattices differ from degree-matched random controls.</li>
-<li><strong>Spectral capacity</strong> $=$ eigenvalue distribution of $L_1^{\text{down}}$: how fast non-protected modes decay. Spectral gaps, flat bands, and near-zero eigenvalue clustering provide "soft" protection beyond the exact kernel. Also structure-dependent.</li>
-</ol>
-</div>
-
-<h3>8.6 Gauge Freedom and Orientation Equivariance</h3>
-
-<p>
-Caravelli et al. emphasize the <strong>gauge freedom</strong> of the spin ice Ising model: the transformation $s_\beta \to \xi_\beta s_\beta$ (with $\xi_\beta = \pm 1$) simultaneously flips the spin and the incidence matrix entry $B_{v,\beta} \to B_{v,\beta}\,\xi_\beta$. The Hamiltonian $H = J\,\bm{\sigma}^T L_1^{\text{down}}\,\bm{\sigma}$ is <em>not</em> gauge-invariant (the couplings $Q_{\beta\beta'}$ change), but the <strong>frustration</strong> &mdash; the product of coupling signs around any loop &mdash; <em>is</em> gauge-invariant.
+Caravelli et al. (2021) emphasize the <strong>gauge freedom</strong> of the spin ice Ising model: the transformation $s_\beta \to \xi_\beta s_\beta$ (with $\xi_\beta = \pm 1$) simultaneously flips the spin and the incidence matrix entry $B_{v,\beta} \to B_{v,\beta}\,\xi_\beta$. The Hamiltonian $H = J\,\bm{\sigma}^T L_1^{\text{down}}\,\bm{\sigma}$ is <em>not</em> gauge-invariant (the couplings $Q_{\beta\beta'}$ change), but the <strong>frustration</strong> &mdash; the product of coupling signs around any loop &mdash; <em>is</em> gauge-invariant.
 </p>
 
 <p>
 In TDL terms, this gauge freedom is the <strong>orientation ambiguity</strong> of the simplicial complex: the choice of reference orientation for each edge is arbitrary, and physical/learnable quantities must not depend on it. Simplicial convolutional networks (Yang et al. 2022) handle this via orientation-equivariant architectures. The gauge invariance of frustration means that the <em>frustration pattern of the lattice is a true topological property</em>, independent of the arbitrary orientation convention &mdash; and is therefore a legitimate feature for the network to exploit.
 </p>
 
-<h3 id="sec8.7">8.7 Loop-Basis Parameterization of the Ice Manifold</h3>
-
-<div class="convention">
-<div class="label">Convention (Face-Filling for This Subsection)</div>
-Mode A neural sampling operates exclusively with $n_2 = 0$ (no faces filled), so $B_2$ is vacuous and $\beta_1 = \dim(\ker B_1)$ throughout &sect;8.7&ndash;8.8. The upper Hodge Laplacian vanishes ($L_1^{\text{up}} = 0$), and $\ker(B_1) = \ker(L_1^{\text{down}}) = \ker(L_1)$.
-</div>
-
-<p>
-<strong>The cycle-space basis.</strong> For a connected graph $G$ with $n_0$ vertices and $n_1$ edges, the kernel of $B_1$ (the vertex-edge incidence matrix) has dimension
-</p>
-
-$$
-\dim(\ker B_1) = n_1 - \rank(B_1) = n_1 - (n_0 - \beta_0) = n_1 - n_0 + 1
-$$
-
-<p>
-since $\beta_0 = 1$ for a connected graph and $\rank(B_1) = n_0 - \beta_0$. With $n_2 = 0$, there is no $B_2$ contribution, so $\beta_1 = \dim(\ker B_1) = n_1 - n_0 + 1$. A basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ of $\ker(B_1)$ consists of $\beta_1$ independent <strong>oriented cycles</strong> &mdash; vectors $\mathbf{l}_i \in \R^{n_1}$ with $B_1 \mathbf{l}_i = \mathbf{0}$, meaning the flow around each cycle is divergence-free at every vertex.
-</p>
-
-<p>
-The dimension chain for $n_2 = 0$ is:
-</p>
-
-$$
-\boxed{\dim(\ker B_1) = n_1 - n_0 + 1 = \beta_1 \qquad (\text{when } n_2 = 0)}
-$$
-
-<p>
-<strong>$\mathrm{GF}(2)$ parameterization.</strong> Given a seed ice state $\bm{\sigma}_{\text{seed}} \in \ker(B_1) \cap \{+1,-1\}^{n_1}$ and a cycle basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$, each independent cycle $\mathbf{l}_i$ defines a potential <strong>loop flip</strong>: reversing all spins along the cycle. Flipping loop $i$ sends $\sigma_e \mapsto -\sigma_e$ for every edge $e$ in the cycle. Since $B_1 \mathbf{l}_i = \mathbf{0}$, the flipped configuration remains in $\ker(B_1)$ &mdash; flipping a cycle preserves the ice rule at every vertex.
-</p>
-
-<p>
-Every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via a sequence of loop flips can be written as:
-</p>
-
-$$
-\bm{\sigma} = \bm{\sigma}_{\text{seed}} \odot (-1)^{\sum_i \alpha_i \mathbf{l}_i}
-$$
-
-<p>
-where $\bm{\alpha} = (\alpha_1, \ldots, \alpha_{\beta_1}) \in \{0,1\}^{\beta_1}$ records which loops have been flipped, and the operations are understood component-wise over $\mathrm{GF}(2)$. More precisely, on each edge $e$:
-</p>
-
-$$
-\sigma_e = \sigma_{\text{seed},e} \cdot (-1)^{\sum_{i:\, e \in \text{supp}(\mathbf{l}_i)} \alpha_i}
-$$
-
-<div class="key-result">
-<div class="label">Key Result 9 &mdash; Loop-Basis Parameterization of the Ice Manifold</div>
-<p>
-Let $G$ be a connected graph with $n_2 = 0$, $\bm{\sigma}_{\text{seed}}$ an ice state, and $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ a basis of $\ker(B_1)$. Then every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via loop flips is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$. This gives:
-</p>
-$$
-|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
-$$
-<p>
-with equality if and only if every combination of loop flips produces a distinct, valid ice state. In practice, equality is rare &mdash; the directed-cycle constraint (&sect;8.8) typically reduces the count substantially.
-</p>
-</div>
-
-<p>
-<strong>Relationship to topological capacity.</strong> Key Result 9 makes explicit how the topological capacity $\dim(\ker B_1) = \beta_1$ from Key Result 8 translates into an upper bound on the number of discrete ice states. The $2^{\beta_1}$ bound arises because the cycle space is $\beta_1$-dimensional over $\R$, and $\mathrm{GF}(2)$ decisions (flip or not) select one of $2^{\beta_1}$ possible binary labelings of the basis.
-</p>
-
-<p>
-<strong>Why $2^{\beta_1}$ is exponentially loose.</strong> The bound $2^{\beta_1}$ counts the number of binary loop-flip decisions &mdash; the dimension of the <em>decision space</em> &mdash; not the number of achievable ice states. For a $z=4$ periodic square lattice, $\beta_1 = n_1 - n_0 + 1 = 2n_0 - n_0 + 1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. Meanwhile, the exact count in the thermodynamic limit (Lieb, 1967) grows as $\varepsilon \sim W_{\text{Lieb}}^{n_0}$ with $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$ per vertex, and the Pauling approximation (which treats vertex constraints as independent) gives $W_{\text{Pauling}} = 3/2 = 1.500$. The ratio of any of these to $2^{\beta_1}$ is:
-</p>
-
-$$
-\frac{\varepsilon}{2^{\beta_1}} \sim \left(\frac{W}{2}\right)^{n_0} = \begin{cases} (3/4)^{n_0} & \text{(Pauling)} \\ (0.770)^{n_0} & \text{(Lieb)} \end{cases}
-$$
-
-<p>
-Both decay <strong>exponentially</strong> in $n_0$. For a 10&times;10 lattice ($n_0 = 100$), the Pauling/Lieb count is $\sim 10^{12}$ times smaller than $2^{\beta_1}$. The hierarchy of estimates for $z=4$ lattices in the thermodynamic limit is:
-</p>
-
-<table>
-<thead>
-<tr>
-  <th>Estimate</th>
-  <th>Per-vertex factor $W$</th>
-  <th>Type</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>$2^{n_1}$ (all configurations)</td><td>$4.000$</td><td>Trivial upper bound</td></tr>
-<tr><td>$2^{\beta_1}$ (cycle-space dimension)</td><td>$2.000$</td><td>Topological upper bound (Key Result 9)</td></tr>
-<tr><td>Lieb exact: $(4/3)^{3n_0/2}$</td><td>$1.540$</td><td>Exact in TDL (square ice only)</td></tr>
-<tr><td>Pauling: $(3/2)^{n_0}$</td><td>$1.500$</td><td>Lower bound (Bethe permanent)</td></tr>
-</tbody>
-</table>
-
-<p>
-Each gap is exponential in $n_0$. The Pauling estimate is a <strong>lower bound</strong> on the true ice-state count for even-degree regular lattices, proved via the Gurvits bound on the Bethe permanent (&sect;8.4). For small, mixed-coordination, open-boundary lattices &mdash; the cases most relevant to Mode A training &mdash; the Pauling formula can overestimate or underestimate; see the comparison in &sect;8.8 below.
-</p>
-
-<h3 id="sec8.8">8.8 The Directed-Cycle Constraint and Reachable States</h3>
-
-<p>
-<strong>Definition.</strong> A cycle $\mathbf{c}$ is <em>directed</em> in configuration $\bm{\sigma}$ if, at every vertex of the cycle, exactly one cycle edge carries spin flowing into the vertex along the cycle direction and exactly one carries spin flowing out. Equivalently, traversing the cycle, every edge spin is aligned with the traversal direction &mdash; the cycle carries a consistent "current."
-</p>
-
-<p>
-<strong>Why directedness matters.</strong> A loop flip reverses all spins along a cycle. For the flipped configuration to remain in $\{+1,-1\}^{n_1}$, each edge must change from $+1$ to $-1$ or vice versa &mdash; this is always possible since spins are binary. But for the flip to correspond to a <em>distinct</em> state (not just the same state re-encoded), the cycle must be <strong>directed</strong> in the current configuration. Flipping a non-directed cycle can violate the ice rule at vertices where the cycle edges don't carry consistent flow.
-</p>
-
-<p>
-Crucially, whether cycle $\mathbf{l}_i$ is directed depends on the <em>current</em> spin configuration $\bm{\sigma}$, which in turn depends on which earlier loops have been flipped. This creates a <strong>pruned decision tree</strong>, not a flat $2^{\beta_1}$ product space. Each path through the tree (choosing to flip or skip each loop in sequence) encounters different sets of directed vs. non-directed cycles, and many branches collapse to the same final state or become inaccessible.
-</p>
-
-<div class="key-result">
-<div class="label">Key Result 10 &mdash; Directed-Cycle Reduction of the Ice Manifold</div>
-<p>
-The number of ice states reachable from a seed via loop flips satisfies:
-</p>
-$$
-|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
-$$
-<p>
-with equality rare in practice. The ratio $|\mathcal{I}_{\text{reachable}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by more than five orders of magnitude across the Morrison et al. lattice zoo.
-</p>
-</div>
-
-<p>
-<strong>Counting DFS-reachable states by exhaustive tree search.</strong> The $|\mathcal{I}_{\text{DFS}}|$ column in the table below is computed by exact enumeration (see <code>src/neural/enumeration.py</code>). The algorithm works as follows: starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, it performs a depth-first search through the $\beta_1$ loop decisions in a <em>fixed autoregressive order</em> $(l_1, l_2, \ldots, l_{\beta_1})$. At decision step $i$, it checks whether loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$. If directed, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of this pruned tree are collected and deduplicated (different decision paths can produce the same final $\bm{\sigma}$). This is the same autoregressive ordering used by the LoopMPVAN sampler, so $|\mathcal{I}_{\text{DFS}}|$ is exactly the set of states that Mode&nbsp;A training can discover.
-</p>
-
-<p>
-Three mechanisms make $|\mathcal{I}_{\text{DFS}}|$ much smaller than $2^{\beta_1}$:
-</p>
-<ol>
-<li><strong>Directedness gating:</strong> At each node of the decision tree, if the loop is not directed in the current $\bm{\sigma}$, the flip branch is pruned entirely. This removes exponentially many paths. On lattices with tight coordination constraints (e.g., tetris), most loops are non-directed in most configurations, leaving very few open branches.</li>
-<li><strong>Path convergence:</strong> Different sequences of flip decisions can produce the same final spin configuration. For example, flipping loops $A$ then $B$ may yield the same $\bm{\sigma}$ as flipping $B$ then $A$ (or neither), especially when the loops share edges. The algorithm deduplicates by tracking the set of distinct $\bm{\sigma}$ vectors encountered.</li>
-<li><strong>Autoregressive ordering limitation:</strong> The fixed processing order $(l_1, \ldots, l_{\beta_1})$ means that whether loop $l_i$ is directed depends only on which of $l_1, \ldots, l_{i-1}$ were flipped. Some ice states may require flip sequences that violate this ordering &mdash; e.g., a state reachable by flipping $l_5$ then $l_3$ may be invisible to the DFS because $l_3$ was not directed when it was processed at step 3 (before $l_5$ was flipped at step 5). This is the dominant cause of undercounting on even-degree periodic lattices (see independent verification below).</li>
-</ol>
-
-<table>
-<thead>
-<tr>
-  <th>Lattice</th>
-  <th>Size</th>
-  <th>BC</th>
-  <th>$\beta_1$</th>
-  <th>$2^{\beta_1}$</th>
-  <th>$\varepsilon_{\text{Pauling}}$</th>
-  <th>$\varepsilon(G)$</th>
-  <th>$|\mathcal{I}_{\text{DFS}}|$</th>
-  <th>$|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>Square</td><td>4&times;4</td><td>open</td><td>9</td><td>512</td><td>2,076</td><td>2,768</td><td>25</td><td>4.9%</td></tr>
-<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>17</td><td>131,072</td><td>657</td><td>2,970</td><td>40</td><td>0.03%</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>6</td><td>64</td><td>68</td><td>172</td><td>32</td><td>50%</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>13</td><td>8,192</td><td>130</td><td>600</td><td>172</td><td>2.1%</td></tr>
-<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>923</td><td>1,312</td><td>8</td><td>6.3%</td></tr>
-<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>112</td><td>0.04%</td></tr>
-<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>74,734</td><td>86,560</td><td>12</td><td>9.4%</td></tr>
-<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>4</td><td>0.0001%</td></tr>
-</tbody>
-</table>
-<p style="font-size: 0.9em;">&dagger; Lower bound only; backtracking search timed out at 120s.</p>
-
-<p>
-<strong>Independent verification: the $\varepsilon(G)$ column.</strong> The $\varepsilon(G)$ column shows the total number of ice states counted by an independent constraint-propagation backtracking algorithm (<code>scripts/verify_ice_counts.py</code>) that does not use the loop basis at all. It directly enumerates all $\bm{\sigma} \in \{+1,-1\}^{n_1}$ satisfying the ice rule $B_1 \bm{\sigma} = \mathbf{Q}_{\text{target}}$ for each valid charge sector, using BFS edge ordering and forward-checking to prune the search tree. For small lattices ($n_1 \leq 24$), brute-force enumeration of all $2^{n_1}$ configurations confirms exact agreement with the backtracking counts.
-</p>
-
-<p>
-<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice: independent verification finds $\varepsilon(G) = 2{,}768$ total ice states across all charge sectors, with the largest sector containing 64 states. Yet the autoregressive DFS finds only $|\mathcal{I}_{\text{DFS}}| = 25$ &mdash; just 39% of its own charge sector. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state. The 25 states found are independently confirmed by Mode&nbsp;A training achieving 25/25 state coverage with zero ice-rule violations.
-</p>
-
-<p>
-<strong>The autoregressive ordering gap.</strong> Comparing $\varepsilon(G)$ with $|\mathcal{I}_{\text{DFS}}|$ reveals a systematic pattern: the autoregressive DFS explores only a fraction of the true ice manifold, with the gap most dramatic for <strong>even-degree periodic lattices</strong>:
-</p>
-<ul>
-<li><strong>Square 4&times;4 periodic:</strong> $\varepsilon(G) = 2{,}970$ total states, but the DFS finds only 40 (1.3%). Since all vertices have $z = 4$ on the torus, there is only one charge sector &mdash; the 2,930 missing states are topologically reachable via loop flips but invisible to the fixed autoregressive ordering.</li>
-<li><strong>Kagome 2&times;2 periodic:</strong> $\varepsilon(G) = 600$ total, DFS finds 172 (29%). Again one charge sector on this even-degree torus.</li>
-<li><strong>Odd-degree lattices (open BC):</strong> For kagome 2&times;2 open, the DFS reaches 32 states, matching exactly the 32-state charge sector of its seed. The 6 charge sectors (34, 34, 32, 32, 20, 20 states) sum to $\varepsilon(G) = 172$. This sector-matching pattern also holds for shakti&nbsp;1&times;1 (3/3) and tetris&nbsp;2&times;2 (12 matching a sector of 34).</li>
-</ul>
-<p>
-The implication for Mode&nbsp;A training is significant: LoopMPVAN uses the same fixed autoregressive ordering as the DFS, so it can discover at most $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality. On even-degree periodic lattices, this represents a <em>fundamental sampling limitation of the autoregressive architecture</em>, not a training failure. Addressing it would require either (a)&nbsp;multiple passes with different loop orderings, (b)&nbsp;a non-autoregressive architecture, or (c)&nbsp;MCMC post-processing to escape the ordering constraint.
-</p>
-
-<p>
-Across lattices where the DFS count is reliable (open-BC with sector matching), the $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ ratio varies from 50% (kagome 2&times;2 open, where half of all $2^{\beta_1}$ combinations within a sector yield valid states) down to 0.0001% (tetris 3&times;3 open, where $\beta_1 = 22$ but only 4 of 4.2 million candidate states are found). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice.
-</p>
-
-<p>
-<strong>The Pauling column: why neither bound is tight at small sizes.</strong> The $\varepsilon_{\text{Pauling}}$ column (computed from <code>src/topology/ice_sampling.pauling_estimate()</code>) shows the Pauling approximation $\varepsilon_{\text{Pauling}} = 2^{n_1} \prod_v f(z_v)$, where $f(z_v) = \binom{z_v}{z_v/2}/2^{z_v}$ for even $z_v$ and $f(z_v) = 2\binom{z_v}{\lfloor z_v/2\rfloor}/2^{z_v}$ for odd $z_v$. The Pauling estimate counts from a <em>different starting point</em> than $2^{\beta_1}$: it starts with $2^{n_1}$ total edge configurations and filters by independent vertex constraints, while $2^{\beta_1}$ starts from the cycle-space dimension. For these small lattices, three surprises emerge:
-</p>
-<ol>
-<li><strong>Pauling can exceed $2^{\beta_1}$</strong> &mdash; dramatically so for shakti ($1.6 \times 10^9$ vs. 262k) and tetris 3&times;3 ($1.9 \times 10^{12}$ vs. 4.2M). These lattices have many low-coordination boundary vertices ($z = 1, 2$), which contribute weak per-vertex constraints to the Pauling product while not adding proportionally to $\beta_1$.</li>
-<li><strong>Pauling can be below $2^{\beta_1}$</strong> &mdash; for square 4&times;4 periodic (657 vs. 131k) and kagome 2&times;2 periodic (130 vs. 8,192). These uniform-$z$ periodic lattices have strong per-vertex constraints and large $\beta_1$ from the periodic topology.</li>
-<li><strong>Pauling tracks $\varepsilon(G)$ better than $2^{\beta_1}$ does</strong> &mdash; for uniform-$z$ periodic lattices, Pauling is within an order of magnitude of the verified $\varepsilon(G)$: Pauling gives 657 vs. $\varepsilon = 2{,}970$ for square 4&times;4 periodic, and 130 vs. 600 for kagome 2&times;2 periodic. By contrast, $2^{\beta_1}$ overshoots $\varepsilon(G)$ by 44&times; and 14&times; respectively. For open-BC mixed-coordination lattices, both Pauling and $2^{\beta_1}$ overestimate $\varepsilon(G)$ by large factors.</li>
-</ol>
-<p>
-The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices that are tractable for Mode&nbsp;A training, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count $\varepsilon(G)$. The independent backtracking enumeration (<code>scripts/verify_ice_counts.py</code>) is currently the most reliable method at these sizes.
-</p>
-
-<p>
-<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $\varepsilon(G) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states. For even-degree graphs (all $z_v$ even), every ice state is topologically reachable from any other via some sequence of loop flips &mdash; the ice manifold forms a single connected component under loop moves. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and loop flips connect only states within the same sector. The autoregressive DFS count $|\mathcal{I}_{\text{DFS}}|$ is a further restriction: it counts only states reachable via loop flips <em>in the fixed autoregressive order</em>. As the $\varepsilon(G)$ column demonstrates, $|\mathcal{I}_{\text{DFS}}| \leq \varepsilon_{\text{sector}} \leq \varepsilon(G)$, with the first inequality strict whenever the autoregressive ordering misses states that require out-of-order flips.
-</p>
-
-<p>
-<strong>Implications for neural sampling.</strong> For Mode&nbsp;A (LoopMPVAN), the autoregressive network must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\mathcal{I}_{\text{DFS}}|$ states is uniform. When $|\mathcal{I}_{\text{DFS}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task that REINFORCE training must solve. The training difficulty correlates with the DFS-reachable state count and the structure of the decision tree, not with $\beta_1$ alone. Crucially, Mode&nbsp;A can never discover more than $|\mathcal{I}_{\text{DFS}}|$ states regardless of training quality &mdash; sampling the full $\varepsilon(G)$ requires breaking the autoregressive ordering constraint. See <a href="mode-a-walkthrough.md">Mode A Walkthrough</a> and <a href="training-experiments.md">Training Experiments</a> for detailed results.
-</p>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 10: Worked Example -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- SECTION 9: Worked Example -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec9">9. Worked Example &mdash; 3&times;3 Periodic Square Lattice</h2>
+<h2 id="sec10">10. Worked Example &mdash; 3&times;3 Periodic Square Lattice</h2>
 
 <p>
 This section works through the <em>complete</em> computation on a $3 \times 3$ square lattice with periodic boundary conditions (a discrete torus). We compute every operator explicitly, verify all identities, and demonstrate each correspondence.
 </p>
 
-<h3>9.1 Lattice Setup</h3>
+<h3>10.1 Lattice Setup</h3>
 
 <p>
 <strong>Vertices:</strong> 9 vertices arranged on a $3\times 3$ grid, labeled $v_0, \ldots, v_8$ in row-major order:
@@ -2148,7 +2225,7 @@ with coordinates $v_k$ at position $(k \bmod 3,\; \lfloor k/3 \rfloor)$.
 
 <p><strong>Counts:</strong> $n_0 = 9$, $n_1 = 18$, $n_2 = 9$.</p>
 
-<h3>9.2 The Incidence Matrix $B_1$ (9&times;18)</h3>
+<h3>10.2 The Incidence Matrix $B_1$ (9&times;18)</h3>
 
 <p>
 Using $\eqref{eq:B1def}$: $[B_1]_{v,e} = +1$ if $v$ is the head of $e$, $-1$ if the tail.
@@ -2174,7 +2251,7 @@ $$
 <strong>Structure.</strong> Each column has exactly one $+1$ (head) and one $-1$ (tail). Each row (vertex) has exactly four nonzero entries ($z_v = 4$): two $+1$'s (edges arriving) and two $-1$'s (edges leaving), in the reference orientation. Every column sums to zero.
 </p>
 
-<h3>9.3 The Incidence Matrix $B_2$ (18&times;9)</h3>
+<h3>10.3 The Incidence Matrix $B_2$ (18&times;9)</h3>
 
 <p>
 Using $\eqref{eq:B2def}$: for face $f$ with CCW boundary cycle, $[B_2]_{e,f} = +1$ if edge $e$ is traversed in its reference direction, $-1$ if against.
@@ -2216,7 +2293,7 @@ $$
 
 <p><strong>Structure.</strong> Each column (face) has exactly four nonzero entries (the four boundary edges of the square), two $+1$'s and two $-1$'s. Each row (edge) appears in exactly two faces (on a torus), so has exactly two nonzero entries that sum to zero.</p>
 
-<h3>9.4 Verify $B_1 B_2 = 0$</h3>
+<h3>10.4 Verify $B_1 B_2 = 0$</h3>
 
 <p>
 The chain complex property $B_1 B_2 = 0$ must hold. We verify on face $f_0$ (the first column of $B_2$):
@@ -2236,7 +2313,7 @@ For each vertex row $v$, this sums $[B_1]_{v,e_0}(+1) + [B_1]_{v,e_3}(-1) + [B_1
 </ul>
 <p>The same holds for all other columns of $B_2$, confirming $B_1 B_2 = 0$. &check;</p>
 
-<h3>9.5 Graph Laplacian $L_0 = B_1 B_1^T$</h3>
+<h3>10.5 Graph Laplacian $L_0 = B_1 B_1^T$</h3>
 
 <p>
 On the periodic $3\times 3$ square lattice, every vertex has degree $z = 4$. The graph Laplacian is:
@@ -2266,7 +2343,7 @@ $$
 
 <p>$\beta_0 = 1$ (one zero eigenvalue, graph is connected). &check;</p>
 
-<h3>9.6 Betti Numbers and Euler Characteristic</h3>
+<h3>10.6 Betti Numbers and Euler Characteristic</h3>
 
 <p>
 <strong>Expected Betti numbers</strong> for the torus $T^2$: $\beta_0 = 1$, $\beta_1 = 2$, $\beta_2 = 1$.
@@ -2291,7 +2368,7 @@ $$
 $$
 <p>which splits as $\rank(B_2) + \beta_1 = 8 + 2 = 10$. &check;</p>
 
-<h3>9.7 The Hodge 1-Laplacian and Its Spectrum</h3>
+<h3>10.7 The Hodge 1-Laplacian and Its Spectrum</h3>
 
 <p>
 The full Hodge 1-Laplacian $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$ is $18 \times 18$. Rather than display the full matrix, we describe its spectral structure.
@@ -2330,7 +2407,7 @@ $$
 
 <p>The spectral gap of $L_1$ is $\Delta_1 = 3$ (the smallest nonzero eigenvalue).</p>
 
-<h3>9.8 The Two Harmonic Modes</h3>
+<h3>10.8 The Two Harmonic Modes</h3>
 
 <p>
 The two harmonic eigenvectors $\mathbf{h}_1, \mathbf{h}_2 \in \ker(L_1)$ correspond to the two independent non-contractible cycles on the torus:
@@ -2356,7 +2433,7 @@ $$
 
 <p>These two modes are orthogonal and span $\ker(L_1)$. They are the topologically protected degrees of freedom. No sequence of local operations (plaquette flips) can change the winding numbers.</p>
 
-<h3>9.9 An Ice-Rule Configuration and Its Hodge Decomposition</h3>
+<h3>10.9 An Ice-Rule Configuration and Its Hodge Decomposition</h3>
 
 <p>
 Consider the "all-right, all-up" configuration: every spin aligns with the reference orientation.
@@ -2384,7 +2461,7 @@ $$
 
 <p>This means $\bm{\sigma}_{\text{curl}} = \mathbf{0}$! The "all-right, all-up" configuration is <em>purely harmonic</em>. Physically: it has nonzero winding number in both directions and no local curl structure. This makes sense &mdash; it is the most "globally coherent" ice configuration.</p>
 
-<h3>9.10 A Monopole Excitation</h3>
+<h3>10.10 A Monopole Excitation</h3>
 
 <p>
 Starting from $\bm{\sigma}_0$, flip spin $e_0$ (the horizontal edge $v_0 \to v_1$): set $\sigma_{e_0} = -1$ (now pointing $v_1 \to v_0$). Call this $\bm{\sigma}_1$.
@@ -2409,7 +2486,7 @@ $$
 
 <p>Alternatively via the quadratic form: $\mathcal{H} = \frac{\epsilon}{2}\bm{\sigma}_1^T L_1^{\text{down}} \bm{\sigma}_1 = 4\epsilon$. The ice-rule configuration had $\mathcal{H} = 0$, so the monopole pair costs energy $4\epsilon$.</p>
 
-<h3>9.11 Verifying Nisoli's $S_{vv'}$ Matrix</h3>
+<h3>10.11 Verifying Nisoli's $S_{vv'}$ Matrix</h3>
 
 <p>
 For the all-right-all-up ice configuration $\bm{\sigma}_0$, we verify Key Result 1.
@@ -2435,14 +2512,14 @@ $$
 The complete $S$ matrix for this configuration has $S_{vv'} = +1$ for all neighbor pairs $(v, v')$ where $v'$ is to the right or above $v$ (following the spin direction), and $S_{vv'} = -1$ in the opposite direction.
 </p>
 
-<h3>9.12 Line Graph and $L_1^{\text{down}} = 2I - A_{L(G)}$</h3>
+<h3>10.12 Line Graph and $L_1^{\text{down}} = 2I - A_{L(G)}$</h3>
 
 <p>
 The <strong>line graph</strong> $L(G)$ of our $3\times 3$ torus has one vertex for each edge of $G$, so $|V(L(G))| = 18$. Two vertices of $L(G)$ are adjacent iff the corresponding edges of $G$ share a vertex. Since every vertex $v$ of $G$ has degree $z_v = 4$, it contributes a clique $K_4$ in $L(G)$ (all $\binom{4}{2} = 6$ pairs of its incident edges become adjacent). Total edges in $L(G)$: $\sum_v \binom{z_v}{2} = 9 \times 6 = 54$.
 </p>
 
 <p>
-By the line-graph dual identity (&sect;8.1), $L_1^{\text{down}} = B_1^T B_1 = 2I_{18} - A_{L(G)}$, so the adjacency matrix of $L(G)$ is:
+By the line-graph dual identity ($L_1^{\text{down}} = B_1^T B_1 = 2I - A_{\mathcal{L}(G)}$, which follows from the definition of line graph adjacency), $L_1^{\text{down}} = B_1^T B_1 = 2I_{18} - A_{L(G)}$, so the adjacency matrix of $L(G)$ is:
 </p>
 $$
 A_{L(G)} = 2I_{18} - L_1^{\text{down}}
@@ -2457,9 +2534,9 @@ $$
 
 <p>For a non-adjacent edge, say $e_4$ ($v_4 \to v_5$): column $e_4$ of $B_1$ has nonzeros only at rows $v_4$ and $v_5$, neither of which is $v_0$ or $v_1$. So $[B_1^T B_1]_{e_0,e_4} = 0$, and $[A_{L(G)}]_{e_0,e_4} = 0$. &check;</p>
 
-<p><strong>Frustration check.</strong> Each vertex $v$ with $z_v = 4$ contributes a $K_4$ clique in $L(G)$. $K_4$ contains triangles (odd cycles), so $L(G)$ is <strong>not bipartite</strong>. Since non-bipartiteness is the Ising frustration condition, every vertex with $z > 2$ generates frustration in the line graph. For our all-$z=4$ square torus, all 9 vertices contribute frustrated $K_4$ cliques, confirming the universal frustration theorem of &sect;8.2.</p>
+<p><strong>Frustration check.</strong> Each vertex $v$ with $z_v = 4$ contributes a $K_4$ clique in $L(G)$. $K_4$ contains triangles (odd cycles), so $L(G)$ is <strong>not bipartite</strong>. Since non-bipartiteness is the Ising frustration condition, every vertex with $z > 2$ generates frustration in the line graph. For our all-$z=4$ square torus, all 9 vertices contribute frustrated $K_4$ cliques, confirming the universal frustration property: every vertex with $z > 2$ generates frustrated cliques in the line graph.</p>
 
-<h3>9.13 Ice Degeneracy and Pauling Entropy</h3>
+<h3>10.13 Ice Degeneracy and Pauling Entropy</h3>
 
 <p>
 How many binary ($\pm 1$) spin configurations $\bm{\sigma} \in \{+1,-1\}^{18}$ satisfy the ice rule $B_1 \bm{\sigma} = \mathbf{0}$ on our $3\times 3$ torus?
@@ -2471,7 +2548,7 @@ We know $\dim(\ker B_1) = 10$, so the ice manifold is a 10-dimensional linear su
 
 <p><strong>Pauling estimate.</strong> Using the Pauling approximation for a lattice with uniform coordination $z = 4$:</p>
 $$
-\varepsilon_{\text{Pauling}} = 2^{n_1} \prod_v \frac{\binom{z_v}{z_v/2}}{2^{z_v}} = 2^{18} \cdot \left(\frac{\binom{4}{2}}{2^4}\right)^9 = 262144 \cdot \left(\frac{6}{16}\right)^9
+|\mathcal{I}_{\text{P}}| = 2^{n_1} \prod_v \frac{\binom{z_v}{z_v/2}}{2^{z_v}} = 2^{18} \cdot \left(\frac{\binom{4}{2}}{2^4}\right)^9 = 262144 \cdot \left(\frac{6}{16}\right)^9
 $$
 $$
 = 262144 \cdot \left(\frac{3}{8}\right)^9 = 262144 \cdot \frac{19683}{134217728} \approx 38.4
@@ -2479,7 +2556,7 @@ $$
 
 <p>The Pauling entropy per vertex:</p>
 $$
-s_{\text{Pauling}} = \frac{1}{N_v}\ln \varepsilon_{\text{Pauling}} = \frac{1}{9}\ln(38.4) \approx \frac{3.65}{9} \approx 0.405
+s_{\text{Pauling}} = \frac{1}{N_v}\ln |\mathcal{I}_{\text{P}}| = \frac{1}{9}\ln(38.4) \approx \frac{3.65}{9} \approx 0.405
 $$
 
 <p>
@@ -2488,18 +2565,18 @@ This is close to but below the exact Lieb result for the infinite square lattice
 
 <p><strong>The permanent formula.</strong> For a $z=4$ uniform lattice, Caravelli, Saccone &amp; Nisoli (2021) give:</p>
 $$
-\varepsilon(G) = \frac{\operatorname{perm}(A)}{\prod_v (z_v/2)!^2} = \frac{\operatorname{perm}(A)}{(2!)^{18}} = \frac{\operatorname{perm}(A)}{2^{18}}
+|\mathcal{I}| = \frac{\operatorname{perm}(A)}{\prod_v (z_v/2)!^2} = \frac{\operatorname{perm}(A)}{(2!)^{18}} = \frac{\operatorname{perm}(A)}{2^{18}}
 $$
 <p>
-where $A$ is the $9 \times 9$ adjacency matrix of our torus graph and the denominator uses $(z_v/2)! = 2! = 2$ at each of the 9 vertices, squared. Computing $\operatorname{perm}(A)$ exactly requires enumeration (or Ryser's formula), which we defer to the Stage 1 computational pipeline. The Bethe permanent provides a tractable lower bound (&sect;8.4).
+where $A$ is the $9 \times 9$ adjacency matrix of our torus graph and the denominator uses $(z_v/2)! = 2! = 2$ at each of the 9 vertices, squared. Computing $\operatorname{perm}(A)$ exactly requires enumeration (or Ryser's formula), which we defer to the Stage 1 computational pipeline. The Bethe permanent provides a tractable lower bound (&sect;5.5).
 </p>
 
-<p><strong>Key observation for the lattice zoo.</strong> Two lattices with the <em>same</em> degree sequence and the same $\dim(\ker B_1)$ can have <em>very different</em> $\varepsilon(G)$ values because the permanent depends on the detailed graph structure (which edges connect which vertices), not just on the degree sequence. This is the combinatorial level of the three-level capacity framework (&sect;8, Key Result 8). The Stage 1 computational pipeline will compute these values numerically across the Morrison et al. lattice zoo.</p>
+<p><strong>Key observation for the lattice zoo.</strong> Two lattices with the <em>same</em> degree sequence and the same $\dim(\ker B_1)$ can have <em>very different</em> $|\mathcal{I}|$ values because the permanent depends on the detailed graph structure (which edges connect which vertices), not just on the degree sequence. This is the combinatorial level of the three-level capacity framework (&sect;5, Key Result 8). The Stage 1 computational pipeline will compute these values numerically across the Morrison et al. lattice zoo.</p>
 
-<h3>9.14 Loop Basis and Reachable States on the 3&times;3 Torus</h3>
+<h3>10.14 Loop Basis and Reachable States on the 3&times;3 Torus</h3>
 
 <p>
-We can now apply the loop-basis parameterization of &sect;8.7 to our worked example. With <strong>no faces filled</strong> ($n_2 = 0$), the cycle-space dimension is:
+We can now apply the loop-basis parameterization of &sect;5.7 to our worked example. With <strong>no faces filled</strong> ($n_2 = 0$), the cycle-space dimension is:
 </p>
 
 $$
@@ -2507,11 +2584,11 @@ $$
 $$
 
 <p>
-This gives an upper bound of $2^{10} = 1024$ candidate ice states from the loop-flip parameterization. The Pauling estimate from &sect;9.13 gives $\varepsilon_{\text{Pauling}} \approx 38$ ice states. The ratio $38/1024 \approx 3.7\%$ is consistent with the general pattern of severe directed-cycle pruning observed across the lattice zoo (cf. the empirical table in &sect;8.8, where ratios range from 50% down to 0.0001%).
+This gives an upper bound of $2^{10} = 1024$ candidate ice states from the loop-flip parameterization. The Pauling estimate from &sect;10.13 gives $|\mathcal{I}_{\text{P}}| \approx 38$ ice states. The ratio $38/1024 \approx 3.7\%$ is consistent with the general pattern of severe directed-cycle pruning observed across the lattice zoo (cf. the empirical table in &sect;5.8, where ratios range from 50% down to 0.0001%).
 </p>
 
 <p>
-With <strong>all 9 faces filled</strong> ($n_2 = 9$), the situation changes. $B_2$ is now an $18 \times 9$ matrix, and the faces account for 8 of the 10 independent cycles (the 9 faces satisfy one linear relation, since the boundary of the entire torus is empty). This leaves $\beta_1 = 10 - 8 = 2$, and the two surviving harmonic modes are precisely the <strong>horizontal and vertical winding modes</strong> described in &sect;9.8 &mdash; the non-contractible cycles that wrap around the torus. These are the topologically protected modes that no amount of local smoothing can eliminate.
+With <strong>all 9 faces filled</strong> ($n_2 = 9$), the situation changes. $B_2$ is now an $18 \times 9$ matrix, and the faces account for 8 of the 10 independent cycles (the 9 faces satisfy one linear relation, since the boundary of the entire torus is empty). This leaves $\beta_1 = 10 - 8 = 2$, and the two surviving harmonic modes are precisely the <strong>horizontal and vertical winding modes</strong> described in &sect;10.8 &mdash; the non-contractible cycles that wrap around the torus. These are the topologically protected modes that no amount of local smoothing can eliminate.
 </p>
 
 <p>
@@ -2521,7 +2598,7 @@ This example illustrates the two extremes of the face-filling strategy: with no 
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 10 -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec10">10. Master Correspondence Table</h2>
+<h2 id="sec11">11. Master Correspondence Table</h2>
 
 <p>
 The following table summarizes all correspondences established in this document. Each row maps a concept between Nisoli's spin ice framework and TDL, with the section reference for the derivation.
@@ -2564,7 +2641,7 @@ The following table summarizes all correspondences established in this document.
   <td>Ice rule $|Q_v| = z_v \bmod 2$</td>
   <td>Divergence-free (even $z$) / affine coset (odd $z$)</td>
   <td>$\bm{\sigma} \in \ker(B_1)$ or $\bm{\sigma}_0 + \ker(B_1)$</td>
-  <td>&sect;4, &sect;5</td>
+  <td>&sect;4, &sect;5.3, &sect;8</td>
 </tr>
 <tr>
   <td>5</td>
@@ -2578,175 +2655,145 @@ The following table summarizes all correspondences established in this document.
   <td>Ice manifold $\mathcal{I}$</td>
   <td>$\ker(B_1)$ (even $z$) or coset $\bm{\sigma}_0 + \ker(B_1)$ (odd $z$)</td>
   <td>$\ker(B_1) = \im(B_2) \oplus \ker(L_1)$</td>
-  <td>&sect;5</td>
+  <td>&sect;5.3, &sect;8</td>
 </tr>
 <tr>
   <td>7</td>
   <td>Local plaquette flips</td>
   <td>Curl component $\im(B_2)$</td>
   <td>$B_2 \mathbf{y}$: circulations around faces</td>
-  <td>&sect;5</td>
+  <td>&sect;5.3, &sect;8</td>
 </tr>
 <tr>
   <td>8</td>
   <td>Topological winding modes</td>
   <td>Harmonic subspace $\ker(L_1)$</td>
   <td>$\dim = \beta_1$ (first Betti number)</td>
-  <td>&sect;5</td>
+  <td>&sect;5.3, &sect;8</td>
 </tr>
 <tr>
   <td>9</td>
   <td>Ground-state degeneracy</td>
   <td>$\dim(\ker B_1) = n_1 - n_0 + \beta_0$</td>
   <td>Splits: $\rank(B_2) + \beta_1$</td>
-  <td>&sect;5</td>
+  <td>&sect;5.3, &sect;8</td>
 </tr>
 <tr>
   <td>10</td>
   <td>Dumbbell Hamiltonian $\frac{\epsilon}{2}\sum_v Q_v^2$</td>
   <td>Quadratic form in $L_1^{\text{down}}$</td>
   <td>$\mathcal{H} = \frac{\epsilon}{2}\,\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$</td>
-  <td>&sect;6</td>
+  <td>&sect;8</td>
 </tr>
 <tr>
   <td>11</td>
   <td>Ground state ($E_{\min}$)</td>
   <td>$\ker(L_1^{\text{down}}) = \ker(B_1)$</td>
   <td>$E = 0$ (even $z$); $E = \frac{\epsilon}{2}\sum(z_v \bmod 2)$ (odd $z$)</td>
-  <td>&sect;6</td>
+  <td>&sect;8</td>
 </tr>
 <tr>
   <td>12</td>
   <td>Monopole excitation energy</td>
   <td>Spectral gap of $L_1^{\text{down}}$</td>
   <td>$E_{\min} \propto \lambda_{\min}(L_1^{\text{down}} |_{\im B_1^T})$</td>
-  <td>&sect;6</td>
+  <td>&sect;8</td>
 </tr>
 <tr>
   <td>13</td>
   <td>Discrete gradient $\nabla_{vv'}\varphi$</td>
   <td>Coboundary $d^0 = B_1^T$</td>
   <td>$(B_1^T \bm{\varphi})_e = \varphi_{\text{head}} - \varphi_{\text{tail}}$</td>
-  <td>&sect;7</td>
+  <td>&sect;8</td>
 </tr>
 <tr>
   <td>14</td>
   <td>Poisson equation on graph</td>
   <td>$L_0 = B_1 B_1^T = D - A$</td>
   <td>$L_0 \bm{\varphi} = \mathbf{q}$</td>
-  <td>&sect;7</td>
+  <td>&sect;8</td>
 </tr>
 <tr>
   <td>15</td>
   <td>Charge interaction kernel $L_0^{-1}$</td>
   <td>Pseudoinverse $L_0^+$</td>
   <td>$\langle q_v q_{v'}\rangle \propto [L_0^+]_{vv'}$</td>
-  <td>&sect;7</td>
+  <td>&sect;8</td>
 </tr>
+
+
 <tr>
   <td>16</td>
-  <td>Screened Green operator $\hat{G}$</td>
-  <td>Resolvent operator on graph</td>
-  <td>$\hat{G} = (\hat{L}_0 + \xi^{-2})^{-1}$</td>
-  <td>&sect;7</td>
-</tr>
-<tr>
-  <td>17</td>
-  <td>Correlation length $\xi = \sqrt{\epsilon/T}$</td>
-  <td>Interaction range parameter</td>
-  <td>$\xi \to \infty$: Coulomb; $\xi \to 0$: local</td>
-  <td>&sect;7</td>
-</tr>
-<tr>
-  <td>18</td>
   <td>Extensive degeneracy (frustrated lattice)</td>
   <td>Large $\dim(\ker B_1)$ / topological channel capacity</td>
   <td>$\dim(\ker B_1) = n_1 - n_0 + \beta_0$; protected fraction $= 1 - 2/\bar{z}$</td>
   <td>&sect;5, &sect;8</td>
 </tr>
+
+
+
 <tr>
-  <td>19</td>
-  <td>Lower Hodge Laplacian $L_1^{\text{down}} = B_1^T B_1$</td>
-  <td>Kirchhoff matrix of line graph: $L_1^{\text{down}} = 2I - A_{L(G)}$</td>
-  <td>$[L_1^{\text{down}}]_{ee'} = \begin{cases} 2 & e = e' \\ -1 & e,e' \text{ share vertex} \\ 0 & \text{else} \end{cases}$</td>
-  <td>&sect;8.1</td>
-</tr>
-<tr>
-  <td>20</td>
-  <td>Spin ice frustration (vertex rule violation)</td>
-  <td>Odd cliques in line graph $L(G)$</td>
-  <td>$z_v > 2 \Rightarrow K_{z_v}$ in $L(G)$ is frustrated (odd cycles)</td>
-  <td>&sect;8.2</td>
-</tr>
-<tr>
-  <td>21</td>
-  <td>Universal frustration theorem</td>
-  <td>Non-bipartiteness of $L(G)$</td>
-  <td>All ASI with $z_v > 2$ are frustrated; only $z=2$ (1D chain) is non-degenerate</td>
-  <td>&sect;8.2</td>
-</tr>
-<tr>
-  <td>22</td>
-  <td>Ice degeneracy $\varepsilon(G)$</td>
+  <td>17</td>
+  <td>Ice degeneracy $|\mathcal{I}|$</td>
   <td>$|\ker(B_1) \cap \{+1,-1\}^{n_1}|$</td>
-  <td>$\varepsilon(G) = \operatorname{perm}(A)/\prod_v (z_v/2)!^2$ (even $z$)</td>
-  <td>&sect;8.4</td>
+  <td>$|\mathcal{I}| = \operatorname{perm}(A)/\prod_v (z_v/2)!^2$ (even $z$)</td>
+  <td>&sect;5.5</td>
 </tr>
 <tr>
-  <td>23</td>
-  <td>Pauling entropy $s(G) = \ln\varepsilon / N_v$</td>
+  <td>18</td>
+  <td>Pauling entropy $s(G) = \ln|\mathcal{I}| / N_v$</td>
   <td>Combinatorial density of ice states in $\ker(B_1)$</td>
   <td>$s_{\text{square}} \approx 0.431$; $s_{\text{kagome}} \approx 0.502$; varies by lattice</td>
-  <td>&sect;8.3</td>
+  <td>&sect;5.5</td>
 </tr>
 <tr>
-  <td>24</td>
+  <td>19</td>
   <td>Bethe permanent (BP fixed point)</td>
   <td>GNN message-passing equilibrium</td>
   <td>$\operatorname{Bethe\text{-}perm}(A) \leq \operatorname{perm}(A)$ (Gurvits bound)</td>
-  <td>&sect;8.4, &sect;8.5</td>
+  <td>&sect;5.5, &sect;5.9</td>
 </tr>
 <tr>
-  <td>25</td>
+  <td>20</td>
   <td>Belief propagation on ice graph</td>
   <td>GNN message passing on line graph</td>
   <td>$m_{e \to v}^{(t+1)} = f\!\big(\sum_{e' \in \mathcal{N}(e)\setminus v} m_{e' \to v}^{(t)}\big)$</td>
-  <td>&sect;8.5</td>
+  <td>&sect;5.9</td>
 </tr>
 <tr>
-  <td>26</td>
+  <td>21</td>
   <td>Gauge freedom (reference orientation choice)</td>
   <td>Orientation equivariance in SCNNs</td>
   <td>$B_1 \mapsto B_1 G$, $\bm{\sigma} \mapsto G^{-1}\bm{\sigma}$, with $G = \text{diag}(\pm1)$</td>
-  <td>&sect;8.6</td>
+  <td>&sect;9</td>
 </tr>
 <tr>
-  <td>27</td>
+  <td>22</td>
   <td>Three levels of ice-manifold structure</td>
   <td>Three levels of edge-signal capacity</td>
-  <td>Topological ($\dim \ker B_1$), Combinatorial ($\varepsilon(G)$), Spectral ($\{\lambda_i(L_1^{\text{down}})\}$)</td>
-  <td>&sect;8 (Key Result)</td>
+  <td>Topological ($\dim \ker B_1$), Combinatorial ($|\mathcal{I}|$), Spectral ($\{\lambda_i(L_1^{\text{down}})\}$)</td>
+  <td>&sect;5.9</td>
 </tr>
 <tr>
-  <td>28</td>
+  <td>23</td>
   <td>Loop-flip parameterization</td>
   <td>$\mathrm{GF}(2)$ encoding over cycle basis</td>
   <td>$\bm{\sigma} = \bm{\sigma}_{\text{seed}} \odot (-1)^{\sum_i \alpha_i \mathbf{l}_i}$, $\bm{\alpha} \in \{0,1\}^{\beta_1}$</td>
-  <td>&sect;8.7</td>
+  <td>&sect;5.7</td>
 </tr>
 <tr>
-  <td>29</td>
+  <td>24</td>
   <td>Directed-cycle constraint</td>
   <td>Decision-tree pruning of loop-flip space</td>
-  <td>$|\mathcal{I}_{\text{DFS}}| \leq \varepsilon(G) \leq 2^{\beta_1}$</td>
-  <td>&sect;8.8</td>
+  <td>$|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}| \leq 2^{\beta_1}$</td>
+  <td>&sect;5.8</td>
 </tr>
 <tr>
-  <td>30</td>
+  <td>25</td>
   <td>Autoregressive ordering gap</td>
   <td>Fixed-order DFS undercounts ice manifold</td>
-  <td>$|\mathcal{I}_{\text{DFS}}|/\varepsilon(G)$ ranges from 1.3% (periodic) to 100% (open, sector-matched)</td>
-  <td>&sect;8.8</td>
+  <td>$|\mathcal{I}_{\text{DFS}}|/|\mathcal{I}|$ ranges from 1.3% (periodic) to 100% (open, sector-matched)</td>
+  <td>&sect;5.8</td>
 </tr>
 </tbody>
 </table>
@@ -2765,13 +2812,13 @@ Caravelli, Saccone &amp; Nisoli (2021), <em>On the Degeneracy of Spin Ice Graphs
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 11: Summary -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<h2 id="sec11">11. Summary of Established Results</h2>
+<h2 id="sec12">12. Summary of Established Results</h2>
 
 <p>
 This document has established a precise, equation-level bridge between two independently developed mathematical frameworks. We summarize the key results and their status.
 </p>
 
-<h3>11.1 Rigorous Identities</h3>
+<h3>12.1 Rigorous Identities</h3>
 
 <p>The following correspondences are <strong>exact mathematical identities</strong>, proven in full with worked examples:</p>
 
@@ -2780,20 +2827,20 @@ This document has established a precise, equation-level bridge between two indep
 
 <li><strong>Topological charge = boundary operator</strong> (&sect;4). The charge vector $\mathbf{Q} = B_1 \bm{\sigma}$ is the image of the 1-cochain under the boundary map. Charge conservation follows from $\mathbf{1}^T B_1 = \mathbf{0}$ (Key Result 2).</li>
 
-<li><strong>Ice manifold = $\ker(B_1)$</strong> (&sect;5). The ice rule $Q_v = 0$ at every vertex is $\bm{\sigma} \in \ker(B_1)$, which decomposes via Hodge as $\ker(B_1) = \im(B_2) \oplus \ker(L_1)$. The dimension $\dim(\ker B_1) = n_1 - n_0 + \beta_0$ is independent of face-filling; the split into curl and harmonic components depends on $B_2$ (Key Result 3).</li>
+<li><strong>Ice manifold = $\ker(B_1)$</strong> (&sect;5.3, &sect;6). The ice rule $Q_v = 0$ at every vertex is $\bm{\sigma} \in \ker(B_1)$, which decomposes via Hodge as $\ker(B_1) = \im(B_2) \oplus \ker(L_1)$. The dimension $\dim(\ker B_1) = n_1 - n_0 + \beta_0$ is independent of face-filling; the split into curl and harmonic components depends on $B_2$ (Key Result 3).</li>
 
-<li><strong>Hamiltonian = quadratic form in $L_1^{\text{down}}$</strong> (&sect;6). The dumbbell Hamiltonian $\mathcal{H} = (\epsilon/2)\|\mathbf{Q}\|^2 = (\epsilon/2)\,\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$. Ground states are $\ker(L_1^{\text{down}}) = \ker(B_1)$. The monopole energy gap is the spectral gap of $L_1^{\text{down}}$ (Key Result 4).</li>
+<li><strong>Hamiltonian = quadratic form in $L_1^{\text{down}}$</strong> (&sect;7). The dumbbell Hamiltonian $\mathcal{H} = (\epsilon/2)\|\mathbf{Q}\|^2 = (\epsilon/2)\,\bm{\sigma}^T L_1^{\text{down}} \bm{\sigma}$. Ground states are $\ker(L_1^{\text{down}}) = \ker(B_1)$. The monopole energy gap is the spectral gap of $L_1^{\text{down}}$ (Key Result 4).</li>
 
-<li><strong>Entropic field theory = discrete Poisson</strong> (&sect;7). Nisoli's gradient, Poisson equation, and screened Green operator map exactly to $B_1^T$, $L_0 = B_1 B_1^T$, and the resolvent $(L_0 + \xi^{-2})^{-1}$ (Key Result 5).</li>
+<li><strong>Entropic field theory = discrete Poisson</strong> (&sect;8). Nisoli's gradient and Poisson equation map exactly to $B_1^T$ and $L_0 = B_1 B_1^T$ (Key Result 5).</li>
 
-<li><strong>Line graph dual</strong> (&sect;8). $L_1^{\text{down}} = 2I - A_{L(G)}$: the lower Hodge Laplacian is the Kirchhoff matrix of the line graph. All vertices with $z > 2$ generate frustrated cliques, and only the 1D chain is non-degenerate (Key Result 8).</li>
+<li><strong>Coulomb classes, degeneracy, and capacity</strong> (&sect;5). Nisoli's charge equivalence partitions configuration space into Coulomb classes (affine cosets of $\ker(B_1)$). The three-level capacity framework (Key Result 8, &sect;5.9) distinguishes topological ($\dim\ker B_1$), combinatorial ($|\mathcal{I}|$, Pauling entropy), and spectral capacity.</li>
 
-<li><strong>Loop-basis parameterization, directed-cycle bound, and autoregressive gap</strong> (&sect;8.7&ndash;8.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving $|\mathcal{I}_{\text{DFS}}| \leq \varepsilon(G) \leq 2^{\beta_1}$. The directed-cycle constraint prunes the upper bound exponentially (Key Results 9, 10), and the fixed autoregressive ordering introduces a further gap: independently verified total counts $\varepsilon(G)$ exceed the DFS-reachable count by up to 74&times; on even-degree periodic lattices.</li>
+<li><strong>Loop-basis parameterization, directed-cycle bound, and autoregressive gap</strong> (&sect;5.7&ndash;5.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving $|\mathcal{I}_{\text{DFS}}| \leq |\mathcal{I}| \leq 2^{\beta_1}$. The directed-cycle constraint prunes the upper bound exponentially (Key Results 9, 10), and the fixed autoregressive ordering introduces a further gap: independently verified total counts $|\mathcal{I}|$ exceed the DFS-reachable count by up to 74&times; on even-degree periodic lattices.</li>
 </ol>
 
-<h3>11.2 Quantitative Framework</h3>
+<h3>12.2 Quantitative Framework</h3>
 
-<p>The three-level capacity framework (&sect;8, Key Result 8) organizes the structure of the ice manifold $\ker(B_1) \cap \{+1,-1\}^{n_1}$ into three independently measurable quantities:</p>
+<p>The three-level capacity framework (&sect;5.9, Key Result 8) organizes the structure of the ice manifold $\ker(B_1) \cap \{+1,-1\}^{n_1}$ into three independently measurable quantities:</p>
 
 <table>
 <thead>
@@ -2808,7 +2855,7 @@ This document has established a precise, equation-level bridge between two indep
 </tr>
 <tr>
   <td><strong>Combinatorial</strong></td>
-  <td>$\varepsilon(G) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$</td>
+  <td>$|\mathcal{I}| = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$</td>
   <td>Number of binary ice states (Pauling entropy)</td>
   <td><strong>Yes</strong> &mdash; depends on graph structure, not just degrees</td>
 </tr>
@@ -2820,14 +2867,14 @@ This document has established a precise, equation-level bridge between two indep
 </tr>
 <tr>
   <td><strong>Directed-cycle + autoregressive</strong></td>
-  <td>$|\mathcal{I}_{\text{DFS}}| / \varepsilon(G)$</td>
+  <td>$|\mathcal{I}_{\text{DFS}}| / |\mathcal{I}|$</td>
   <td>Fraction of total ice states reachable by fixed-order autoregressive DFS</td>
   <td><strong>Yes</strong> &mdash; ranges from 100% (open-BC sector match) to 1.3% (even-degree periodic); determines Mode&nbsp;A sampling ceiling</td>
 </tr>
 </tbody>
 </table>
 
-<h3>11.3 Open Questions</h3>
+<h3>12.3 Open Questions</h3>
 
 <p>
 The mathematical bridge established here is <em>structural</em>: it translates objects and identities from one framework to the other without loss. What remains open is the question of <strong>utility</strong>: how should this bridge be exploited to design better graph neural network architectures?
@@ -2835,17 +2882,18 @@ The mathematical bridge established here is <em>structural</em>: it translates o
 
 <p>Several directions are under investigation:</p>
 <ul>
-<li><strong>Does higher Pauling entropy (combinatorial level) confer advantages in GNNs?</strong> Two graphs with identical degree sequences and identical $\dim(\ker B_1)$ can have very different $\varepsilon(G)$. Does this matter for learning?</li>
+<li><strong>Does higher Pauling entropy (combinatorial level) confer advantages in GNNs?</strong> Two graphs with identical degree sequences and identical $\dim(\ker B_1)$ can have very different $|\mathcal{I}|$. Does this matter for learning?</li>
 <li><strong>Does spectral structure (flat bands, small gaps) affect feature propagation?</strong> The eigenvalue distribution of $L_1^{\text{down}}$ governs both the energy landscape of spin ice excitations and the filtering behavior of Hodge-domain neural networks. Frustrated lattices tend to have richer spectral structure (more flat bands, smaller gaps). The computational catalog from Stage 1 will quantify this across the Morrison et al. lattice zoo.</li>
-<li><strong>Is the BP &harr; GNN message-passing parallel actionable?</strong> The structural similarity between belief propagation on the ice graph and message passing on the line graph (&sect;8.5) suggests that physical insights about convergence, fixed points, and approximation quality might transfer. This remains speculative.</li>
-<li><strong>What role does orientation equivariance play?</strong> The gauge freedom of spin ice (&sect;8.6) maps to orientation equivariance in simplicial neural networks. Architectures that respect this symmetry may generalize better on edge-signal tasks.</li>
-<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;8.8), from 50% on kagome to $10^{-6}$ on tetris. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
-<li><strong>Can the autoregressive ordering gap be closed?</strong> Independent verification (&sect;8.8) shows that the fixed-order autoregressive DFS misses the majority of ice states on even-degree periodic lattices (e.g., 40 of 2,970 for square 4&times;4 periodic). Since all states are topologically connected by loop flips, a multi-pass or non-autoregressive architecture could in principle reach the full $\varepsilon(G)$. What is the minimal modification to the LoopMPVAN architecture that achieves this?</li>
+<li><strong>Is the BP &harr; GNN message-passing parallel actionable?</strong> The structural similarity between belief propagation on the ice graph and message passing on the line graph (&sect;5.9) suggests that physical insights about convergence, fixed points, and approximation quality might transfer. This remains speculative.</li>
+<li><strong>What role does orientation equivariance play?</strong> The gauge freedom of spin ice (&sect;9) maps to orientation equivariance in simplicial neural networks. Architectures that respect this symmetry may generalize better on edge-signal tasks.</li>
+<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;5.8), from 50% on kagome to $10^{-6}$ on tetris. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
+<li><strong>Can the autoregressive ordering gap be closed?</strong> Independent verification (&sect;5.8) shows that the fixed-order autoregressive DFS misses the majority of ice states on even-degree periodic lattices (e.g., 40 of 2,970 for square 4&times;4 periodic). Since all states are topologically connected by loop flips, a multi-pass or non-autoregressive architecture could in principle reach the full $|\mathcal{I}|$. What is the minimal modification to the LoopMPVAN architecture that achieves this?</li>
 </ul>
 
 <p>
 The immediate next step is the <strong>Stage 1 computational pipeline</strong>: construct all eight lattice types from the Morrison et al. zoo as simplicial complexes, compute their full spectral catalogs ($L_0$, $L_1^{\text{down}}$, $L_1$, Betti numbers, harmonic bases), and tabulate the quantities in the framework above. Numerical results may suggest which direction is most promising.
 </p>
+
 
 <hr style="margin-top:3rem;">
 
