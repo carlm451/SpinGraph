@@ -1494,6 +1494,396 @@ We would welcome critical feedback on any of the formalism or the neural
 sampling ideas, and especially on whether we have the ASI physics right.
 
 % ===================================================================
+% APPENDICES
+% ===================================================================
+\appendix
+
+\section{Worked Example: Triangle Graph \texorpdfstring{$K_3$}{K3}}
+\label{app:triangle}
+
+This appendix works through the $S$ matrix (\cref{kr:S_matrix}), topological
+charge (\cref{kr:charge}), and Hamiltonian (\cref{kr:hamiltonian})
+correspondences on the smallest nontrivial graph.
+
+\subsection{Setup}
+
+The triangle graph $K_3$ has $n_0 = 3$ vertices $\{v_0, v_1, v_2\}$ and
+$n_1 = 3$ edges with reference orientations:
+$e_0\!: v_0 \to v_1$,\;
+$e_1\!: v_0 \to v_2$,\;
+$e_2\!: v_2 \to v_1$.
+
+The incidence matrix is
+\begin{equation}
+  B_1 = \begin{pmatrix}
+    -1 & -1 &  0 \\
+    +1 &  0 & +1 \\
+     0 & +1 & -1
+  \end{pmatrix}
+  \quad
+  \begin{array}{l}
+    \leftarrow v_0 \\ \leftarrow v_1 \\ \leftarrow v_2
+  \end{array}
+  \label{eq:B1_triangle}
+\end{equation}
+with columns indexed by $e_0, e_1, e_2$.  Each column has one $+1$ (head)
+and one $-1$ (tail), and every column sums to zero.
+
+Choose the spin configuration $\bm\sigma = (+1,\,+1,\,-1)^T$: spins on
+$e_0$ and $e_1$ align with the reference orientation (pointing away from
+$v_0$), while the spin on $e_2$ opposes it (pointing $v_1 \to v_2$).
+This is a ``source'' configuration at $v_0$.
+
+\subsection{\texorpdfstring{$S_{vv'}$}{S} matrix (Key Result~\ref{kr:S_matrix})}
+
+Using $S_{ww'} = -[B_1]_{w,e}\,\sigma_e$ for adjacent $w, w'$ sharing
+edge~$e$:
+\begin{align*}
+  S_{v_0 v_1} &= -[B_1]_{v_0,e_0}\,\sigma_{e_0}
+  = -(-1)(+1) = +1, \\
+  S_{v_0 v_2} &= -[B_1]_{v_0,e_1}\,\sigma_{e_1}
+  = -(-1)(+1) = +1, \\
+  S_{v_2 v_1} &= -[B_1]_{v_2,e_2}\,\sigma_{e_2}
+  = -(-1)(-1) = -1.
+\end{align*}
+By antisymmetry, the full matrix is
+\begin{equation}
+  S = \begin{pmatrix}
+     0 & +1 & +1 \\
+    -1 &  0 & +1 \\
+    -1 & -1 &  0
+  \end{pmatrix}.
+\end{equation}
+
+\paragraph{Matrix-formula verification.}
+We verify~\eqref{eq:Smatrix} by computing
+$M = |B_1|\,D_\sigma\,B_1^T$ where $D_\sigma = \diag(+1,+1,-1)$:
+\begin{equation}
+  |B_1| = \begin{pmatrix}
+    1 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 1
+  \end{pmatrix},
+  \quad
+  D_\sigma B_1^T = \begin{pmatrix}
+    -1 & +1 &  0 \\
+    -1 &  0 & +1 \\
+     0 & -1 & +1
+  \end{pmatrix}.
+\end{equation}
+Then $M = |B_1|\,(D_\sigma B_1^T)$:
+\begin{equation}
+  M = \begin{pmatrix}
+    -2 & +1 & +1 \\
+    -1 &  0 & +1 \\
+    -1 & -1 & +2
+  \end{pmatrix}.
+\end{equation}
+The diagonal gives the charges:
+$\diag(M) = (-2,\,0,\,+2) = \mathbf{Q}$.
+The skew-symmetrization $\tfrac{1}{2}(M - M^T) = S$.~$\checkmark$
+
+\subsection{Topological charge (Key Result~\ref{kr:charge})}
+
+\begin{equation}
+  \mathbf{Q} = B_1\bm\sigma
+  = \begin{pmatrix} -1-1+0 \\ +1+0-1 \\ 0+1+1 \end{pmatrix}
+  = \begin{pmatrix} -2 \\ 0 \\ +2 \end{pmatrix}.
+\end{equation}
+$v_0$ is a negative monopole (source, $Q = -2$); $v_1$ satisfies the ice
+rule ($Q = 0$); $v_2$ is a positive monopole (sink, $Q = +2$).  Total
+charge: $\sum_v Q_v = 0$.~$\checkmark$
+
+\paragraph{Ice manifold.}
+$\dim(\ker B_1) = n_1 - n_0 + 1 = 1$.  A basis vector is
+$\bm\sigma_{\text{ice}} = (+1,\,-1,\,-1)^T$ (a clockwise circulation:
+$v_0 \to v_1 \to v_2 \to v_0$, every vertex has one spin in and one out).
+The full ice manifold on $K_3$ is
+$\calI = \{(+1,-1,-1),\;(-1,+1,+1)\}$---the two circulations.
+
+\paragraph{Coulomb classes.}
+$K_3$ has $2^3 = 8$ spin configurations partitioned into four Coulomb
+classes:
+$C_{\mathbf{0}} = \{(\pm 1,\mp 1,\mp 1)\}$ (two ice states),
+and three monopole classes of two configurations each.
+
+\subsection{Hamiltonian (Key Result~\ref{kr:hamiltonian})}
+
+\begin{equation}
+  L_1^{\text{down}} = B_1^T B_1
+  = \begin{pmatrix} 2 & 1 & 1 \\ 1 & 2 & -1 \\ 1 & -1 & 2 \end{pmatrix}.
+\end{equation}
+
+\textbf{Non-ice configuration} $\bm\sigma = (+1,+1,-1)^T$
+($\mathbf{Q} = (-2,0,+2)^T$):
+\begin{equation}
+  \bm\sigma^T L_1^{\text{down}}\bm\sigma
+  = \|\mathbf{Q}\|^2 = 4 + 0 + 4 = 8,
+  \qquad
+  \calH = \tfrac{\epsilon}{2}\cdot 8 = 4\epsilon.
+\end{equation}
+
+\textbf{Ice configuration} $\bm\sigma_{\text{ice}} = (+1,-1,-1)^T$:
+\begin{equation}
+  B_1\bm\sigma_{\text{ice}} = \mathbf{0},
+  \qquad
+  \calH_{\text{ice}} = 0.\;\checkmark
+\end{equation}
+
+\textbf{Spectrum of $L_1^{\text{down}}$.}  The eigenvalues are
+$\{0, 3, 3\}$: one zero eigenvalue ($\beta_1 = 1$, the ice manifold) and
+a doubly-degenerate spectral gap $\Delta = 3$.  The minimum monopole pair
+energy is $\calH_{\min} = (\epsilon/2)\cdot\Delta\cdot c_{\min}^2$ where
+$c_{\min}^2$ is the smallest nonzero squared expansion coefficient.
+
+
+% -------------------------------------------------------------------
+\section{Worked Example: \texorpdfstring{$3\times 3$}{3x3} Periodic Square Lattice}
+\label{app:torus}
+
+This appendix works through the full computation on a $3\times 3$ square
+lattice with periodic boundary conditions (a discrete torus), producing
+every matrix and eigenvalue explicitly.
+
+\subsection{Lattice setup}
+
+\textbf{Vertices:} 9 vertices on a $3\times 3$ grid, labeled $v_0,\ldots,v_8$
+in row-major order with coordinates $v_k$ at
+$(k\bmod 3,\;\lfloor k/3\rfloor)$.
+
+\textbf{Periodic BCs:} Right wraps to left
+($v_2 \sim v_0$, $v_5 \sim v_3$, $v_8 \sim v_6$);
+top wraps to bottom
+($v_6 \sim v_0$, $v_7 \sim v_1$, $v_8 \sim v_2$).
+Topologically a torus~$T^2$.
+
+\textbf{Edges:} $n_1 = 18$ (9~horizontal $+$ 9~vertical).
+Reference orientation: horizontal edges point right, vertical edges point up.
+Wrap-around edges: $e_2 (v_2\!\to\!v_0)$, $e_5 (v_5\!\to\!v_3)$,
+$e_8 (v_8\!\to\!v_6)$, $e_{15} (v_6\!\to\!v_0)$,
+$e_{16} (v_7\!\to\!v_1)$, $e_{17} (v_8\!\to\!v_2)$.
+
+\textbf{Faces:} $n_2 = 9$ unit squares, all oriented counterclockwise.
+
+\textbf{Counts:} $n_0 = 9$, $n_1 = 18$, $n_2 = 9$.  All vertices have
+coordination $z_v = 4$.
+
+\subsection{Incidence matrix \texorpdfstring{$B_1$}{B1} \texorpdfstring{$(9\times 18)$}{(9x18)}}
+
+Using the convention $[B_1]_{v,e} = +1$ at the head, $-1$ at the tail:
+
+{\small
+\begin{equation}
+B_1 = \left(\begin{array}{@{}rrrrrrrrrrrrrrrrrr@{}}
+-1 &  0 &  1 &  0 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 \\
+ 1 & -1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 \\
+ 0 &  1 & -1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  1 \\
+ 0 &  0 &  0 & -1 &  0 &  1 &  0 &  0 &  0 &  1 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 \\
+ 0 &  0 &  0 &  1 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 & -1 &  0 &  0 &  0 &  0 \\
+ 0 &  0 &  0 &  0 &  1 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 & -1 &  0 &  0 &  0 \\
+ 0 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  1 &  0 &  0 &  0 &  1 &  0 &  0 & -1 &  0 &  0 \\
+ 0 &  0 &  0 &  0 &  0 &  0 &  1 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 & -1 &  0 \\
+ 0 &  0 &  0 &  0 &  0 &  0 &  0 &  1 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 & -1
+\end{array}\right)
+\label{eq:B1_torus}
+\end{equation}
+}
+
+Each column has one $+1$ and one $-1$; each row has four nonzero entries
+(two $+1$, two $-1$) reflecting $z_v = 4$.
+
+\subsection{Incidence matrix \texorpdfstring{$B_2$}{B2} \texorpdfstring{$(18\times 9)$}{(18x9)}}
+
+For face~$f_j$ with CCW boundary, $[B_2]_{e,f} = +1$ if edge~$e$ is
+traversed in its reference direction, $-1$ if against.  For example,
+$f_0$ has boundary $+e_0,+e_{10},-e_3,-e_9$:
+
+{\small
+\begin{equation}
+B_2 = \left(\begin{array}{@{}rrrrrrrrr@{}}
+ 1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 \\
+ 0 &  1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 \\
+ 0 &  0 &  1 &  0 &  0 &  0 &  0 &  0 & -1 \\
+-1 &  0 &  0 &  1 &  0 &  0 &  0 &  0 &  0 \\
+ 0 & -1 &  0 &  0 &  1 &  0 &  0 &  0 &  0 \\
+ 0 &  0 & -1 &  0 &  0 &  1 &  0 &  0 &  0 \\
+ 0 &  0 &  0 & -1 &  0 &  0 &  1 &  0 &  0 \\
+ 0 &  0 &  0 &  0 & -1 &  0 &  0 &  1 &  0 \\
+ 0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  1 \\
+-1 &  0 &  1 &  0 &  0 &  0 &  0 &  0 &  0 \\
+ 1 & -1 &  0 &  0 &  0 &  0 &  0 &  0 &  0 \\
+ 0 &  1 & -1 &  0 &  0 &  0 &  0 &  0 &  0 \\
+ 0 &  0 &  0 & -1 &  0 &  1 &  0 &  0 &  0 \\
+ 0 &  0 &  0 &  1 & -1 &  0 &  0 &  0 &  0 \\
+ 0 &  0 &  0 &  0 &  1 & -1 &  0 &  0 &  0 \\
+ 0 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  1 \\
+ 0 &  0 &  0 &  0 &  0 &  0 &  1 & -1 &  0 \\
+ 0 &  0 &  0 &  0 &  0 &  0 &  0 &  1 & -1
+\end{array}\right)
+\label{eq:B2_torus}
+\end{equation}
+}
+
+Each column (face) has four nonzero entries; each row (edge) appears in
+exactly two faces.
+
+\subsection{Verification: \texorpdfstring{$B_1 B_2 = 0$}{B1 B2 = 0}}
+
+We verify on face~$f_0$ (first column of $B_2$, nonzero at
+$e_0 (+1)$, $e_3 (-1)$, $e_9 (-1)$, $e_{10} (+1)$).
+For each vertex:
+\begin{align*}
+  v_0 &: (-1)(+1) + 0(-1) + (-1)(-1) + 0(+1) = -1+1 = 0, \\
+  v_1 &: (+1)(+1) + 0(-1) + 0(-1) + (-1)(+1) = 1-1 = 0, \\
+  v_3 &: 0(+1) + (-1)(-1) + (+1)(-1) + 0(+1) = 1-1 = 0, \\
+  v_4 &: 0(+1) + (+1)(-1) + 0(-1) + (+1)(+1) = -1+1 = 0.
+\end{align*}
+All other vertices have no incident edges in~$f_0$.
+The same holds for all columns: $B_1 B_2 = 0$.~$\checkmark$
+
+\subsection{Graph Laplacian \texorpdfstring{$L_0$}{L0} and its spectrum}
+
+With $z_v = 4$ everywhere, $L_0 = 4I_9 - A$.  The eigenvalues of the
+$3\times 3$ torus are
+\begin{equation}
+  \lambda_{jk} = 2\bigl(2 - \cos(2\pi j/3) - \cos(2\pi k/3)\bigr),
+  \quad j,k \in \{0,1,2\},
+\end{equation}
+giving spectrum $\{0,\, 3^{(\times 4)},\, 6^{(\times 4)}\}$.
+Spectral gap $\lambda_1 = 3$; one zero eigenvalue confirms
+$\beta_0 = 1$.~$\checkmark$
+
+\subsection{Betti numbers and Euler characteristic}
+
+Expected for the torus $T^2$: $\beta_0 = 1$, $\beta_1 = 2$, $\beta_2 = 1$.
+
+\textbf{Euler characteristic:}
+\begin{equation}
+  \chi = n_0 - n_1 + n_2 = 9 - 18 + 9 = 0
+  = \beta_0 - \beta_1 + \beta_2 = 1 - 2 + 1.\;\checkmark
+\end{equation}
+
+\textbf{Rank check:}
+\begin{equation}
+  \beta_1 = n_1 - \rank(B_1) - \rank(B_2) = 18 - 8 - 8 = 2.\;\checkmark
+\end{equation}
+
+\textbf{Ice manifold dimension:}
+$\dim(\ker B_1) = 18 - 8 = 10$, which splits as
+$\rank(B_2) + \beta_1 = 8 + 2 = 10$.~$\checkmark$
+
+\subsection{Spectrum of \texorpdfstring{$L_1$}{L1}}
+
+The eigenvalues of $L_1^{\text{down}} = B_1^T B_1$ on $\R^{18}$:
+\begin{equation}
+  \{0^{(\times 10)},\; 3^{(\times 4)},\; 6^{(\times 4)}\}.
+\end{equation}
+The 10 zero eigenvalues span $\ker(B_1)$ (the ice manifold).  The nonzero
+eigenvalues match those of $L_0$ (standard property: $B_1^T B_1$ and
+$B_1 B_1^T$ share nonzero spectra).
+
+The eigenvalues of $L_1^{\text{up}} = B_2 B_2^T$ on $\R^{18}$:
+\begin{equation}
+  \{0^{(\times 10)},\; 3^{(\times 4)},\; 6^{(\times 4)}\}.
+\end{equation}
+
+The combined Hodge 1-Laplacian $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$:
+\begin{equation}
+  \operatorname{spec}(L_1)
+  = \{\underbrace{0,\, 0}_{\beta_1 = 2},\;
+      \underbrace{3,3,3,3,3,3,3,3}_{8},\;
+      \underbrace{6,6,6,6,6,6,6,6}_{8}\}.
+\end{equation}
+Spectral gap $\Delta_1 = 3$.
+
+\subsection{The two harmonic modes}
+
+The two harmonic eigenvectors $\mathbf{h}_H, \mathbf{h}_V \in \ker(L_1)$
+correspond to the two non-contractible cycles on the torus:
+
+\textbf{Horizontal winding mode:}
+$[\mathbf{h}_H]_e = 1/3$ for horizontal edges, $0$ for vertical.
+(Normalized: $\|\mathbf{h}_H\|^2 = 9\cdot(1/3)^2 = 1$.)
+
+\textbf{Vertical winding mode:}
+$[\mathbf{h}_V]_e = 0$ for horizontal edges, $1/3$ for vertical.
+
+Verification: $B_1\mathbf{h}_H = \mathbf{0}$ (at each vertex, one
+horizontal edge enters and one leaves due to periodicity).
+$B_2^T\mathbf{h}_H = \mathbf{0}$ (each face has one horizontal edge
+traversed forward and one backward, canceling).  Therefore
+$L_1\mathbf{h}_H = \mathbf{0}$.~$\checkmark$
+
+These two modes are orthogonal and span $\ker(L_1)$.  They represent
+topologically protected degrees of freedom: no sequence of local plaquette
+flips can change the winding numbers.
+
+\subsection{Ice configuration and Hodge decomposition}
+
+The ``all-right, all-up'' configuration has
+$\bm\sigma_0 = (1,1,1,1,1,1,1,1,1,\;1,1,1,1,1,1,1,1,1)^T$.
+
+\textbf{Ice rule:} At each vertex, two edges point in and two point out,
+so $B_1\bm\sigma_0 = \mathbf{0}$.~$\checkmark$
+
+\textbf{Hodge projection:}
+$\langle\bm\sigma_0, \mathbf{h}_H\rangle = 9\cdot(1/3) = 3$,\;
+$\langle\bm\sigma_0, \mathbf{h}_V\rangle = 3$.  So
+$\bm\sigma_{\text{harm}} = 3\mathbf{h}_H + 3\mathbf{h}_V = \bm\sigma_0$.
+The curl component is $\bm\sigma_{\text{curl}} = \mathbf{0}$: this
+configuration is \emph{purely harmonic}.  It has nonzero winding number in
+both directions and no local curl structure.
+
+\subsection{A monopole excitation}
+
+Starting from $\bm\sigma_0$, flip $e_0$ ($v_0 \to v_1$):
+set $\sigma_{e_0} = -1$.  Call this $\bm\sigma_1$.
+\begin{equation}
+  \mathbf{Q} = B_1\bm\sigma_1
+  = B_1\bm\sigma_0 - 2\,B_1\mathbf{e}_0
+  = -2\begin{pmatrix} -1\\1\\0\\\cdots\\0 \end{pmatrix}
+  = \begin{pmatrix} +2\\-2\\0\\\cdots\\0 \end{pmatrix}.
+\end{equation}
+A monopole--antimonopole pair: $Q_{v_0} = +2$, $Q_{v_1} = -2$, all others
+zero.
+
+\textbf{Energy:}
+$\calH[\bm\sigma_1] = (\epsilon/2)\|\mathbf{Q}\|^2 = (\epsilon/2)(4+4)
+= 4\epsilon$.  The ice configuration had $\calH = 0$, so the monopole
+pair costs~$4\epsilon$.
+
+\subsection{Pauling entropy}
+
+The Pauling approximation for uniform $z = 4$:
+\begin{equation}
+  |\calI_{\text{P}}|
+  = 2^{18}\!\left(\frac{\binom{4}{2}}{2^4}\right)^{\!9}
+  = 2^{18}\!\left(\frac{3}{8}\right)^{\!9}
+  \approx 38.4.
+\end{equation}
+Pauling entropy per vertex:
+$s_{\text{P}} = \frac{1}{9}\ln 38.4 \approx 0.405$,
+close to Lieb's exact result~\cite{lieb1967}
+$s_{\text{Lieb}} = \tfrac{3}{2}\ln(4/3) \approx 0.431$.
+The small discrepancy is a finite-size effect.
+
+\subsection{Loop basis and reachable states}
+
+With no faces filled ($n_2 = 0$):
+$\beta_1 = \dim(\ker B_1) = 18 - 9 + 1 = 10$,
+giving an upper bound of $2^{10} = 1024$ from the loop-flip
+parameterization.  The Pauling estimate is $\approx 38$, so the ratio
+$38/1024 \approx 3.7\%$ reflects severe directed-cycle pruning, consistent
+with the patterns in \cref{tab:counting}.
+
+With all 9 faces filled ($n_2 = 9$): the faces account for 8 of the 10
+independent cycles (9~faces minus one linear relation), leaving
+$\beta_1 = 10 - 8 = 2$.  The two surviving harmonic modes are exactly the
+horizontal and vertical winding modes from the previous subsection---the
+non-contractible cycles that wrap around the torus.  This illustrates the
+two extremes of the face-filling strategy: with no faces, $\beta_1 = 10$
+and the full cycle space is available for loop-flip sampling; with all
+faces, $\beta_1 = 2$ and only the global winding modes survive.
+
+% ===================================================================
 % BIBLIOGRAPHY
 % ===================================================================
 \begin{thebibliography}{10}
