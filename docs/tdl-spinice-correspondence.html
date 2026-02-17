@@ -1532,23 +1532,24 @@ Three mechanisms make $|\mathcal{I}_{\text{DFS}}|$ much smaller than $2^{\beta_1
   <th>Lattice</th>
   <th>Size</th>
   <th>BC</th>
+  <th>$n_1$</th>
+  <th>$|\mathcal{P}| = 2^{n_1}$</th>
   <th>$\beta_1$</th>
   <th>$2^{\beta_1}$</th>
   <th>$|\mathcal{I}_{\text{P}}|$</th>
   <th>$|\mathcal{I}|$</th>
   <th>$|\mathcal{I}_{\text{DFS}}|$</th>
-  <th>$|\mathcal{I}_{\text{DFS}}|/2^{\beta_1}$</th>
 </tr>
 </thead>
 <tbody>
-<tr><td>Square</td><td>4&times;4</td><td>open</td><td>9</td><td>512</td><td>2,076</td><td>2,768</td><td>25</td><td>4.9%</td></tr>
-<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>17</td><td>131,072</td><td>657</td><td>2,970</td><td>40</td><td>0.03%</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>6</td><td>64</td><td>68</td><td>172</td><td>32</td><td>50%</td></tr>
-<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>13</td><td>8,192</td><td>130</td><td>600</td><td>172</td><td>2.1%</td></tr>
-<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>923</td><td>1,312</td><td>8</td><td>6.3%</td></tr>
-<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>112</td><td>0.04%</td></tr>
-<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>74,734</td><td>86,560</td><td>12</td><td>9.4%</td></tr>
-<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>4</td><td>0.0001%</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>open</td><td>24</td><td>$1.7 \times 10^7$</td><td>9</td><td>512</td><td>2,076</td><td>2,768</td><td>25</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>32</td><td>$4.3 \times 10^9$</td><td>17</td><td>131,072</td><td>657</td><td>2,970</td><td>40</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>17</td><td>131,072</td><td>6</td><td>64</td><td>68</td><td>172</td><td>32</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>24</td><td>$1.7 \times 10^7$</td><td>13</td><td>8,192</td><td>130</td><td>600</td><td>172</td></tr>
+<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>30</td><td>$1.1 \times 10^9$</td><td>7</td><td>128</td><td>923</td><td>1,312</td><td>8</td></tr>
+<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>81</td><td>$2.4 \times 10^{24}$</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>&gt;1.4M&dagger;</td><td>112</td></tr>
+<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>38</td><td>$2.7 \times 10^{11}$</td><td>7</td><td>128</td><td>74,734</td><td>86,560</td><td>12</td></tr>
+<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>93</td><td>$9.9 \times 10^{27}$</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>&gt;3.1M&dagger;</td><td>4</td></tr>
 </tbody>
 </table>
 <p style="font-size: 0.9em;">&dagger; Lower bound only; backtracking search timed out at 120s.</p>
