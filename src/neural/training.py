@@ -42,6 +42,7 @@ class TrainingConfig:
     lr_scheduler: str = "cosine"
     baseline_momentum: float = 0.99
     entropy_bonus: float = 0.01
+    lr_min_factor: float = 0.01
     grad_clip: float = 1.0
     eval_every: int = 200
     checkpoint_every: int = 0  # Save checkpoint every N epochs (0 = disabled)
@@ -126,7 +127,7 @@ def train(
     optimizer = optim.Adam(model.parameters(), lr=config.lr)
     if config.lr_scheduler == "cosine":
         scheduler = optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, T_max=config.n_epochs, eta_min=config.lr * 0.01
+            optimizer, T_max=config.n_epochs, eta_min=config.lr * config.lr_min_factor
         )
     else:
         scheduler = None

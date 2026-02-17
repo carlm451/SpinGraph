@@ -244,7 +244,12 @@ tr:nth-child(even) { background: #fafafa; }
   <li><a href="#sec5">Ice Manifold, $\ker(B_1)$, and the Hodge Decomposition</a></li>
   <li><a href="#sec6">Spin Ice Hamiltonian as Quadratic Form in $L_1^{\text{down}}$</a></li>
   <li><a href="#sec7">Entropic Field Theory and the Graph Laplacian</a></li>
-  <li><a href="#sec8">Line Graph Dual, Degeneracy, and the Bethe Permanent</a></li>
+  <li><a href="#sec8">Line Graph Dual, Degeneracy, and the Bethe Permanent</a>
+    <ol style="list-style-type: none; padding-left: 1rem; margin-top: 0.2rem;">
+      <li><a href="#sec8.7">8.7 Loop-Basis Parameterization of the Ice Manifold</a></li>
+      <li><a href="#sec8.8">8.8 The Directed-Cycle Constraint and Reachable States</a></li>
+    </ol>
+  </li>
   <li><a href="#sec9">Worked Example &mdash; 3&times;3 Periodic Square Lattice</a></li>
   <li><a href="#sec10">Master Correspondence Table</a></li>
   <li><a href="#sec11">Summary of Established Results</a></li>
@@ -271,6 +276,10 @@ The connection between these frameworks is <strong>structural, not analogical</s
 
 <p>
 The ice manifold (the degenerate ground-state manifold of a frustrated spin ice) is structurally governed by $\ker(B_1)$ &mdash; either as the ice manifold itself (for even-degree vertices) or as the space of fluctuations within it (for odd-degree vertices). The dimension of this space, its combinatorial density (Pauling entropy), and its spectral structure all vary across lattice types in ways that ASI physics has characterized in detail. This document establishes the precise mathematical identities that make these quantities accessible to TDL and GNN analysis. The question of <em>how</em> this structure can best be exploited in machine learning remains an active direction of investigation.
+</p>
+
+<p>
+A particular focus of this document is the precise relationship between $\beta_1$ and the degeneracy of the ice manifold. While $\beta_1$ determines the dimension of the topologically protected subspace (&sect;5) and sets an upper bound of $2^{\beta_1}$ on the number of reachable ice states (&sect;8.7), the actual count is controlled by a <strong>directed-cycle constraint</strong> that can reduce it by orders of magnitude (&sect;8.8). This distinction is critical for neural sampling, where training difficulty depends on the reachable state count, not on $\beta_1$ alone.
 </p>
 
 <p>
@@ -1851,6 +1860,194 @@ Caravelli et al. emphasize the <strong>gauge freedom</strong> of the spin ice Is
 In TDL terms, this gauge freedom is the <strong>orientation ambiguity</strong> of the simplicial complex: the choice of reference orientation for each edge is arbitrary, and physical/learnable quantities must not depend on it. Simplicial convolutional networks (Yang et al. 2022) handle this via orientation-equivariant architectures. The gauge invariance of frustration means that the <em>frustration pattern of the lattice is a true topological property</em>, independent of the arbitrary orientation convention &mdash; and is therefore a legitimate feature for the network to exploit.
 </p>
 
+<h3 id="sec8.7">8.7 Loop-Basis Parameterization of the Ice Manifold</h3>
+
+<div class="convention">
+<div class="label">Convention (Face-Filling for This Subsection)</div>
+Mode A neural sampling operates exclusively with $n_2 = 0$ (no faces filled), so $B_2$ is vacuous and $\beta_1 = \dim(\ker B_1)$ throughout &sect;8.7&ndash;8.8. The upper Hodge Laplacian vanishes ($L_1^{\text{up}} = 0$), and $\ker(B_1) = \ker(L_1^{\text{down}}) = \ker(L_1)$.
+</div>
+
+<p>
+<strong>The cycle-space basis.</strong> For a connected graph $G$ with $n_0$ vertices and $n_1$ edges, the kernel of $B_1$ (the vertex-edge incidence matrix) has dimension
+</p>
+
+$$
+\dim(\ker B_1) = n_1 - \rank(B_1) = n_1 - (n_0 - \beta_0) = n_1 - n_0 + 1
+$$
+
+<p>
+since $\beta_0 = 1$ for a connected graph and $\rank(B_1) = n_0 - \beta_0$. With $n_2 = 0$, there is no $B_2$ contribution, so $\beta_1 = \dim(\ker B_1) = n_1 - n_0 + 1$. A basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ of $\ker(B_1)$ consists of $\beta_1$ independent <strong>oriented cycles</strong> &mdash; vectors $\mathbf{l}_i \in \R^{n_1}$ with $B_1 \mathbf{l}_i = \mathbf{0}$, meaning the flow around each cycle is divergence-free at every vertex.
+</p>
+
+<p>
+The dimension chain for $n_2 = 0$ is:
+</p>
+
+$$
+\boxed{\dim(\ker B_1) = n_1 - n_0 + 1 = \beta_1 \qquad (\text{when } n_2 = 0)}
+$$
+
+<p>
+<strong>$\mathrm{GF}(2)$ parameterization.</strong> Given a seed ice state $\bm{\sigma}_{\text{seed}} \in \ker(B_1) \cap \{+1,-1\}^{n_1}$ and a cycle basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$, each independent cycle $\mathbf{l}_i$ defines a potential <strong>loop flip</strong>: reversing all spins along the cycle. Flipping loop $i$ sends $\sigma_e \mapsto -\sigma_e$ for every edge $e$ in the cycle. Since $B_1 \mathbf{l}_i = \mathbf{0}$, the flipped configuration remains in $\ker(B_1)$ &mdash; flipping a cycle preserves the ice rule at every vertex.
+</p>
+
+<p>
+Every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via a sequence of loop flips can be written as:
+</p>
+
+$$
+\bm{\sigma} = \bm{\sigma}_{\text{seed}} \odot (-1)^{\sum_i \alpha_i \mathbf{l}_i}
+$$
+
+<p>
+where $\bm{\alpha} = (\alpha_1, \ldots, \alpha_{\beta_1}) \in \{0,1\}^{\beta_1}$ records which loops have been flipped, and the operations are understood component-wise over $\mathrm{GF}(2)$. More precisely, on each edge $e$:
+</p>
+
+$$
+\sigma_e = \sigma_{\text{seed},e} \cdot (-1)^{\sum_{i:\, e \in \text{supp}(\mathbf{l}_i)} \alpha_i}
+$$
+
+<div class="key-result">
+<div class="label">Key Result 9 &mdash; Loop-Basis Parameterization of the Ice Manifold</div>
+<p>
+Let $G$ be a connected graph with $n_2 = 0$, $\bm{\sigma}_{\text{seed}}$ an ice state, and $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ a basis of $\ker(B_1)$. Then every ice state reachable from $\bm{\sigma}_{\text{seed}}$ via loop flips is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$. This gives:
+</p>
+$$
+|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
+$$
+<p>
+with equality if and only if every combination of loop flips produces a distinct, valid ice state. In practice, equality is rare &mdash; the directed-cycle constraint (&sect;8.8) typically reduces the count substantially.
+</p>
+</div>
+
+<p>
+<strong>Relationship to topological capacity.</strong> Key Result 9 makes explicit how the topological capacity $\dim(\ker B_1) = \beta_1$ from Key Result 8 translates into an upper bound on the number of discrete ice states. The $2^{\beta_1}$ bound arises because the cycle space is $\beta_1$-dimensional over $\R$, and $\mathrm{GF}(2)$ decisions (flip or not) select one of $2^{\beta_1}$ possible binary labelings of the basis.
+</p>
+
+<p>
+<strong>Why $2^{\beta_1}$ is exponentially loose.</strong> The bound $2^{\beta_1}$ counts the number of binary loop-flip decisions &mdash; the dimension of the <em>decision space</em> &mdash; not the number of achievable ice states. For a $z=4$ periodic square lattice, $\beta_1 = n_1 - n_0 + 1 = 2n_0 - n_0 + 1 \approx n_0$, giving $2^{\beta_1} \approx 2^{n_0}$ &mdash; a factor of $W = 2$ per vertex. Meanwhile, the exact count in the thermodynamic limit (Lieb, 1967) grows as $\varepsilon \sim W_{\text{Lieb}}^{n_0}$ with $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$ per vertex, and the Pauling approximation (which treats vertex constraints as independent) gives $W_{\text{Pauling}} = 3/2 = 1.500$. The ratio of any of these to $2^{\beta_1}$ is:
+</p>
+
+$$
+\frac{\varepsilon}{2^{\beta_1}} \sim \left(\frac{W}{2}\right)^{n_0} = \begin{cases} (3/4)^{n_0} & \text{(Pauling)} \\ (0.770)^{n_0} & \text{(Lieb)} \end{cases}
+$$
+
+<p>
+Both decay <strong>exponentially</strong> in $n_0$. For a 10&times;10 lattice ($n_0 = 100$), the Pauling/Lieb count is $\sim 10^{12}$ times smaller than $2^{\beta_1}$. The hierarchy of estimates for $z=4$ lattices in the thermodynamic limit is:
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Estimate</th>
+  <th>Per-vertex factor $W$</th>
+  <th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>$2^{n_1}$ (all configurations)</td><td>$4.000$</td><td>Trivial upper bound</td></tr>
+<tr><td>$2^{\beta_1}$ (cycle-space dimension)</td><td>$2.000$</td><td>Topological upper bound (Key Result 9)</td></tr>
+<tr><td>Lieb exact: $(4/3)^{3n_0/2}$</td><td>$1.540$</td><td>Exact in TDL (square ice only)</td></tr>
+<tr><td>Pauling: $(3/2)^{n_0}$</td><td>$1.500$</td><td>Lower bound (Bethe permanent)</td></tr>
+</tbody>
+</table>
+
+<p>
+Each gap is exponential in $n_0$. The Pauling estimate is a <strong>lower bound</strong> on the true ice-state count for even-degree regular lattices, proved via the Gurvits bound on the Bethe permanent (&sect;8.4). For small, mixed-coordination, open-boundary lattices &mdash; the cases most relevant to Mode A training &mdash; the Pauling formula can overestimate or underestimate; see the comparison in &sect;8.8 below.
+</p>
+
+<h3 id="sec8.8">8.8 The Directed-Cycle Constraint and Reachable States</h3>
+
+<p>
+<strong>Definition.</strong> A cycle $\mathbf{c}$ is <em>directed</em> in configuration $\bm{\sigma}$ if, at every vertex of the cycle, exactly one cycle edge carries spin flowing into the vertex along the cycle direction and exactly one carries spin flowing out. Equivalently, traversing the cycle, every edge spin is aligned with the traversal direction &mdash; the cycle carries a consistent "current."
+</p>
+
+<p>
+<strong>Why directedness matters.</strong> A loop flip reverses all spins along a cycle. For the flipped configuration to remain in $\{+1,-1\}^{n_1}$, each edge must change from $+1$ to $-1$ or vice versa &mdash; this is always possible since spins are binary. But for the flip to correspond to a <em>distinct</em> state (not just the same state re-encoded), the cycle must be <strong>directed</strong> in the current configuration. Flipping a non-directed cycle can violate the ice rule at vertices where the cycle edges don't carry consistent flow.
+</p>
+
+<p>
+Crucially, whether cycle $\mathbf{l}_i$ is directed depends on the <em>current</em> spin configuration $\bm{\sigma}$, which in turn depends on which earlier loops have been flipped. This creates a <strong>pruned decision tree</strong>, not a flat $2^{\beta_1}$ product space. Each path through the tree (choosing to flip or skip each loop in sequence) encounters different sets of directed vs. non-directed cycles, and many branches collapse to the same final state or become inaccessible.
+</p>
+
+<div class="key-result">
+<div class="label">Key Result 10 &mdash; Directed-Cycle Reduction of the Ice Manifold</div>
+<p>
+The number of ice states reachable from a seed via loop flips satisfies:
+</p>
+$$
+|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}
+$$
+<p>
+with equality rare in practice. The ratio $|\mathcal{I}_{\text{reachable}}| / 2^{\beta_1}$ is a <strong>lattice-specific structural property</strong> that depends on the coordination numbers, loop topology, and frustration pattern of the graph. Empirically, it varies by more than five orders of magnitude across the Morrison et al. lattice zoo.
+</p>
+</div>
+
+<p>
+<strong>Counting reachable states by exhaustive tree search.</strong> The "Reachable" column in the table below is computed by exact enumeration (see <code>src/neural/enumeration.py</code>). The algorithm works as follows: starting from a seed ice state $\bm{\sigma}_{\text{seed}}$, it performs a depth-first search through the $\beta_1$ loop decisions in autoregressive order. At decision step $i$, it checks whether loop $\mathbf{l}_i$ is a <em>directed cycle</em> in the current configuration $\bm{\sigma}$. If directed, both branches (flip and no-flip) are explored; if not, only the no-flip branch is explored &mdash; the flip is <strong>gated off</strong> because flipping a non-directed cycle would violate the ice rule. All unique states reached at the leaves of this pruned tree are collected and deduplicated (different decision paths can produce the same final $\bm{\sigma}$).
+</p>
+
+<p>
+Two mechanisms make $|\mathcal{I}_{\text{reachable}}|$ much smaller than $2^{\beta_1}$:
+</p>
+<ol>
+<li><strong>Directedness gating:</strong> At each node of the decision tree, if the loop is not directed in the current $\bm{\sigma}$, the flip branch is pruned entirely. This removes exponentially many paths. On lattices with tight coordination constraints (e.g., tetris), most loops are non-directed in most configurations, leaving very few open branches.</li>
+<li><strong>Path convergence:</strong> Different sequences of flip decisions can produce the same final spin configuration. For example, flipping loops $A$ then $B$ may yield the same $\bm{\sigma}$ as flipping $B$ then $A$ (or neither), especially when the loops share edges. The algorithm deduplicates by tracking the set of distinct $\bm{\sigma}$ vectors encountered.</li>
+</ol>
+
+<table>
+<thead>
+<tr>
+  <th>Lattice</th>
+  <th>Size</th>
+  <th>BC</th>
+  <th>$\beta_1$</th>
+  <th>$2^{\beta_1}$</th>
+  <th>$\varepsilon_{\text{Pauling}}$</th>
+  <th>$|\mathcal{I}_{\text{reach}}|$</th>
+  <th>$|\mathcal{I}_{\text{reach}}|/2^{\beta_1}$</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td>4&times;4</td><td>open</td><td>9</td><td>512</td><td>2,076</td><td>25</td><td>4.9%</td></tr>
+<tr><td>Square</td><td>4&times;4</td><td>periodic</td><td>17</td><td>131,072</td><td>657</td><td>40</td><td>0.03%</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>open</td><td>6</td><td>64</td><td>68</td><td>32</td><td>50%</td></tr>
+<tr><td>Kagome</td><td>2&times;2</td><td>periodic</td><td>13</td><td>8,192</td><td>130</td><td>172</td><td>2.1%</td></tr>
+<tr><td>Santa Fe</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>923</td><td>8</td><td>6.3%</td></tr>
+<tr><td>Shakti</td><td>2&times;2</td><td>open</td><td>18</td><td>262,144</td><td>$1.6 \times 10^9$</td><td>112</td><td>0.04%</td></tr>
+<tr><td>Tetris</td><td>2&times;2</td><td>open</td><td>7</td><td>128</td><td>74,734</td><td>12</td><td>9.4%</td></tr>
+<tr><td>Tetris</td><td>3&times;3</td><td>open</td><td>22</td><td>4,194,304</td><td>$1.9 \times 10^{12}$</td><td>4</td><td>0.0001%</td></tr>
+</tbody>
+</table>
+
+<p>
+<strong>Interpretation.</strong> Consider the square 4&times;4 open lattice as a concrete example: $\beta_1 = 9$ gives $2^9 = 512$ candidate flip-combinations, but the tree search finds only 25 distinct ice states. Starting from the seed, typically only 2&ndash;4 of the 9 loops are directed (flippable) in any given configuration, so the tree is heavily pruned at every level. Moreover, many surviving paths converge &mdash; flipping overlapping loops in different orders often produces the same state. The result: 25 states, independently confirmed by the Mode A training achieving 25/25 state coverage with zero ice-rule violations.
+</p>
+
+<p>
+Across the zoo, the reduction ratio varies from 50% (kagome 2&times;2 open, where half of all $2^{\beta_1}$ combinations yield valid states) down to 0.0001% (tetris 3&times;3 open, where $\beta_1 = 22$ but only 4 of 4.2 million candidate states are reachable). The tetris extreme is particularly striking: the lattice's mixed coordination and T-shaped connectivity create a cycle topology where almost all loop-flip combinations lead to non-directed dead ends. This five-order-of-magnitude range &mdash; invisible from $\beta_1$ alone &mdash; is a fundamental structural property of the lattice. For even-degree lattices (square, tetris), $|\mathcal{I}_{\text{reachable}}|$ equals the Pauling degeneracy $\varepsilon(G)$, so these counts are the <em>total</em> number of ice states, not just a subset.
+</p>
+
+<p>
+<strong>The Pauling column: why neither bound is tight at small sizes.</strong> The $\varepsilon_{\text{Pauling}}$ column (computed from <code>src/topology/ice_sampling.pauling_estimate()</code>) shows the Pauling approximation $\varepsilon_{\text{Pauling}} = 2^{n_1} \prod_v f(z_v)$, where $f(z_v) = \binom{z_v}{z_v/2}/2^{z_v}$ for even $z_v$ and $f(z_v) = 2\binom{z_v}{\lfloor z_v/2\rfloor}/2^{z_v}$ for odd $z_v$. The Pauling estimate counts from a <em>different starting point</em> than $2^{\beta_1}$: it starts with $2^{n_1}$ total edge configurations and filters by independent vertex constraints, while $2^{\beta_1}$ starts from the cycle-space dimension. For these small lattices, three surprises emerge:
+</p>
+<ol>
+<li><strong>Pauling can exceed $2^{\beta_1}$</strong> &mdash; dramatically so for shakti ($1.6 \times 10^9$ vs. 262k) and tetris 3&times;3 ($1.9 \times 10^{12}$ vs. 4.2M). These lattices have many low-coordination boundary vertices ($z = 1, 2$), which contribute weak per-vertex constraints to the Pauling product while not adding proportionally to $\beta_1$.</li>
+<li><strong>Pauling can be below $2^{\beta_1}$</strong> &mdash; for square 4&times;4 periodic (657 vs. 131k) and kagome 2&times;2 periodic (130 vs. 8,192). These uniform-$z$ periodic lattices have strong per-vertex constraints and large $\beta_1$ from the periodic topology.</li>
+<li><strong>Both overestimate wildly</strong> &mdash; the actual reachable count is far below <em>both</em> bounds in every case. Tetris 3&times;3 has $\varepsilon_{\text{Pauling}} \approx 10^{12}$, $2^{\beta_1} \approx 4 \times 10^6$, but only 4 reachable states.</li>
+</ol>
+<p>
+The Pauling approximation is designed for the <strong>thermodynamic limit</strong> of large, uniform-coordination, periodic lattices, where it gives the correct exponential scaling (within 6% of Lieb's exact result for $z = 4$). For the small, open-boundary, mixed-coordination lattices that are tractable for Mode A training, neither Pauling nor $2^{\beta_1}$ provides a useful estimate of the actual state count. The directed-cycle DFS enumeration remains the only reliable method at these sizes.
+</p>
+
+<p>
+<strong>Relationship to Pauling entropy.</strong> The Pauling degeneracy $\varepsilon(G) = |\ker(B_1) \cap \{+1,-1\}^{n_1}|$ counts <em>all</em> binary ice states, while $|\mathcal{I}_{\text{reachable}}|$ counts those reachable from a specific seed via loop flips. For even-degree graphs (all $z_v$ even, including square and tetris), every ice state is reachable from any other via loop flips, so $|\mathcal{I}_{\text{reachable}}| = \varepsilon(G)$. For odd-degree graphs (e.g., kagome with $z = 3$), the ice manifold splits into distinct <strong>charge sectors</strong> (characterized by the pattern of $|Q_v| = 1$ charges on odd-degree vertices), and $|\mathcal{I}_{\text{reachable}}|$ counts only those states within the seed's sector. In this case $\varepsilon(G) \geq |\mathcal{I}_{\text{reachable}}|$.
+</p>
+
+<p>
+<strong>Implications for neural sampling.</strong> For Mode A (LoopMPVAN), the autoregressive network must learn to assign probabilities to $\beta_1$ binary flip decisions such that the resulting distribution over $|\mathcal{I}_{\text{reachable}}|$ states is uniform. When $|\mathcal{I}_{\text{reachable}}| \ll 2^{\beta_1}$, most decision-tree paths lead to the same small set of states, and the network must learn which paths are equivalent &mdash; a non-trivial combinatorial task that REINFORCE training must solve. The training difficulty correlates with the reachable-state count and the structure of the decision tree, not with $\beta_1$ alone. See <a href="mode-a-walkthrough.md">Mode A Walkthrough</a> and <a href="training-experiments.md">Training Experiments</a> for detailed results.
+</p>
+
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 9: Worked Example -->
@@ -2280,6 +2477,28 @@ where $A$ is the $9 \times 9$ adjacency matrix of our torus graph and the denomi
 
 <p><strong>Key observation for the lattice zoo.</strong> Two lattices with the <em>same</em> degree sequence and the same $\dim(\ker B_1)$ can have <em>very different</em> $\varepsilon(G)$ values because the permanent depends on the detailed graph structure (which edges connect which vertices), not just on the degree sequence. This is the combinatorial level of the three-level capacity framework (&sect;8, Key Result 8). The Stage 1 computational pipeline will compute these values numerically across the Morrison et al. lattice zoo.</p>
 
+<h3>9.14 Loop Basis and Reachable States on the 3&times;3 Torus</h3>
+
+<p>
+We can now apply the loop-basis parameterization of &sect;8.7 to our worked example. With <strong>no faces filled</strong> ($n_2 = 0$), the cycle-space dimension is:
+</p>
+
+$$
+\beta_1 = \dim(\ker B_1) = n_1 - n_0 + \beta_0 = 18 - 9 + 1 = 10
+$$
+
+<p>
+This gives an upper bound of $2^{10} = 1024$ candidate ice states from the loop-flip parameterization. The Pauling estimate from &sect;9.13 gives $\varepsilon_{\text{Pauling}} \approx 38$ ice states. The ratio $38/1024 \approx 3.7\%$ is consistent with the general pattern of severe directed-cycle pruning observed across the lattice zoo (cf. the empirical table in &sect;8.8, where ratios range from 50% down to 0.0001%).
+</p>
+
+<p>
+With <strong>all 9 faces filled</strong> ($n_2 = 9$), the situation changes. $B_2$ is now an $18 \times 9$ matrix, and the faces account for 8 of the 10 independent cycles (the 9 faces satisfy one linear relation, since the boundary of the entire torus is empty). This leaves $\beta_1 = 10 - 8 = 2$, and the two surviving harmonic modes are precisely the <strong>horizontal and vertical winding modes</strong> described in &sect;9.8 &mdash; the non-contractible cycles that wrap around the torus. These are the topologically protected modes that no amount of local smoothing can eliminate.
+</p>
+
+<p>
+This example illustrates the two extremes of the face-filling strategy: with no faces, $\beta_1 = 10$ and the full cycle space is available for loop-flip sampling; with all faces, $\beta_1 = 2$ and only the global winding modes survive as topologically protected channels.
+</p>
+
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SECTION 10 -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -2489,6 +2708,27 @@ The following table summarizes all correspondences established in this document.
   <td>Topological ($\dim \ker B_1$), Combinatorial ($\varepsilon(G)$), Spectral ($\{\lambda_i(L_1^{\text{down}})\}$)</td>
   <td>&sect;8 (Key Result)</td>
 </tr>
+<tr>
+  <td>28</td>
+  <td>Loop-flip parameterization</td>
+  <td>$\mathrm{GF}(2)$ encoding over cycle basis</td>
+  <td>$\bm{\sigma} = \bm{\sigma}_{\text{seed}} \odot (-1)^{\sum_i \alpha_i \mathbf{l}_i}$, $\bm{\alpha} \in \{0,1\}^{\beta_1}$</td>
+  <td>&sect;8.7</td>
+</tr>
+<tr>
+  <td>29</td>
+  <td>Directed-cycle constraint</td>
+  <td>Decision-tree pruning of loop-flip space</td>
+  <td>$|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}$</td>
+  <td>&sect;8.8</td>
+</tr>
+<tr>
+  <td>30</td>
+  <td>Reachable-state reduction ratio</td>
+  <td>Lattice-specific structural property</td>
+  <td>Ratio $|\mathcal{I}_{\text{reachable}}|/2^{\beta_1}$ varies from 50% to $10^{-6}$ across zoo</td>
+  <td>&sect;8.8</td>
+</tr>
 </tbody>
 </table>
 
@@ -2528,6 +2768,8 @@ This document has established a precise, equation-level bridge between two indep
 <li><strong>Entropic field theory = discrete Poisson</strong> (&sect;7). Nisoli's gradient, Poisson equation, and screened Green operator map exactly to $B_1^T$, $L_0 = B_1 B_1^T$, and the resolvent $(L_0 + \xi^{-2})^{-1}$ (Key Result 5).</li>
 
 <li><strong>Line graph dual</strong> (&sect;8). $L_1^{\text{down}} = 2I - A_{L(G)}$: the lower Hodge Laplacian is the Kirchhoff matrix of the line graph. All vertices with $z > 2$ generate frustrated cliques, and only the 1D chain is non-degenerate (Key Result 8).</li>
+
+<li><strong>Loop-basis parameterization and directed-cycle bound</strong> (&sect;8.7&ndash;8.8). Every reachable ice state is encoded by a binary vector $\bm{\alpha} \in \{0,1\}^{\beta_1}$ over a cycle basis, giving $|\mathcal{I}_{\text{reachable}}| \leq 2^{\beta_1}$. The directed-cycle constraint prunes this exponentially, with the reduction ratio varying by five orders of magnitude across the lattice zoo (Key Results 9, 10).</li>
 </ol>
 
 <h3>11.2 Quantitative Framework</h3>
@@ -2557,6 +2799,12 @@ This document has established a precise, equation-level bridge between two indep
   <td>Energy landscape of excitations above ice manifold</td>
   <td><strong>Yes</strong> &mdash; flat bands, gaps, and density of states vary</td>
 </tr>
+<tr>
+  <td><strong>Directed-cycle</strong></td>
+  <td>$|\mathcal{I}_{\text{reachable}}| / 2^{\beta_1}$</td>
+  <td>Fraction of loop-flip combinations yielding distinct ice states</td>
+  <td><strong>Yes</strong> &mdash; ranges from 50% (kagome) to $10^{-6}$ (tetris); determines neural sampling difficulty</td>
+</tr>
 </tbody>
 </table>
 
@@ -2572,6 +2820,7 @@ The mathematical bridge established here is <em>structural</em>: it translates o
 <li><strong>Does spectral structure (flat bands, small gaps) affect feature propagation?</strong> The eigenvalue distribution of $L_1^{\text{down}}$ governs both the energy landscape of spin ice excitations and the filtering behavior of Hodge-domain neural networks. Frustrated lattices tend to have richer spectral structure (more flat bands, smaller gaps). The computational catalog from Stage 1 will quantify this across the Morrison et al. lattice zoo.</li>
 <li><strong>Is the BP &harr; GNN message-passing parallel actionable?</strong> The structural similarity between belief propagation on the ice graph and message passing on the line graph (&sect;8.5) suggests that physical insights about convergence, fixed points, and approximation quality might transfer. This remains speculative.</li>
 <li><strong>What role does orientation equivariance play?</strong> The gauge freedom of spin ice (&sect;8.6) maps to orientation equivariance in simplicial neural networks. Architectures that respect this symmetry may generalize better on edge-signal tasks.</li>
+<li><strong>What determines the directed-cycle reduction ratio?</strong> The ratio $|\mathcal{I}_{\text{reachable}}|/2^{\beta_1}$ varies by five orders of magnitude across the lattice zoo (&sect;8.8), from 50% on kagome to $10^{-6}$ on tetris. This ratio governs the effective difficulty of neural sampling, yet we lack a closed-form predictor for it. Is it related to the coordination number distribution, the loop topology, or the frustration type? Can it be estimated without exact enumeration?</li>
 </ul>
 
 <p>

@@ -179,6 +179,8 @@ F_θ = T · E_q[ln q_θ(σ)] = -T · H(q_θ)
 
 Minimizing F_θ = maximizing entropy H(q_θ) = learning to sample **uniformly**.
 
+**Why train at all if every sample is already valid?** Zero ice-rule violations are guaranteed by construction (Section 4) — an untrained model produces 100% valid ice states. What training achieves is *uniform frequency* across those valid states. An untrained model might sample state #3 fifty times and state #17 never. The REINFORCE objective pushes the model toward equal probability for every reachable state. This matters because thermodynamic observables (correlation functions, structure factors) are averages over the ice manifold weighted equally at T=0. Biased sampling gives wrong expectation values. KL(empirical || uniform) measures exactly this: how far the sampling distribution is from the target uniform distribution.
+
 ### 5b. One epoch step-by-step
 
 > `src/neural/training.py:139-197` — main training loop

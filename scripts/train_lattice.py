@@ -81,6 +81,9 @@ def main():
     parser.add_argument("--equ-dim", type=int, default=16)
     parser.add_argument("--inv-dim", type=int, default=8)
     parser.add_argument("--head-hidden", type=int, default=32)
+    parser.add_argument("--entropy-bonus", type=float, default=0.01)
+    parser.add_argument("--lr-min-factor", type=float, default=0.01,
+                        help="Cosine LR schedule minimum as fraction of initial LR")
     parser.add_argument("--n-eval-samples", type=int, default=2000,
                         help="Number of samples for final evaluation")
     parser.add_argument("--skip-enum", action="store_true",
@@ -164,6 +167,8 @@ def main():
         n_epochs=args.epochs,
         batch_size=args.batch_size,
         lr=args.lr,
+        entropy_bonus=args.entropy_bonus,
+        lr_min_factor=args.lr_min_factor,
         seed=args.seed,
         eval_every=max(1, args.epochs // 10),
         checkpoint_every=checkpoint_every,
@@ -265,6 +270,7 @@ def main():
         lr=args.lr,
         lr_scheduler=config.lr_scheduler,
         entropy_bonus=config.entropy_bonus,
+        lr_min_factor=config.lr_min_factor,
         grad_clip=config.grad_clip,
         eval_every=config.eval_every,
         seed=args.seed,

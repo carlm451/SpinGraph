@@ -36,6 +36,7 @@ class RunMetadata:
     lr: float
     lr_scheduler: str
     entropy_bonus: float
+    lr_min_factor: float
     grad_clip: float
     eval_every: int
     seed: int
