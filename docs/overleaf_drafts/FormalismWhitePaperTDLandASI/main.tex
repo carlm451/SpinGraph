@@ -2,6 +2,8 @@
 
 % --- Packages ---
 \usepackage[utf8]{inputenc}
+% Toggle: uncomment [draft] for fast compile (figures as bounding boxes)
+%\usepackage[draft]{graphicx}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{bm}
@@ -9,13 +11,11 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{tikz}
+% tikz removed -- diagrams pre-compiled to standalone PDFs (tikz_triangle, tikz_torus)
 \usepackage{subcaption}
 % longtable omitted -- revtex4-2 provides its own longtable support
 \usepackage{xcolor}
 \usepackage[capitalize,noabbrev]{cleveref}
-
-\usetikzlibrary{graphs, shapes.geometric, arrows.meta}
 
 % --- Figure path ---
 \graphicspath{{figures/}}
@@ -1081,6 +1081,102 @@ the two summands depends on which faces are filled:
 \end{itemize}
 \end{keyresult}
 
+\subsection{Laplacian definitions and topological invariants across the zoo}
+\label{sec:topology_zoo}
+
+To see how the Hodge machinery connects the boundary operators of
+\cref{sec:boundary_ops} to the Betti numbers of the preceding subsections,
+we collect all three Laplacians in one place.
+The \textbf{graph (vertex) Laplacian} acts on vertex signals:
+\begin{equation}
+  \boxed{L_0 = B_1\, B_1^T,}
+  \qquad (n_0 \times n_0), \qquad
+  \dim\ker L_0 = \beta_0.
+  \label{eq:L0_def}
+\end{equation}
+The \textbf{Hodge 1-Laplacian} acts on edge signals and splits into
+lower and upper parts:
+\begin{equation}
+  \boxed{L_1 = \underbrace{B_1^T B_1}_{L_1^{\text{down}}}
+             + \underbrace{B_2\, B_2^T}_{L_1^{\text{up}}},}
+  \qquad (n_1 \times n_1), \qquad
+  \dim\ker L_1 = \beta_1.
+  \label{eq:L1_def}
+\end{equation}
+The \textbf{face Laplacian} acts on face signals:
+\begin{equation}
+  \boxed{L_2 = B_2^T B_2,}
+  \qquad (n_2 \times n_2), \qquad
+  \dim\ker L_2 = \beta_2.
+  \label{eq:L2_def}
+\end{equation}
+All three are symmetric positive semi-definite, and their null-space
+dimensions are precisely the Betti numbers $\beta_0$, $\beta_1$, $\beta_2$
+constrained by the Euler relation~\eqref{eq:euler}.
+
+\Cref{tab:topology_zoo} tabulates the full simplex counts and Betti numbers
+for every lattice in \cref{tab:counting} under both face-filling strategies
+and both boundary conditions, verifying these identities concretely.
+
+\begin{table*}[t]
+\centering
+\caption{Topological invariants across the lattice zoo under both
+face-filling strategies.  $n_2$ and $\chi = n_0 - n_1 + n_2$ refer to the
+all-faces-filled complex.  Betti numbers are shown for both strategies:
+``none'' ($n_2 = 0$) and ``all'' (all minimal faces filled).
+$\beta_0 = 1$ throughout (connected graphs).
+Consistency checks: $\chi = \beta_0 - \beta_1(\text{all}) + \beta_2(\text{all})$
+and $\beta_1(\text{none}) = n_1 - n_0 + 1$.}
+\label{tab:topology_zoo}
+\small
+\begin{tabular}{lllrrrrccccc}
+\toprule
+\textbf{Lattice} & \textbf{Size} & \textbf{BC}
+  & $n_0$ & $n_1$ & $n_2$ & $\chi$
+  & $\beta_0$ & $\beta_1(\text{none})$ & $\beta_1(\text{all})$
+  & $\beta_2(\text{none})$ & $\beta_2(\text{all})$ \\
+\midrule
+Square   & $4\!\times\!4$ & open     &  16 &  24 &   9 &  1 & 1 &   9 &  0 & 0 & 0 \\
+Square   & $4\!\times\!4$ & periodic &  16 &  32 &  16 &  0 & 1 &  17 &  2 & 0 & 1 \\
+Square   & $6\!\times\!6$ & open     &  36 &  60 &  25 &  1 & 1 &  25 &  0 & 0 & 0 \\
+Square   & $6\!\times\!6$ & periodic &  36 &  72 &  36 &  0 & 1 &  37 &  2 & 0 & 1 \\
+\midrule
+Kagome   & $2\!\times\!2$ & open     &  12 &  17 &   6 &  1 & 1 &   6 &  0 & 0 & 0 \\
+Kagome   & $2\!\times\!2$ & periodic &  12 &  24 &  12 &  0 & 1 &  13 &  2 & 0 & 1 \\
+Kagome   & $3\!\times\!3$ & open     &  27 &  43 &  17 &  1 & 1 &  17 &  0 & 0 & 0 \\
+Kagome   & $3\!\times\!3$ & periodic &  27 &  54 &  27 &  0 & 1 &  28 &  2 & 0 & 1 \\
+\midrule
+Santa Fe & $2\!\times\!2$ & open     &  24 &  30 &   7 &  1 & 1 &   7 &  0 & 0 & 0 \\
+Santa Fe & $2\!\times\!2$ & periodic &  24 &  36 &  12 &  0 & 1 &  13 &  2 & 0 & 1 \\
+Santa Fe & $3\!\times\!3$ & open     &  54 &  72 &  19 &  1 & 1 &  19 &  0 & 0 & 0 \\
+Santa Fe & $3\!\times\!3$ & periodic &  54 &  81 &  27 &  0 & 1 &  28 &  2 & 0 & 1 \\
+\midrule
+Shakti   & $2\!\times\!2$ & open     &  64 &  81 &  18 &  1 & 1 &  18 &  0 & 0 & 0 \\
+Shakti   & $2\!\times\!2$ & periodic &  64 &  96 &  32 &  0 & 1 &  33 &  2 & 0 & 1 \\
+Shakti   & $3\!\times\!3$ & open     & 144 & 193 &  50 &  1 & 1 &  50 &  0 & 0 & 0 \\
+Shakti   & $3\!\times\!3$ & periodic & 144 & 216 &  72 &  0 & 1 &  73 &  2 & 0 & 1 \\
+\midrule
+Tetris   & $2\!\times\!2$ & open     &  32 &  38 &   7 &  1 & 1 &   7 &  0 & 0 & 0 \\
+Tetris   & $2\!\times\!2$ & periodic &  32 &  48 &  16 &  0 & 1 &  17 &  2 & 0 & 1 \\
+Tetris   & $3\!\times\!3$ & open     &  72 &  93 &  22 &  1 & 1 &  22 &  0 & 0 & 0 \\
+Tetris   & $3\!\times\!3$ & periodic &  72 & 108 &  36 &  0 & 1 &  37 &  2 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Several patterns emerge.  Reading across the Betti columns:
+$\beta_2(\text{none}) = 0$ always (no faces means no 2-cycles);
+$\beta_2(\text{all}) = 0$ for open BCs and $1$ for periodic
+(the torus encloses one independent ``void'').
+$\beta_1(\text{none}) = n_1 - n_0 + 1$ regardless of boundary conditions,
+because without faces the upper Laplacian vanishes ($L_1^{\text{up}} = 0$)
+and $\ker(L_1) = \ker(B_1^\top)$.
+$\beta_1(\text{all}) = 0$ for open BCs (every cycle on a planar patch
+bounds a union of faces) and $2$ for periodic (the two non-contractible
+winding modes of $H_1(\mathbb{T}^2) \cong \Z^2$).
+Periodic BCs add wrap-around edges without adding vertices, so
+$\beta_1(\text{none})$ roughly doubles relative to the open case.
+
 % ===================================================================
 % SECTION 7: HAMILTONIAN
 % ===================================================================
@@ -1581,34 +1677,8 @@ $e_2\!: v_2 \to v_1$.
 
 \begin{figure}[h]
 \centering
-\begin{tikzpicture}[
-  vertex/.style={circle, draw, fill=blue!20, minimum size=20pt, inner sep=0pt, font=\small},
-  edge label/.style={font=\small, fill=white, inner sep=1pt},
-  >={Stealth[length=5pt]}
-]
-  % Vertices: equilateral triangle, v0 at left, v1 at right, v2 at top
-  \node[vertex] (v0) at (0, 0)     {$v_0$};
-  \node[vertex] (v1) at (3, 0)     {$v_1$};
-  \node[vertex] (v2) at (1.5, 2.6) {$v_2$};
-
-  % Edge e0: v0 -> v1 (bottom)
-  \draw[->, thick] (v0) -- node[edge label, below] {$e_0$} (v1);
-  % Edge e1: v0 -> v2 (left)
-  \draw[->, thick] (v0) -- node[edge label, left]  {$e_1$} (v2);
-  % Edge e2: v2 -> v1 (right)
-  \draw[->, thick] (v2) -- node[edge label, right] {$e_2$} (v1);
-
-  % Spin arrows (offset from edges, showing sigma = (+1,+1,-1))
-  % e0: sigma=+1, same as reference (v0->v1)
-  \draw[->, red, thick, dashed] (0.9, -0.35) -- (2.1, -0.35);
-  \node[red, font=\scriptsize] at (1.5, -0.6) {$\sigma_0\!=\!+1$};
-  % e1: sigma=+1, same as reference (v0->v2)
-  \draw[->, red, thick, dashed] (-0.25, 0.8) -- (-0.05, 1.7);
-  \node[red, font=\scriptsize, left] at (-0.3, 1.25) {$\sigma_1\!=\!+1$};
-  % e2: sigma=-1, opposes reference, so physical flow is v1->v2
-  \draw[->, red, thick, dashed] (2.85, 0.8) -- (2.15, 1.7);
-  \node[red, font=\scriptsize, right] at (2.8, 1.25) {$\sigma_2\!=\!-1$};
-\end{tikzpicture}
+% Pre-compiled from tikz_triangle.tex (standalone)
+\includegraphics[width=0.45\textwidth]{tikz_triangle}
 \caption{Triangle $K_3$ with reference orientations (black arrows) and spin
 configuration $\bm\sigma = (+1,+1,-1)^T$ (red dashed arrows showing physical
 spin direction).  Vertex $v_0$ is a source ($Q=-2$), $v_1$ satisfies the
@@ -1771,68 +1841,8 @@ coordination $z_v = 4$.
 
 \begin{figure}[h]
 \centering
-\begin{tikzpicture}[
-  vertex/.style={circle, draw, fill=blue!20, minimum size=16pt, inner sep=0pt, font=\scriptsize},
-  wrap/.style={->, thick, densely dotted, gray},
-  >={Stealth[length=4pt]},
-  scale=1.0
-]
-  % Grid spacing
-  \def\s{2.2}
-
-  % Vertices: row-major v0..v8
-  \foreach \r in {0,1,2} {
-    \foreach \c in {0,1,2} {
-      \pgfmathtruncatemacro{\idx}{\r*3+\c}
-      \node[vertex] (v\idx) at (\c*\s, \r*\s) {$v_{\idx}$};
-    }
-  }
-
-  % Horizontal edges (reference: right)
-  % Row 0: e0(v0->v1), e1(v1->v2), e2(v2->v0 wrap)
-  \draw[->, thick] (v0) -- node[font=\tiny, above] {$e_0$} (v1);
-  \draw[->, thick] (v1) -- node[font=\tiny, above] {$e_1$} (v2);
-  % Row 1: e3(v3->v4), e4(v4->v5), e5(v5->v3 wrap)
-  \draw[->, thick] (v3) -- node[font=\tiny, above] {$e_3$} (v4);
-  \draw[->, thick] (v4) -- node[font=\tiny, above] {$e_4$} (v5);
-  % Row 2: e6(v6->v7), e7(v7->v8), e8(v8->v6 wrap)
-  \draw[->, thick] (v6) -- node[font=\tiny, above] {$e_6$} (v7);
-  \draw[->, thick] (v7) -- node[font=\tiny, above] {$e_7$} (v8);
-
-  % Vertical edges (reference: up)
-  % Col 0: e9(v0->v3), e12(v3->v6), e15(v6->v0 wrap)
-  \draw[->, thick] (v0) -- node[font=\tiny, left] {$e_9$} (v3);
-  \draw[->, thick] (v3) -- node[font=\tiny, left] {$e_{12}$} (v6);
-  % Col 1: e10(v1->v4), e13(v4->v7), e16(v7->v1 wrap)
-  \draw[->, thick] (v1) -- node[font=\tiny, left] {$e_{10}$} (v4);
-  \draw[->, thick] (v4) -- node[font=\tiny, left] {$e_{13}$} (v7);
-  % Col 2: e11(v2->v5), e14(v5->v8), e17(v8->v2 wrap)
-  \draw[->, thick] (v2) -- node[font=\tiny, left] {$e_{11}$} (v5);
-  \draw[->, thick] (v5) -- node[font=\tiny, left] {$e_{14}$} (v8);
-
-  % Wrap-around horizontal edges (dotted, curving outside the grid)
-  % e2: v2 -> v0 (right wraps to left, row 0)
-  \draw[wrap] (v2.south east) to[out=-30, in=-150]
-    node[font=\tiny, below] {$e_2$} (v0.south west);
-  % e5: v5 -> v3 (row 1)
-  \draw[wrap] (v5.east) to[out=0, in=0, looseness=1.5]
-    node[font=\tiny, right] {$e_5$} (v3.west);
-  % e8: v8 -> v6 (row 2)
-  \draw[wrap] (v8.north east) to[out=30, in=150]
-    node[font=\tiny, above] {$e_8$} (v6.north west);
-
-  % Wrap-around vertical edges (dotted, curving outside the grid)
-  % e15: v6 -> v0 (top wraps to bottom, col 0)
-  \draw[wrap] (v6.north west) to[out=150, in=-150, looseness=1.5]
-    node[font=\tiny, left] {$e_{15}$} (v0.south west);
-  % e16: v7 -> v1 (col 1)
-  \draw[wrap] (v7.north) to[out=90, in=-90, looseness=1.2]
-    node[font=\tiny, right, xshift=5pt] {$e_{16}$} (v1.south);
-  % e17: v8 -> v2 (col 2)
-  \draw[wrap] (v8.north east) to[out=30, in=-30, looseness=1.5]
-    node[font=\tiny, right] {$e_{17}$} (v2.south east);
-
-\end{tikzpicture}
+% Pre-compiled from tikz_torus.tex (standalone)
+\includegraphics[width=0.65\textwidth]{tikz_torus}
 \caption{The $3\times 3$ periodic square lattice (torus $T^2$).  Solid arrows
 show the 12~interior edges with reference orientations (horizontal: right,
 vertical: up).  Dotted gray arrows show the 6~wrap-around edges implementing
@@ -1968,6 +1978,123 @@ The combined Hodge 1-Laplacian $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$:
       \underbrace{6,6,6,6,6,6,6,6}_{8}\}.
 \end{equation}
 Spectral gap $\Delta_1 = 3$.
+
+\subsection{Explicit Laplacians: all faces vs.\ no faces}
+
+We now display the three Laplacians of~\eqref{eq:L0_def}--\eqref{eq:L2_def}
+for the $3\times 3$ torus, comparing the two face-filling strategies.
+
+\medskip\noindent
+\textbf{Graph Laplacian $L_0 = B_1 B_1^T$\; $(9\times 9)$.}
+Since every vertex has $z_v = 4$, $L_0 = 4I_9 - A$ where $A$ is the
+adjacency matrix.  This matrix is the same under both face-filling
+strategies (it depends only on the graph, not on faces):
+{\small
+\begin{equation}
+L_0 = \left(\begin{array}{@{}rrrrrrrrr@{}}
+ 4 & -1 & -1 & -1 &  0 &  0 & -1 &  0 &  0 \\
+-1 &  4 & -1 &  0 & -1 &  0 &  0 & -1 &  0 \\
+-1 & -1 &  4 &  0 &  0 & -1 &  0 &  0 & -1 \\
+-1 &  0 &  0 &  4 & -1 & -1 & -1 &  0 &  0 \\
+ 0 & -1 &  0 & -1 &  4 & -1 &  0 & -1 &  0 \\
+ 0 &  0 & -1 & -1 & -1 &  4 &  0 &  0 & -1 \\
+-1 &  0 &  0 & -1 &  0 &  0 &  4 & -1 & -1 \\
+ 0 & -1 &  0 &  0 & -1 &  0 & -1 &  4 & -1 \\
+ 0 &  0 & -1 &  0 &  0 & -1 & -1 & -1 &  4
+\end{array}\right)
+\label{eq:L0_torus}
+\end{equation}
+}
+The circulant block structure reflects the toroidal periodicity.
+$\operatorname{spec}(L_0) = \{0,\, 3^{(\times 4)},\, 6^{(\times 4)}\}$;
+one zero eigenvalue confirms $\beta_0 = 1$.
+
+\medskip\noindent
+\textbf{Face Laplacian $L_2 = B_2^T B_2$\; $(9\times 9)$, all faces filled.}
+A direct computation yields
+\begin{equation}
+  L_2 = L_0 \quad\text{(identically).}
+  \label{eq:L2_torus}
+\end{equation}
+This is \textbf{Poincar\'e duality} on the torus: the dual graph of the
+$3\times 3$ periodic square lattice is again a $3\times 3$ periodic square
+lattice, so the face adjacency structure is isomorphic to the vertex
+adjacency structure.
+$\operatorname{spec}(L_2) = \{0,\, 3^{(\times 4)},\, 6^{(\times 4)}\}$;
+one zero eigenvalue confirms $\beta_2 = 1$.
+
+With no faces filled, $L_2$ does not exist ($n_2 = 0$), and
+$\beta_2 = 0$.
+
+\medskip\noindent
+\textbf{Hodge 1-Laplacian $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$\;
+$(18\times 18)$, all faces filled.}
+The diagonal is uniformly~4 (each edge participates in~2 faces and
+connects~2 vertices, each of degree~4, giving
+$[L_1^{\text{down}}]_{ee} + [L_1^{\text{up}}]_{ee} = 2 + 2 = 4$).
+Off-diagonal entries lie in $\{-1, 0, +1\}$:
+{\scriptsize
+\begin{equation}
+L_1 = \left(\begin{array}{@{}rrrrrrrrrrrrrrrrrr@{}}
+ 4 &  0 & -1 &  0 & -1 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 &  0 &  0 \\
+ 0 &  4 &  0 & -1 &  0 &  1 &  0 & -1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 \\
+-1 &  0 &  4 &  0 & -1 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 \\
+ 0 & -1 &  0 &  4 &  0 &  1 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 \\
+-1 &  0 & -1 &  0 &  4 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 \\
+ 0 &  1 &  0 &  1 &  0 &  4 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 & -1 \\
+-1 &  0 &  0 &  0 &  0 &  0 &  4 &  0 & -1 &  0 & -1 &  0 &  1 &  0 &  0 &  0 &  0 &  0 \\
+ 0 & -1 &  0 &  0 &  0 &  0 &  0 &  4 &  0 & -1 &  0 &  1 &  0 & -1 &  0 &  0 &  0 &  0 \\
+ 0 &  0 & -1 &  0 &  0 &  0 & -1 &  0 &  4 &  0 & -1 &  0 &  0 &  0 &  1 &  0 &  0 &  0 \\
+ 0 &  0 &  0 & -1 &  0 &  0 &  0 & -1 &  0 &  4 &  0 &  1 &  0 &  0 &  0 & -1 &  0 &  0 \\
+ 0 &  0 &  0 &  0 & -1 &  0 & -1 &  0 & -1 &  0 &  4 &  0 &  0 &  0 &  0 &  0 &  1 &  0 \\
+ 0 &  0 &  0 &  0 &  0 & -1 &  0 &  1 &  0 &  1 &  0 &  4 &  0 &  0 &  0 &  0 &  0 & -1 \\
+ 1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 &  0 &  0 &  4 &  0 & -1 &  0 & -1 &  0 \\
+ 0 & -1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 &  4 &  0 & -1 &  0 &  1 \\
+ 0 &  0 &  1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 & -1 &  0 &  4 &  0 & -1 &  0 \\
+ 0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 & -1 &  0 &  4 &  0 &  1 \\
+ 0 &  0 &  0 &  0 &  1 &  0 &  0 &  0 &  0 &  0 &  1 &  0 & -1 &  0 & -1 &  0 &  4 &  0 \\
+ 0 &  0 &  0 &  0 &  0 & -1 &  0 &  0 &  0 &  0 &  0 & -1 &  0 &  1 &  0 &  1 &  0 &  4
+\end{array}\right)
+\label{eq:L1_torus}
+\end{equation}
+}
+
+\noindent
+The $6\times 6$ block structure (three $6\times 6$ blocks along the diagonal,
+corresponding to the three rows of the lattice) reflects the toroidal
+translation symmetry.
+
+\medskip\noindent
+\textbf{Face-filling comparison.}
+The following table summarizes how the Laplacian spectra change between
+the two face-filling strategies:
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+& \textbf{All faces} ($n_2 = 9$) & \textbf{No faces} ($n_2 = 0$) \\
+\midrule
+$L_0 = B_1 B_1^T$ & \multicolumn{2}{c}{$\{0,\, 3^{(\times 4)},\, 6^{(\times 4)}\}$ \quad(unchanged)} \\
+$L_1^{\text{down}} = B_1^T B_1$ & \multicolumn{2}{c}{$\{0^{(\times 10)},\, 3^{(\times 4)},\, 6^{(\times 4)}\}$ \quad(unchanged)} \\
+$L_1^{\text{up}} = B_2 B_2^T$ & $\{0^{(\times 10)},\, 3^{(\times 4)},\, 6^{(\times 4)}\}$ & $\mathbf{0}$ \\
+$L_1 = L_1^{\text{down}} + L_1^{\text{up}}$ & $\{0^{(\times 2)},\, 3^{(\times 8)},\, 6^{(\times 8)}\}$ & $\{0^{(\times 10)},\, 3^{(\times 4)},\, 6^{(\times 4)}\}$ \\
+$L_2 = B_2^T B_2$ & $\{0,\, 3^{(\times 4)},\, 6^{(\times 4)}\}$ & does not exist \\
+\midrule
+$\beta_1 = \dim\ker L_1$ & \textbf{2} & \textbf{10} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The critical observation: $L_1^{\text{down}}$ and $L_1^{\text{up}}$ each
+have~10 zero eigenvalues individually, but their sum $L_1$ has only~2.
+Adding $L_1^{\text{up}}$ ``lifts'' 8~of the~10 zero modes of
+$L_1^{\text{down}}$, because these modes lie in $\im(B_2)$ (they are
+boundaries of face signals) and $L_1^{\text{up}}$ acts nontrivially on them.
+The 2~surviving zero modes are exactly the harmonic modes---they lie in
+$\ker(B_1) \cap \ker(B_2^T)$, the intersection invisible to both Laplacians.
+With no faces, $L_1^{\text{up}} = 0$ and all~10 cycles remain
+in~$\ker(L_1)$.
 
 \subsection{The two harmonic modes}
 
