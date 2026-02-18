@@ -1280,6 +1280,196 @@ long-range interactions via the graph Green's function
 $L_0^{-1}$~\cite{nisoli2020}, but the nearest-neighbor version already
 establishes the $L_1^{\text{down}}$ connection.
 
+\subsection{Topological current: the face-level dual of topological charge}
+\label{sec:topological_current}
+
+The dumbbell Hamiltonian penalizes topological charge
+$Q_v = (B_1 \bm\sigma)_v$, which measures the net imbalance of incoming
+versus outgoing spins at each vertex. As elementary electric charges
+source an electric field, the natural question arises: is there
+a dual quantity---a \emph{topological current}---that plays the same
+role for faces that $Q_v$ plays for vertices?
+
+Define the \textbf{topological current} on face $f$:
+\begin{equation}
+  J_f \;=\; (B_2^T \bm\sigma)_f
+      \;=\; \sum_{e \in \partial f} \pm\, \sigma_e\,,
+  \label{eq:topological_current}
+\end{equation}
+the signed circulation of spin around the boundary of $f$. Just as $Q_v$
+measures how much spin \emph{diverges} from a vertex, $J_f$ measures how
+much spin \emph{curls} around a face. When all edge spins flow
+consistently around a face (a circulating current loop), $|J_f|$ is
+maximized; when they cancel, $J_f = 0$.
+
+The parallel between charge and current is exact
+(Table~\ref{tab:charge_current}).
+
+\begin{table}[h]
+\centering
+\caption{Charge--current duality for edge spins on a simplicial complex.
+Each row shows the vertex-level (0-cell) quantity alongside its face-level
+(2-cell) dual. The spin configuration $\bm\sigma$ plays the role of a
+discrete vector potential; its divergence yields charge, its curl yields
+current.}
+\label{tab:charge_current}
+\begin{tabular}{lcc}
+\toprule
+ & \textbf{Charge} ($Q_v$) & \textbf{Current} ($J_f$) \\
+\midrule
+Lives on       & vertices (0-cells) & faces (2-cells) \\
+Observable     & $Q_v = (B_1\bm\sigma)_v$ & $J_f = (B_2^T\bm\sigma)_f$ \\
+Operator       & $B_1$ (divergence) & $B_2^T$ (curl) \\
+Laplacian      & $L_1^{\text{down}} = B_1^T B_1$
+               & $L_1^{\text{up}} = B_2 B_2^T$ \\
+Constraint     & Ice rule: $Q_v = 0$ & Current rule: $J_f = 0$ \\
+Excitation     & Monopole   & Vortex \\
+EM analogue    & Electric charge & Current loop / magnetic flux \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The spin configuration $\bm\sigma$ plays the role of a discrete vector
+potential $\mathbf{A}$; the charge $Q_v = (\text{div}\;\bm\sigma)_v$ is its
+divergence, and the current $J_f = (\text{curl}\;\bm\sigma)_f$ is its curl.
+
+\subsection{The Hodge Hamiltonian}
+\label{sec:hodge_hamiltonian}
+
+With the current $J_f$ in hand, the Hamiltonian that penalizes both
+charge and current excitations writes itself:
+\begin{equation}
+  \boxed{\;
+  \mathcal{H}_{\text{Hodge}}
+  = \frac{\epsilon}{2}\sum_v Q_v^2
+  + \frac{\kappa}{2}\sum_f J_f^2
+  = \frac{\epsilon}{2}\,\bm\sigma^T L_1^{\text{down}}\bm\sigma
+  + \frac{\kappa}{2}\,\bm\sigma^T L_1^{\text{up}}\bm\sigma
+  \;}
+  \label{eq:hodge_hamiltonian}
+\end{equation}
+The coupling $\epsilon$ sets the energy cost of monopole excitations
+(nonzero vertex charge), while $\kappa$ sets the cost of vortex
+excitations (nonzero face current). The ratio $\kappa/\epsilon$
+interpolates between pure spin-ice physics ($\kappa = 0$, only charge
+matters) and pure plaquette physics ($\epsilon = 0$, only current
+matters).
+
+The connection to the Hodge decomposition is immediate. The constraint
+$Q_v = 0\;\forall v$ (charge-free) restricts $\bm\sigma$ to
+$\ker(B_1) = \operatorname{im}(B_2) \oplus \ker(L_1)$---the curl and
+harmonic subspaces. The additional constraint
+$J_f = 0\;\forall f$ (current-free) further restricts to
+$\ker(B_2^T) \cap \ker(B_1) = \ker(L_1)$---the harmonic subspace alone.
+When both couplings are nonzero, the ground-state manifold is precisely
+$\ker(L_1)$, the space of configurations that are simultaneously
+divergence-free and curl-free.
+
+\subsection{Current frustration on odd-sided faces}
+\label{sec:current_frustration}
+
+There is a striking parallel between vertex frustration and what we
+might call \emph{current frustration}. Since each $\sigma_e = \pm 1$,
+the current $J_f$ is a sum of $|\partial f|$ terms each equal to $\pm 1$.
+For a face with an \emph{odd} number of edges, $J_f$ is necessarily odd
+and therefore $|J_f| \geq 1$: the current rule $J_f = 0$ can never be
+satisfied. This is the face-level analogue of the familiar fact that
+odd-coordinated vertices cannot satisfy the ice rule $Q_v = 0$.
+
+This has immediate consequences for the lattice zoo:
+\begin{itemize}
+\item \textbf{Kagome} (all triangular faces): maximally
+  current-frustrated---every face has $|J_f| \geq 1$.
+\item \textbf{Square lattice} (all square faces): can satisfy
+  $J_f = 0$ on every face.
+\item \textbf{Mixed lattices} (shakti, tetris, santa fe): current
+  frustration depends on the mix of face sizes in the tiling.
+\end{itemize}
+
+\noindent
+The $\kappa$ term in the Hodge Hamiltonian therefore has a nonzero
+ground-state energy on lattices with odd-sided faces, just as the
+$\epsilon$ term has a nonzero ground-state energy on lattices with
+odd-coordinated vertices. For lattices that are frustrated in both
+sectors, the harmonic subspace $\ker(L_1)$ may be empty, and the
+system must compromise between charge and current costs.
+
+\subsection{Physical realizations of the current term}
+\label{sec:current_physics}
+
+The charge--current decomposition and the Hodge Hamiltonian appear,
+under various names, in several areas of physics:
+
+\paragraph{Lattice gauge theory.}
+In Wilson's lattice gauge theory~\cite{wilson1974}, the plaquette action
+$S_{\text{plaq}} = -\beta \sum_f \cos J_f$ penalizes nonzero
+circulation around faces, directly analogous to the $\kappa$ term for
+Ising ($\mathbb{Z}_2$) gauge fields. The charge term plays the role of
+Gauss's law. The full Hodge Hamiltonian thus combines gauge constraint
+enforcement (charge) with dynamical content (current/flux).
+
+\paragraph{Kitaev's toric code.}
+The toric code Hamiltonian
+$H_{\text{TC}} = -J_s \sum_v A_v - J_p \sum_f B_f$
+is the quantum $\mathbb{Z}_2$ version of Eq.~\eqref{eq:hodge_hamiltonian}:
+the \emph{star operators} $A_v$ enforce zero vertex charge (analogous to
+$L_1^{\text{down}}$), while the \emph{plaquette operators} $B_f$ enforce
+zero face current (analogous to $L_1^{\text{up}}$). Excitations of the
+star term are electric charges ($e$-particles); excitations of the
+plaquette term are magnetic vortices ($m$-particles). Both are anyons,
+and their braiding statistics underlie topological quantum error
+correction.
+
+\paragraph{Discrete electromagnetism.}
+On a simplicial complex, $Q_v = (B_1\bm\sigma)_v$ is the discrete
+divergence and $J_f = (B_2^T\bm\sigma)_f$ is the discrete curl. The
+Hodge Hamiltonian becomes the discrete analogue of electromagnetic
+field energy
+$\mathcal{E} \sim \int(\|\mathbf{E}\|^2 + \|\mathbf{B}\|^2)\,dV$,
+with $\epsilon$ controlling the electric sector and $\kappa$ the
+magnetic sector. Harmonic configurations ($\ker L_1$) are the discrete
+analogue of source-free, curl-free fields---solutions to the vacuum
+Maxwell equations.
+
+\paragraph{Ring-exchange interactions.}
+In quantum dimer models and pyrochlore spin ice, ring-exchange processes
+flip spins around elementary plaquettes. The energy cost of such a flip
+is controlled by $J_f$---precisely the face current. Hermele,
+Fisher, and Balents showed that ring exchange in pyrochlore ice generates
+an emergent $U(1)$ gauge field whose low-energy physics is governed by
+the Maxwell action, the continuum limit of the Hodge
+Hamiltonian~\cite{hermele2004}.
+
+\paragraph{Dipolar spin ice.}
+Real spin-ice materials (Dy$_2$Ti$_2$O$_7$, Ho$_2$Ti$_2$O$_7$)
+have long-range dipolar interactions beyond the nearest-neighbor
+dumbbell model. Castelnovo, Moessner, and Sondhi showed that these
+corrections generate effective multi-spin interactions around
+plaquettes~\cite{castelnovo2008}, introducing an energetic preference
+among ice-rule-satisfying states that is naturally captured by the
+$\kappa$ term: dipolar corrections lift the ice-manifold degeneracy
+by penalizing configurations with large $|J_f|$.
+
+\subsection{Implications for topological deep learning}
+\label{sec:hodge_tdl}
+
+The charge--current framework provides a physical interpretation of why
+simplicial neural networks that use the full Hodge Laplacian $L_1$
+access richer structure than graph neural networks using $L_0$ alone.
+The $\epsilon$ term (graph Laplacian smoothing) drives signals toward
+the charge-free subspace; the $\kappa$ term (upper Laplacian smoothing)
+drives signals toward the current-free subspace. Only in
+$\ker(L_1)$---signals that are both charge-free and current-free---do
+features survive both smoothing channels indefinitely. The dimension
+of this protected subspace is $\beta_1$, explaining its role as the
+key topological invariant for oversmoothing resistance.
+
+For lattice design, this suggests a new axis of control: beyond
+maximizing $\beta_1$ (large harmonic subspace), one can separately tune
+vertex frustration ($\epsilon$ sector) and current frustration ($\kappa$
+sector) by choosing lattice topologies with specific mixes of vertex
+coordination and face size.
+
 % ===================================================================
 % SECTION 8: OUTLOOK
 % ===================================================================
@@ -1598,6 +1788,22 @@ are complementary approaches, but both are at a preliminary design stage.
   \item Whether these neural samplers can actually outperform directed-loop
     MCMC on any practically relevant lattice size---we do not yet have
     evidence that they can.
+  \item Both Mode~A and Mode~B use only $B_1$-based EIGN operators,
+    passing messages between edges via shared vertices. The
+    charge--current duality (\cref{sec:topological_current}) and the Hodge
+    Hamiltonian (\cref{eq:hodge_hamiltonian}) suggest a natural
+    extension: incorporating $B_2$-based operators that pass messages
+    between edges via shared \emph{faces}, enabling the network to
+    learn representations sensitive to plaquette current $J_f$ in
+    addition to vertex charge $Q_v$. This would amount to lifting
+    the architecture from a graph neural network to a simplicial or
+    cell complex neural network operating on the full
+    $(B_1, B_2)$ chain complex. We expect this direction to be
+    relevant for systems where the $\kappa$ term is physically
+    active (ring exchange, gauge theories), but implementing and
+    validating Modes~A and~B on ASI systems with $B_1$-only
+    operators is already a substantial undertaking and the more
+    immediate goal.
 \end{itemize}
 
 We would welcome critical feedback on any of the formalism or the neural
@@ -1663,6 +1869,22 @@ Q.~Li, Z.~Han, and X.-M. Wu,
 ``Deeper insights into graph convolutional networks for semi-supervised
 learning,''
 In \emph{Proc. AAAI 2018}, pp.\ 3538--3545.
+
+\bibitem{wilson1974}
+K.~G. Wilson,
+``Confinement of quarks,''
+\emph{Phys. Rev. D} \textbf{10}, 2445 (1974).
+
+\bibitem{hermele2004}
+M.~Hermele, M.~P.~A. Fisher, and L.~Balents,
+``Pyrochlore photons: The $U(1)$ spin liquid in a $S=1/2$ three-dimensional
+frustrated magnet,''
+\emph{Phys. Rev. B} \textbf{69}, 064404 (2004).
+
+\bibitem{castelnovo2008}
+C.~Castelnovo, R.~Moessner, and S.~L. Sondhi,
+``Magnetic monopoles in spin ice,''
+\emph{Nature} \textbf{451}, 42 (2008).
 
 \end{thebibliography}
 
