@@ -1165,9 +1165,20 @@ Tetris   & $3\!\times\!3$ & periodic &  72 & 108 &  36 &  0 & 1 &  37 &  2 & 0 &
 \end{table*}
 
 Several patterns emerge.  Reading across the Betti columns:
-$\beta_2(\text{none}) = 0$ always (no faces means no 2-cycles);
-$\beta_2(\text{all}) = 0$ for open BCs and $1$ for periodic
-(the torus encloses one independent ``void'').
+$\beta_0 = 1$ always (the graph is connected: every pair of vertices is
+linked by a path, so $\ker(L_0)$ is spanned by the constant vector).
+$\beta_2(\text{none}) = 0$ always (with no faces, $B_2$ is the empty
+matrix, so there are no 2-chains and hence no 2-cycles).
+$\beta_2(\text{all}) = 0$ for open BCs and $1$ for periodic.
+The periodic case has $\beta_2 = 1$ because the faces tile a closed
+surface (the torus), so the signed sum of all consistently oriented
+faces has no boundary---$B_2^T(\text{all faces}) = \mathbf{0}$---giving
+one independent 2-cycle in $\ker(L_2)$.  On an open lattice, the faces
+do not close up: the boundary of the total face sum is nonzero (it
+equals the outer boundary of the patch), so there is no 2-cycle and
+$\beta_2 = 0$.  In short: $\beta_0$ counts connected components,
+$\beta_1$ counts independent non-bounding loops, and $\beta_2$ counts
+enclosed voids---exactly the intuition from classical homology.
 $\beta_1(\text{none}) = n_1 - n_0 + 1$ regardless of boundary conditions,
 because without faces the upper Laplacian vanishes ($L_1^{\text{up}} = 0$)
 and $\ker(L_1) = \ker(B_1^\top)$.
