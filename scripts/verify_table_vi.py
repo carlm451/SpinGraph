@@ -46,8 +46,10 @@ CONFIGS = [
 EXPECTED = {
     ("square",   4, 4, "open"):     dict(n0=16, n1=24, n2=9,  chi=1, b0=1, b2=0, b1_all=0,  b1_none=9),
     ("square",   4, 4, "periodic"): dict(n0=16, n1=32, n2=16, chi=0, b0=1, b2=1, b1_all=2,  b1_none=17),
-    ("kagome",   2, 2, "open"):     dict(n0=12, n1=17, n2=6,  chi=1, b0=1, b2=0, b1_all=0,  b1_none=6),
-    ("kagome",   2, 2, "periodic"): dict(n0=12, n1=24, n2=12, chi=0, b0=1, b2=1, b1_all=2,  b1_none=13),
+    ("kagome",   2, 2, "open"):     dict(n0=8,  n1=7,  n2=0,  chi=1, b0=1, b2=0, b1_all=0,  b1_none=0),
+    ("kagome",   2, 2, "periodic"): dict(n0=8,  n1=12, n2=4,  chi=0, b0=1, b2=1, b1_all=2,  b1_none=5),
+    ("kagome",   3, 3, "open"):     dict(n0=18, n1=19, n2=2,  chi=1, b0=1, b2=0, b1_all=0,  b1_none=2),
+    ("kagome",   3, 3, "periodic"): dict(n0=18, n1=27, n2=9,  chi=0, b0=1, b2=1, b1_all=2,  b1_none=10),
     ("santa_fe", 2, 2, "open"):     dict(n0=24, n1=30, n2=7,  chi=1, b0=1, b2=0, b1_all=0,  b1_none=7),
     ("santa_fe", 2, 2, "periodic"): dict(n0=24, n1=36, n2=12, chi=0, b0=1, b2=1, b1_all=2,  b1_none=13),
     ("shakti",   2, 2, "open"):     dict(n0=64, n1=81, n2=18, chi=1, b0=1, b2=0, b1_all=0,  b1_none=18),

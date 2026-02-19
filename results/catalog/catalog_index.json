@@ -5,9 +5,9 @@
     "face_strategy": "all",
     "boundary": "periodic",
     "beta_1": 2,
-    "n_vertices": 7500,
-    "n_edges": 15000,
-    "n_faces": 7500
+    "n_vertices": 5000,
+    "n_edges": 7500,
+    "n_faces": 2500
   },
   {
     "lattice_name": "kagome",
@@ -15,18 +15,18 @@
     "face_strategy": "all",
     "boundary": "open",
     "beta_1": 0,
-    "n_vertices": 7500,
-    "n_edges": 14801,
-    "n_faces": 7302
+    "n_vertices": 5000,
+    "n_edges": 7351,
+    "n_faces": 2352
   },
   {
     "lattice_name": "kagome",
     "size_label": "L",
     "face_strategy": "none",
     "boundary": "periodic",
-    "beta_1": 7501,
-    "n_vertices": 7500,
-    "n_edges": 15000,
+    "beta_1": 2501,
+    "n_vertices": 5000,
+    "n_edges": 7500,
     "n_faces": 0
   },
   {
@@ -45,9 +45,9 @@
     "face_strategy": "all",
     "boundary": "periodic",
     "beta_1": 2,
-    "n_vertices": 1200,
-    "n_edges": 2400,
-    "n_faces": 1200
+    "n_vertices": 800,
+    "n_edges": 1200,
+    "n_faces": 400
   },
   {
     "lattice_name": "kagome",
@@ -55,18 +55,18 @@
     "face_strategy": "all",
     "boundary": "open",
     "beta_1": 0,
-    "n_vertices": 1200,
-    "n_edges": 2321,
-    "n_faces": 1122
+    "n_vertices": 800,
+    "n_edges": 1141,
+    "n_faces": 342
   },
   {
     "lattice_name": "kagome",
     "size_label": "M",
     "face_strategy": "none",
     "boundary": "periodic",
-    "beta_1": 1201,
-    "n_vertices": 1200,
-    "n_edges": 2400,
+    "beta_1": 401,
+    "n_vertices": 800,
+    "n_edges": 1200,
     "n_faces": 0
   },
   {
@@ -74,9 +74,9 @@
     "size_label": "M",
     "face_strategy": "none",
     "boundary": "open",
-    "beta_1": 1122,
-    "n_vertices": 1200,
-    "n_edges": 2321,
+    "beta_1": 342,
+    "n_vertices": 800,
+    "n_edges": 1141,
     "n_faces": 0
   },
   {
@@ -85,9 +85,9 @@
     "face_strategy": "all",
     "boundary": "periodic",
     "beta_1": 2,
-    "n_vertices": 300,
-    "n_edges": 600,
-    "n_faces": 300
+    "n_vertices": 200,
+    "n_edges": 300,
+    "n_faces": 100
   },
   {
     "lattice_name": "kagome",
@@ -95,18 +95,18 @@
     "face_strategy": "all",
     "boundary": "open",
     "beta_1": 0,
-    "n_vertices": 300,
-    "n_edges": 561,
-    "n_faces": 262
+    "n_vertices": 200,
+    "n_edges": 271,
+    "n_faces": 72
   },
   {
     "lattice_name": "kagome",
     "size_label": "S",
     "face_strategy": "none",
     "boundary": "periodic",
-    "beta_1": 301,
-    "n_vertices": 300,
-    "n_edges": 600,
+    "beta_1": 101,
+    "n_vertices": 200,
+    "n_edges": 300,
     "n_faces": 0
   },
   {
@@ -114,9 +114,9 @@
     "size_label": "S",
     "face_strategy": "none",
     "boundary": "open",
-    "beta_1": 262,
-    "n_vertices": 300,
-    "n_edges": 561,
+    "beta_1": 72,
+    "n_vertices": 200,
+    "n_edges": 271,
     "n_faces": 0
   },
   {
@@ -125,9 +125,9 @@
     "face_strategy": "all",
     "boundary": "periodic",
     "beta_1": 2,
-    "n_vertices": 30000,
-    "n_edges": 60000,
-    "n_faces": 30000
+    "n_vertices": 20000,
+    "n_edges": 30000,
+    "n_faces": 10000
   },
   {
     "lattice_name": "kagome",
@@ -144,9 +144,9 @@
     "size_label": "XL",
     "face_strategy": "none",
     "boundary": "periodic",
-    "beta_1": 30001,
-    "n_vertices": 30000,
-    "n_edges": 60000,
+    "beta_1": 10001,
+    "n_vertices": 20000,
+    "n_edges": 30000,
     "n_faces": 0
   },
   {
@@ -155,9 +155,9 @@
     "face_strategy": "all",
     "boundary": "periodic",
     "beta_1": 2,
-    "n_vertices": 48,
-    "n_edges": 96,
-    "n_faces": 48
+    "n_vertices": 32,
+    "n_edges": 48,
+    "n_faces": 16
   },
   {
     "lattice_name": "kagome",
@@ -165,18 +165,18 @@
     "face_strategy": "all",
     "boundary": "open",
     "beta_1": 0,
-    "n_vertices": 48,
-    "n_edges": 81,
-    "n_faces": 34
+    "n_vertices": 32,
+    "n_edges": 37,
+    "n_faces": 6
   },
   {
     "lattice_name": "kagome",
     "size_label": "XS",
     "face_strategy": "none",
     "boundary": "periodic",
-    "beta_1": 49,
-    "n_vertices": 48,
-    "n_edges": 96,
+    "beta_1": 17,
+    "n_vertices": 32,
+    "n_edges": 48,
     "n_faces": 0
   },
   {
@@ -184,9 +184,9 @@
     "size_label": "XS",
     "face_strategy": "none",
     "boundary": "open",
-    "beta_1": 34,
-    "n_vertices": 48,
-    "n_edges": 81,
+    "beta_1": 6,
+    "n_vertices": 32,
+    "n_edges": 37,
     "n_faces": 0
   },
   {

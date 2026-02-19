@@ -94,7 +94,7 @@ The equ-to-inv cross-channel has the same problem: `|B1|^T @ B1 @ sigma = |B1|^T
 
 **The problem:** The reward `R = -ln q` is a sum over beta_1 directed-loop contributions: `ln q = sum_{directed loops} [alpha_i ln p_i + (1-alpha_i) ln(1-p_i)]`. By CLT, `Var(ln q) ~ beta_1 * var_per_loop`. The REINFORCE gradient variance is proportional to `Var(R) * E[||grad ln q||^2]`, which grows at least linearly with beta_1.
 
-**Impact:** At beta_1 = 9 (square XS), variance is manageable. At beta_1 = 25 (square S-), it's ~3x worse. At beta_1 = 301 (kagome S), ~33x worse. This means:
+**Impact:** At beta_1 = 9 (square XS), variance is manageable. At beta_1 = 25 (square S-), it's ~3x worse. At beta_1 = 101 (kagome S), ~11x worse. This means:
 - More epochs needed for convergence (compounding the per-epoch cost increase)
 - Larger batch sizes needed to control gradient noise
 - Training may fail to converge at all without variance reduction

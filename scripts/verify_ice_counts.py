@@ -359,15 +359,15 @@ def count_ice_states_bruteforce(
 EXPECTED = {
     ("square", 4, 4, "open"): {"beta1": 9, "reachable": 25},
     ("square", 4, 4, "periodic"): {"beta1": 17, "reachable": 40},
-    ("kagome", 2, 2, "open"): {"beta1": 6, "reachable": 32},
-    ("kagome", 2, 2, "periodic"): {"beta1": 13, "reachable": 172},
+    ("kagome", 2, 2, "open"): {"beta1": 0, "reachable": 1},
+    ("kagome", 2, 2, "periodic"): {"beta1": 5, "reachable": 2},
     ("santa_fe", 2, 2, "open"): {"beta1": 7, "reachable": 8},
     ("santa_fe", 3, 3, "open"): {"beta1": 19, "reachable": 48},
     ("shakti", 1, 1, "open"): {"beta1": 2, "reachable": 3},
     ("shakti", 2, 2, "open"): {"beta1": 18, "reachable": 112},
     ("tetris", 2, 2, "open"): {"beta1": 7, "reachable": 12},
     ("tetris", 3, 3, "open"): {"beta1": 22, "reachable": 4},
-    ("kagome", 3, 3, "open"): {"beta1": 17, "reachable": 4352},
+    ("kagome", 3, 3, "open"): {"beta1": 2, "reachable": 3},
     ("square", 6, 6, "open"): {"beta1": 25, "reachable": 3029},
 }
 

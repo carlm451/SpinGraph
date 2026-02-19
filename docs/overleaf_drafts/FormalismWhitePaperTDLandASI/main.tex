@@ -61,17 +61,30 @@
 This document has two parts, both preliminary.
 %
 The first part works out the mathematical correspondence between the
-simplicial-complex formalism used in Topological Deep Learning (TDL)---boundary
+cell-complex formalism used in Topological Deep Learning (TDL)---boundary
 operators, Hodge Laplacians, cochains---and Nisoli's charge framework for
 artificial spin ice (ASI).  The operators turn out to be identical, not
-merely analogous: the same $B_1$, $L_0$, $L_1^{\text{down}}$ that appear
-in TDL message passing are exactly the objects in the ASI charge and
-Hamiltonian theory.  We spell out the dictionary (six ``key results''
-connecting $S_{vv'}$, topological charge, the Hodge decomposition, and the
-Hamiltonian to TDL quantities) and present a counting table showing how
-much the directed-cycle constraint reduces the reachable ice-state count
+merely analogous: the same vertex--edge incidence matrix~$B_1$, graph
+Laplacian~$L_0$, and lower Hodge Laplacian~$L_1^{\text{down}}$ that
+appear in TDL message passing are exactly the objects in the ASI charge
+and Hamiltonian theory.  We derive six ``key results'' connecting the two
+frameworks and then extend Nisoli's charge Hamiltonian to a \emph{Hodge
+Hamiltonian} that penalizes both topological charge ($B_1\bm\sigma$,
+monopoles) and topological current ($B_2^T\bm\sigma$, vortices),
+unifying both sectors through the full Hodge 1-Laplacian~$L_1$.
+A spanning-tree argument yields the global bound
+$|\mathcal{I}| \leq |\mathcal{Q}_{\min}|\cdot 2^{\beta_1}$
+on the total ice manifold, where $|\mathcal{Q}_{\min}|$ is the number
+of feasible charge sectors---reducing to
+$|\mathcal{I}| \leq 2^{\beta_1}$ when every vertex has even
+coordination.
+Two tables collect the core quantitative results: a counting table showing
+how the directed-cycle constraint reduces the reachable ice-state count
 below the topological bound $2^{\beta_1}$---by up to five orders of
-magnitude across the lattice zoo.
+magnitude across a zoo of eight lattice types---and a topological
+invariants catalog listing every simplex count and Betti number under
+both face-filling strategies and both boundary conditions.  Worked
+examples with explicit Laplacian matrices appear in the appendices.
 %
 The second part sketches an idea for future application: using recent
 work on variational autoregressive networks (VAN), message-passing VAN
@@ -168,10 +181,10 @@ investing further in implementation.
   \includegraphics[width=\linewidth]{kagome_2x2_periodic_ice_state}
   \caption{Ice state (periodic)}
 \end{subfigure}
-\caption{Kagome lattice ($2\!\times\!2$). All vertices have coordination
+\caption{Kagome lattice ($2\!\times\!2$). All bulk vertices have coordination
   $z = 3$ (odd), so the ice rule allows $|Q_v| = 1$. Top: open BC
-  ($n_1 = 17$, $\beta_1 = 6$, 6 charge sectors). Bottom: periodic BC
-  ($n_1 = 24$, $\beta_1 = 13$, single sector).}
+  ($n_1 = 7$, $\beta_1 = 0$, 20 charge sectors). Bottom: periodic BC
+  ($n_1 = 12$, $\beta_1 = 5$, 70 charge sectors).}
 \label{fig:kagome}
 \end{figure*}
 
@@ -273,14 +286,14 @@ This document works through the mathematical correspondence between two
 bodies of theory that, at first glance, belong to entirely different fields:
 
 \begin{itemize}
-  \item \textbf{Topological Deep Learning (TDL)}---the framework of simplicial
+  \item \textbf{Topological Deep Learning (TDL)}---the framework of cell
     complexes, boundary operators, Hodge Laplacians, and cochains that
     generalizes graph neural networks to higher-order
     structures~\cite{hajij2023topological,papillon2024architectures}.
   \item \textbf{Artificial Spin Ice (ASI) graph theory}---the charge
     framework~\cite{nisoli2020} for frustrated lattice systems, which describes
     spin configurations, topological charges, ice rules, and entropic
-    interactions using the combinatorial Laplacian and its pseudoinverse.
+    interactions using the graph Laplacian and its pseudoinverse.
 \end{itemize}
 
 The connection turns out to be structural, not analogical: the same
@@ -289,12 +302,32 @@ $L_1^{\text{down}} = B_1^T B_1$---governs both the entropic interactions
 between topological charges in spin ice \emph{and} the message-passing
 dynamics in graph neural networks.  The first part of this document
 (Secs.~\ref{sec:notation}--\ref{sec:hamiltonian}) spells out the dictionary
-in detail, deriving six ``key results'' that translate objects from the ASI
-charge framework---$S_{vv'}$, topological charge, Coulomb classes, ice
-manifold, Hodge decomposition, Hamiltonian---into standard TDL quantities.
+in detail, deriving six ``key results'' that connect objects across the two
+frameworks---$S_{vv'}$, topological charge, Coulomb classes, and the ice
+manifold from ASI physics; boundary operators, the Hodge decomposition,
+and the Hodge Laplacian from TDL.
+The key operators are: the vertex--edge incidence matrix~$B_1$, which
+encodes which vertices bound each edge; the edge--face incidence
+matrix~$B_2$, which encodes which edges bound each face; the graph
+(vertex) Laplacian $L_0 = B_1 B_1^T$, governing vertex-level
+interactions; the lower Hodge Laplacian
+$L_1^{\text{down}} = B_1^T B_1$, governing edge-level interactions
+through shared vertices; the upper Hodge Laplacian
+$L_1^{\text{up}} = B_2 B_2^T$, governing edge-level interactions
+through shared faces; the full Hodge 1-Laplacian
+$L_1 = L_1^{\text{down}} + L_1^{\text{up}}$; and the face Laplacian
+$L_2 = B_2^T B_2$.  These are defined formally in
+\cref{sec:boundary_ops,sec:topology_zoo}.
 A particular focus is the counting table (\cref{sec:counting_table}), which
 tracks how much the directed-cycle constraint reduces the reachable ice-state
 count below the topological bound $2^{\beta_1}$.
+
+Two tables collect the core quantitative results.
+\Cref{tab:counting} (the ``counting table'') tracks how the directed-cycle
+constraint prunes the reachable ice-state count, revealing a five-order-of-magnitude
+variation across the lattice zoo.  \Cref{tab:topology_zoo} catalogs every
+simplex count and Betti number under both face-filling strategies and both
+boundary conditions, verifying the Euler relation concretely for all lattices.
 
 The second part (\cref{sec:outlook}) sketches an idea for where this
 correspondence might lead: neural samplers for spin ice configurations,
@@ -322,22 +355,31 @@ itself (for even-degree vertices) or as the space of fluctuations within it
 density (Pauling entropy), and its spectral structure all vary across lattice
 types in ways that ASI physics has characterized in detail.  A particular
 focus of the formalism sections is the relationship between $\beta_1$ and
-the degeneracy of the ice manifold: $\beta_1$ sets an upper bound of
-$2^{\beta_1}$ on the reachable ice states per charge sector
-(\cref{sec:loop_basis}), but the actual count is controlled by a
+the degeneracy of the ice manifold.  A key finding is the global bound
+on the total ice manifold,
+$|\calI| \leq |\calQ_{\min}|\cdot 2^{\beta_1}$
+(\cref{eq:global_bound}), derived from a spanning-tree argument that
+yields the per-sector bound $|\calI_{\mathbf{Q}}| \leq 2^{\beta_1}$
+and then sums over all $|\calQ_{\min}|$ feasible charge sectors.
+The actual reachable count within each sector is controlled by a
 \textbf{directed-cycle constraint} that can reduce it by orders of magnitude
 (\cref{sec:counting_table}).  This distinction matters for neural sampling,
 where training difficulty depends on the reachable state count, not on
 $\beta_1$ alone.
 
 The remainder of this document is organized as follows.
-\Cref{sec:notation} establishes notation and the simplicial complex setup.
+\Cref{sec:notation} establishes notation and the cell complex setup.
 \Cref{sec:S_matrix,sec:charge} derive the correspondence for the
 $S_{vv'}$ matrix and the topological charge.
 \Cref{sec:coulomb} develops the Coulomb class structure, ice manifold
 parameterization, and the counting table.
 \Cref{sec:hodge} presents the Hodge decomposition, and \cref{sec:hamiltonian}
-connects the spin-ice Hamiltonian to the lower Hodge Laplacian.
+connects Nisoli's charge Hamiltonian to the lower
+Hodge Laplacian $L_1^{\text{down}}$, then extends it to a
+\emph{Hodge Hamiltonian} that penalizes both topological charge
+($B_1\bm\sigma$, monopoles) and topological current
+($B_2^T\bm\sigma$, vortices), unifying both sectors through the full
+$L_1$.
 \Cref{sec:outlook} sketches the two neural-sampling architectures, and
 \cref{sec:summary} summarizes.
 
@@ -369,17 +411,25 @@ For lattices on $\Z^2$, we orient horizontal edges left$\to$right and
 vertical edges bottom$\to$top. For edges not aligned with axes, we orient
 from the vertex with smaller index to the vertex with larger index.
 \end{convention}
+\noindent
+Concrete reference orientations for every lattice in the zoo are shown in
+\cref{fig:square,fig:kagome,fig:santa_fe,fig:shakti,fig:tetris} (center
+panels).
 
-\subsection{Simplicial complex}
+\subsection{Cell complex}
 \label{sec:simplicial}
 
-A simplicial complex $X$ built on $G$ extends the graph to include
+A cell complex $X$ built on $G$ extends the graph to include
 higher-dimensional cells:
 \begin{itemize}
-  \item \textbf{0-simplices (vertices):} the $n_0$ vertices of $G$
-  \item \textbf{1-simplices (edges):} the $n_1$ oriented edges of $G$
-  \item \textbf{2-simplices (faces):} $n_2$ oriented filled polygonal faces
+  \item \textbf{0-cells (vertices):} the $n_0$ vertices of $G$
+  \item \textbf{1-cells (edges):} the $n_1$ oriented edges of $G$
+  \item \textbf{2-cells (faces):} $n_2$ oriented filled polygonal faces
 \end{itemize}
+When all faces are triangles, $X$ is a simplicial complex;
+for lattices with square or larger faces (e.g., kagome hexagons), $X$ is a cell complex.  The
+boundary operators, Hodge Laplacians, and Hodge decomposition are defined
+identically in both cases.
 
 The vertices and edges are given by the graph, but the \textbf{faces are a
 modeling choice}. Morrison, Nelson \& Nisoli~\cite{morrison2013} define a
@@ -464,9 +514,7 @@ Full Hodge 1-Laplacian & $L_1 = L_1^{\text{down}} + L_1^{\text{up}}$ & --- & Cen
 Antisymmetric spin matrix & --- & $S_{vv'} = A^{\text{dir}}_{vv'} - A^{\text{dir}}_{v'v}$ & See \cref{sec:S_matrix} \\
 Topological charge & $(B_1\bm\sigma)_v$ & $Q_v[S] = \sum_{v'} S_{v'v}$ & See \cref{sec:charge} \\
 Ice manifold & $\ker(B_1) \cap \{\pm 1\}^{n_1}$ & $\calI = \{\sigma: Q_v = 0\;\forall v\}$ & See \cref{sec:ice_manifold} \\
-Harmonic subspace & $\ker(L_1)$, dim $= \beta_1$ & Topological winding modes & See \cref{sec:hodge} \\
-Coulomb class & $C_{\mathbf{q}}$ & Charge sector & See \cref{sec:coulomb_classes} \\
-Pauling entropy & $s(G)$ & Entropy per vertex of $\calI$ & $s = \ln|\calI|/n_0$ \\
+Harmonic subspace & $\ker(L_1)$, dim $= \beta_1$ & --- & See \cref{sec:hodge} \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -485,16 +533,33 @@ by: for edge $e$ oriented from vertex $u$ (tail) to $v$ (head),
   \label{eq:B1def}
 \end{equation}
 
+Just as each edge requires a reference orientation to define $B_1$, each
+face requires a \textbf{reference orientation}---a choice of traversal
+direction around its boundary cycle.
+
+\begin{convention}[Face Orientation]
+We orient every face counterclockwise (CCW).
+\end{convention}
+\noindent
+The entry $[B_2]_{e,f}$ then records whether
+edge~$e$'s reference orientation agrees or disagrees with the CCW
+traversal of face~$f$:
+
 The \textbf{edge-face incidence matrix} $B_2$ ($n_1 \times n_2$) is defined
-by: for face $f$ with oriented boundary cycle,
+by: for face $f$ with CCW-oriented boundary cycle,
 \begin{equation}
   [B_2]_{e,f} = \begin{cases}
-    +1 & \text{if } e \in \partial f \text{ with consistent orientation} \\
-    -1 & \text{if } e \in \partial f \text{ with opposite orientation} \\
+    +1 & \text{if } e \in \partial f \text{ and its reference orientation}\\
+       & \text{agrees with the CCW traversal of } f \\
+    -1 & \text{if } e \in \partial f \text{ and its reference orientation}\\
+       & \text{opposes the CCW traversal of } f \\
     0  & \text{if } e \notin \partial f.
   \end{cases}
   \label{eq:B2def}
 \end{equation}
+As with edge orientations, the physics does not depend on the face
+orientation convention: reversing a face negates the corresponding column
+of $B_2$, leaving all Laplacians and observables invariant.
 
 The fundamental chain complex property is
 \begin{equation}
@@ -779,8 +844,9 @@ where the per-vertex ice-rule fraction is
 The key values: $f(2) = 1/2$, $f(3) = 3/4$, $f(4) = 3/8$.
 For the square lattice (all $z_v = 4$):
 $|\calI_{\text{P}}| = 2^{2n_0}(3/8)^{n_0} = (3/2)^{n_0}$,
-giving Pauling factor $W_{\text{P}} = 3/2$, remarkably close to Lieb's exact
-result~\cite{lieb1967} $W_{\text{Lieb}} = (4/3)^{3/2} \approx 1.540$.
+giving $s_{\text{P}} = \ln(3/2) \approx 0.405$ per vertex, remarkably close
+to Lieb's exact result~\cite{lieb1967}
+$s_{\text{Lieb}} = \tfrac{3}{2}\ln(4/3) \approx 0.431$.
 
 \paragraph{The permanent formula.}
 For even-degree graphs, Caravelli et al.~\cite{caravelli2021}
@@ -794,21 +860,113 @@ to determine exactly for general graphs.
 
 \begin{table}[h]
 \centering
-\caption{Hierarchy of per-vertex factors for ice-state counts.}
+\caption{Hierarchy of entropy per vertex $s = \ln|\cdot|/n_0$ for ice-state
+counts ($z=4$ periodic square, no faces filled so
+$\beta_1 = n_0 + 1$).  All entries are thermodynamic limits
+($n_0 \to \infty$).}
 \label{tab:hierarchy}
 \begin{tabular}{lll}
 \toprule
-\textbf{Estimate} & \textbf{Per-vertex $W$} & \textbf{Type} \\
+\textbf{Estimate} & \textbf{$s$ (per vertex)} & \textbf{Type} \\
 \midrule
-$|\calP| = 2^{n_1}$  & 4.000 & Trivial upper bound \\
-$2^{\beta_1}$         & 2.000 & Topological upper bound \\
-Lieb exact            & 1.540 & Exact in TDL \\
-Pauling $|\calI_{\text{P}}|$ & 1.500 & Mean-field approximation \\
+$|\calP| = 2^{n_1}$  & $2\ln 2 \approx 1.386$ & Trivial upper bound \\
+$2^{\beta_1}$ ($n_2=0$) & $\ln 2 \approx 0.693$ & Topological upper bound \\
+Lieb exact            & $\tfrac{3}{2}\ln\tfrac{4}{3} \approx 0.431$ & Exact in TDL \\
+Pauling $|\calI_{\text{P}}|$ & $\ln\tfrac{3}{2} \approx 0.405$ & Mean-field approximation \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Each gap is exponential in $n_0$.
+
+\paragraph{Why $2^{\beta_1}$ is a valid upper bound (per charge sector).}
+The bound follows from a \textbf{spanning-tree argument}
+(illustrated in \cref{fig:spanning_tree} for the all-even case).
+Fix a feasible charge vector~$\mathbf{Q}$ (i.e.\ $Q_v = 0$ for
+even-degree vertices, $Q_v \in \{\pm 1\}$ for odd-degree vertices,
+$\sum_v Q_v = 0$).  Every ice state in sector~$\mathbf{Q}$ satisfies
+$B_1\bm\sigma = \mathbf{Q}$.
+\begin{enumerate}
+  \item Pick a spanning tree $T$ of the graph ($n_0 - 1$ edges).  The
+    remaining $\beta_1 = n_1 - n_0 + 1$ edges are \emph{cotree edges}.
+  \item Each cotree edge can independently take values $\pm 1$, giving
+    $2^{\beta_1}$ choices.
+  \item For each choice, the constraint $B_1\bm\sigma = \mathbf{Q}$
+    \textbf{uniquely determines} every tree-edge value.  Root~$T$ at an
+    arbitrary vertex and process vertices bottom-up (leaves first).  At
+    each non-root vertex~$v$, the child tree edges and all cotree edges
+    incident to~$v$ have already been fixed; the parent tree edge is the
+    sole unknown.  The equation $(B_1\bm\sigma)_v = Q_v$ is then one
+    linear equation in one unknown whose coefficient is $\pm 1$, so it has
+    a unique real solution.  The root equation is redundant---it is
+    automatically satisfied because every column of $B_1$ sums to zero, so
+    $\sum_v(B_1\bm\sigma)_v = 0 = \sum_v Q_v$ for any~$\bm\sigma$.  This
+    gives $n_0 - 1$ independent equations for the $n_0 - 1$ tree-edge
+    unknowns, each solved in turn.
+  \item However, the determined tree-edge values need not all land in
+    $\{\pm 1\}$---on interior vertices with high connectivity, the
+    propagation can produce values $\pm 3$, $\pm 5$, etc.  Only cotree
+    assignments whose propagation stays within $\{\pm 1\}$ yield valid ice
+    states.
+\end{enumerate}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{spanning_tree_argument}
+  \caption{Spanning-tree argument on the $3\times 3$ periodic square lattice
+    ($n_0=9$, $n_1=18$, $\beta_1=10$).
+    \textbf{(a)}~The lattice graph with interior (solid) and wrap-around (dashed) edges.
+    \textbf{(b)}~An S-shaped spanning tree (dark blue, 8 edges) and its cotree (orange, 10 edges);
+    circled numbers show the tree-path order.
+    \textbf{(c)}~Cotree assignment: independently assign $\sigma\in\{\pm1\}$ to each cotree edge
+    (blue $=+1$, red $=-1$); tree edges remain unknown.
+    \textbf{(d)}~Bottom-up propagation via the ice rule uniquely determines every
+    tree edge (circled numbers give the solve order), yielding a valid ice state.
+    \textbf{(e)}~Invalid state: a different cotree assignment (all $+1$) produces
+    tree-edge values $\pm 3$ and $\pm 5$ (red labels), none in $\{\pm1\}$---this
+    assignment does not extend to an ice state.}
+  \label{fig:spanning_tree}
+\end{figure*}
+
+Therefore $|\calI_{\mathbf{Q}}| \leq 2^{\beta_1}$ for each feasible
+charge sector~$\mathbf{Q}$, with strict inequality whenever some cotree
+assignments fail to extend.
+
+\paragraph{All-even coordination (single sector).}
+When every vertex has even degree, $\mathbf{Q} = \mathbf{0}$ is the
+only feasible sector.  The per-sector bound is the global bound:
+$|\calI| \leq 2^{\beta_1}$.  For the $3 \times 3$ periodic square
+lattice ($\beta_1 = 10$): $2^{10} = 1024$, while brute-force enumeration
+gives $|\calI| = 148$---barely $14\%$ of the topological bound.
+The gap between $2^{\beta_1}$ and $|\calI|$ is precisely what the
+directed-cycle constraint (\cref{sec:counting_table}) quantifies.
+
+\paragraph{Mixed coordination (multiple sectors).}
+When some vertices have odd degree, multiple charge sectors exist and the
+total ice manifold sums across them:
+\begin{equation}
+  |\calI| = \sum_{\mathbf{Q} \in \calQ_{\min}} |\calI_{\mathbf{Q}}|
+  \leq |\calQ_{\min}| \cdot 2^{\beta_1}.
+  \label{eq:global_bound}
+\end{equation}
+In particular, $|\calI|$ can exceed $2^{\beta_1}$.
+The counting table (\cref{tab:counting}) confirms this: the square
+$4\!\times\!4$ open lattice has $\beta_1 = 9$, so $2^{\beta_1} = 512$,
+but $|\calI| = 2{,}768$ across $|\calQ_{\min}| = 70$ charge sectors.
+The spanning-tree argument itself is unchanged---at step~3, one
+propagates $(B_1\bm\sigma)_v = Q_v$ instead of $(B_1\bm\sigma)_v = 0$,
+which shifts the determined tree-edge values but does not alter the
+counting logic.
+
+\paragraph{Face-filling caveat.}
+The bound requires $\beta_1$ with \emph{no faces filled}
+($n_2 = 0$), where $\beta_1 = n_1 - n_0 + 1 = n_0 + 1$ grows extensively
+for the periodic square lattice.  With all faces filled, $\beta_1 = 2$
+(the two torus winding modes) regardless of system size, so
+$2^{\beta_1} = 4$ is \emph{not} an upper bound on $|\calI|$---it gives
+$s \to 0$ in the thermodynamic limit while $|\calI|$ grows exponentially.
+The all-faces $\beta_1$ counts only the topologically nontrivial
+(harmonic) dimensions of the cycle space, not its full size.
 
 \subsection{Kinetics: single flips vs.\ loop flips}
 \label{sec:kinetics}
@@ -817,19 +975,48 @@ Each gap is exponential in $n_0$.
 at both endpoints. Moves the configuration to a \emph{different} Coulomb class.
 Creates or annihilates a monopole-antimonopole pair.
 
-\textbf{Loop flip} (flipping all edges along a cycle $\mathbf{c} \in \ker(B_1)$):
-$B_1\mathbf{c} = \mathbf{0}$, so charge at every vertex is unchanged. The
-configuration stays in the same Coulomb class.
+\paragraph{Cycles and the cycle space.}
+An \emph{oriented cycle} on $G$ is a vector
+$\mathbf{c} \in \{-1, 0, +1\}^{n_1}$ supported on the edges of a closed
+path, with a consistent flow direction: every vertex on the path has exactly
+one incoming cycle edge ($[B_1]_{v,e} = +1$) and one outgoing cycle edge
+($[B_1]_{v,e'} = -1$), so that
+\begin{equation}
+  (B_1 \mathbf{c})_v
+  = \underbrace{(+1)}_{\text{head of one edge}}
+  + \underbrace{(-1)}_{\text{tail of another}}
+  = 0
+  \label{eq:cycle_divergence}
+\end{equation}
+for every vertex $v$ on the cycle (and trivially zero for vertices off the
+cycle).  Therefore every oriented cycle satisfies
+$\mathbf{c} \in \ker(B_1)$.  More generally, any integer linear
+combination of simple cycles also lies in $\ker(B_1)$; the full space
+$\ker(B_1)$ is the \textbf{cycle space} of~$G$, with dimension
+$n_1 - n_0 + 1$ for a connected graph (\cref{eq:dim_kerB1}).
 
-\begin{convention}[Kinetics Dichotomy]
-\emph{Intra-class dynamics} ($T=0$, ice manifold): loop flips explore
-configurations within a single Coulomb class. This motivates Mode~A
-neural sampling (\cref{sec:modeA}).
-\emph{Inter-class dynamics} ($T>0$, monopole excitations): single flips
-change the Coulomb class at energy cost $\sim \epsilon\Delta$ where
-$\Delta$ is the spectral gap of $L_1^{\text{down}}$. This motivates
-Mode~B neural sampling (\cref{sec:modeB}).
-\end{convention}
+\textbf{Loop flip} (flipping all edges along a cycle
+$\mathbf{c} \in \ker(B_1)$): since $B_1\mathbf{c} = \mathbf{0}$
+by~\eqref{eq:cycle_divergence}, the charge at every vertex is unchanged.
+The configuration stays in the same Coulomb class.
+
+\paragraph{Two kinds of cycle.}
+The Hodge decomposition (\cref{sec:hodge}) refines the cycle space into
+two orthogonal summands:
+\begin{equation}
+  \ker(B_1) = \im(B_2) \;\oplus\; \ker(L_1).
+  \label{eq:cycle_hodge_preview}
+\end{equation}
+\emph{Exact cycles} ($\im B_2$) are boundaries of faces:
+each column of $B_2$ is the oriented boundary of a face, and
+$B_1 B_2 = 0$ guarantees these are cycles.  Flipping an exact cycle
+rearranges spins around one or more faces---a purely local move.
+\emph{Harmonic cycles} ($\ker L_1$) are topologically nontrivial: they
+are divergence-free ($B_1\mathbf{c} = 0$) \emph{and} curl-free
+($B_2^T\mathbf{c} = 0$), meaning they are not the boundary of any
+collection of faces.  On a torus, the two harmonic modes correspond to net
+circulation around the two non-contractible loops (horizontal and vertical
+winding numbers); no sequence of face-boundary flips can change them.
 
 \subsection{Loop-basis parameterization of the ice manifold}
 \label{sec:loop_basis}
@@ -894,7 +1081,7 @@ search across $K = 200$ random autoregressive orderings---satisfies
   \label{eq:directed_bound}
 \end{equation}
 The ratio $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ varies by five orders of
-magnitude across the Morrison et al.\ lattice zoo (from 53\% on kagome to
+magnitude across the Morrison et al.\ lattice zoo (from 18\% on Santa Fe to
 $6 \times 10^{-4}\%$ on tetris $3\times 3$).
 \end{keyresult}
 
@@ -929,8 +1116,8 @@ $|\varepsilon_{\mathbf{q}}|$: multi-ordering reachable states
 \midrule
 Square  & $4\!\times\!4$ & open     & 24 &  8 & $1.7\!\times\!10^7$  &  9 & 512       &    70 & 2,076              & 2,768             & 38 \\
 Square  & $4\!\times\!4$ & periodic & 32 &  0 & $4.3\!\times\!10^9$  & 17 & 131,072   &     1 & 657                & 2,970             & 299$^*$ \\
-Kagome  & $2\!\times\!2$ & open     & 17 &  4 & 131,072              &  6 & 64        &     6 & 68                 & 172               & 34 \\
-Kagome  & $2\!\times\!2$ & periodic & 24 &  0 & $1.7\!\times\!10^7$  & 13 & 8,192     &     1 & 130                & 600               & 355$^*$ \\
+Kagome  & $2\!\times\!2$ & open     &  7 &  6 & 128                  &  0 & 1         &    20 & 18                 & 18                & 1 \\
+Kagome  & $2\!\times\!2$ & periodic & 12 &  8 & 4,096                &  5 & 32        &    70 & 410                & 450               & 2 \\
 Santa Fe & $2\!\times\!2$ & open    & 30 &  8 & $1.1\!\times\!10^9$  &  7 & 128       &    68 & 923                & 1,312             & 23 \\
 Shakti  & $2\!\times\!2$ & open     & 81 & 26 & $2.4\!\times\!10^{24}$ & 18 & 262,144 & $\geq$1,881$^\ddagger$ & $1.6\!\times\!10^9$ & $>$1.4M$^\dagger$ & 248 \\
 Tetris  & $2\!\times\!2$ & open     & 38 & 16 & $2.7\!\times\!10^{11}$ &  7 & 128     & 9,232 & 74,734             & 86,560            & 17 \\
@@ -947,11 +1134,12 @@ $^*$ Lower bound; $K=200$ random orderings may not saturate.
 \end{table*}
 
 \textbf{Charge sectors.}
-Under open boundary conditions, vertices at the lattice boundary may have
-odd coordination number, admitting $Q_v = \pm 1$. The ice manifold splits
+Vertices with odd coordination number admit $Q_v = \pm 1$. The ice manifold splits
 into charge sectors indexed by the $\pm 1$ pattern at the $n_{\text{odd}}$
-odd-degree vertices, subject to $\sum_v Q_v = 0$. For periodic lattices all
-vertices are even-degree ($n_{\text{odd}} = 0$), giving a single sector.
+odd-degree vertices, subject to $\sum_v Q_v = 0$. For lattices with all-even
+bulk coordination (e.g., square with $z=4$), periodic BCs give
+$n_{\text{odd}} = 0$ and a single sector; for odd-coordination lattices
+(e.g., kagome with $z=3$), multiple sectors persist even with periodic BCs.
 The sector count explains why $|\calI|$ can exceed $2^{\beta_1}$: the bound
 applies per sector (\cref{kr:loop_basis}), but total states sum across all
 $|\calQ_{\min}|$ sectors.
@@ -959,12 +1147,11 @@ $|\calQ_{\min}|$ sectors.
 \textbf{Multi-ordering gains.}
 Multi-ordering enumeration finds substantially more states than any single
 ordering. For example: square $4\!\times\!4$ periodic finds 299 states
-vs.\ 27--40 per single ordering ($|\calI| = 2{,}970$); kagome $2\!\times\!2$
-periodic finds 355 vs.\ 172--178 ($|\calI| = 600$); tetris $3\!\times\!3$
+vs.\ 27--40 per single ordering ($|\calI| = 2{,}970$); tetris $3\!\times\!3$
 open finds 25 vs.\ 4--6 (a $6\times$ increase).
 
 \textbf{The reduction ratio} $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ ranges
-from 53\% (kagome $2\!\times\!2$ open, $34/64$) to
+from 18\% (Santa Fe $2\!\times\!2$ open, $23/128$) to
 $6 \times 10^{-4}\%$ (tetris $3\!\times\!3$ open, $25/4{,}194{,}304$).
 This five-order-of-magnitude range---invisible from $\beta_1$ alone---is a
 fundamental structural property of the lattice.
@@ -977,7 +1164,7 @@ fundamental structural property of the lattice.
 
 \subsection{The Hodge decomposition theorem}
 
-The edge signal space of a simplicial complex $X$ with boundary operators
+The edge signal space of a cell complex $X$ with boundary operators
 $B_1$ and $B_2$ decomposes as
 \begin{equation}
   \boxed{\R^{n_1} = \im(B_1^T) \;\oplus\; \im(B_2) \;\oplus\; \ker(L_1)}
@@ -1141,10 +1328,10 @@ Square   & $4\!\times\!4$ & periodic &  16 &  32 &  16 &  0 & 1 &  17 &  2 & 0 &
 Square   & $6\!\times\!6$ & open     &  36 &  60 &  25 &  1 & 1 &  25 &  0 & 0 & 0 \\
 Square   & $6\!\times\!6$ & periodic &  36 &  72 &  36 &  0 & 1 &  37 &  2 & 0 & 1 \\
 \midrule
-Kagome   & $2\!\times\!2$ & open     &  12 &  17 &   6 &  1 & 1 &   6 &  0 & 0 & 0 \\
-Kagome   & $2\!\times\!2$ & periodic &  12 &  24 &  12 &  0 & 1 &  13 &  2 & 0 & 1 \\
-Kagome   & $3\!\times\!3$ & open     &  27 &  43 &  17 &  1 & 1 &  17 &  0 & 0 & 0 \\
-Kagome   & $3\!\times\!3$ & periodic &  27 &  54 &  27 &  0 & 1 &  28 &  2 & 0 & 1 \\
+Kagome   & $2\!\times\!2$ & open     &   8 &   7 &   0 &  1 & 1 &   0 &  0 & 0 & 0 \\
+Kagome   & $2\!\times\!2$ & periodic &   8 &  12 &   4 &  0 & 1 &   5 &  2 & 0 & 1 \\
+Kagome   & $3\!\times\!3$ & open     &  18 &  19 &   2 &  1 & 1 &   2 &  0 & 0 & 0 \\
+Kagome   & $3\!\times\!3$ & periodic &  18 &  27 &   9 &  0 & 1 &  10 &  2 & 0 & 1 \\
 \midrule
 Santa Fe & $2\!\times\!2$ & open     &  24 &  30 &   7 &  1 & 1 &   7 &  0 & 0 & 0 \\
 Santa Fe & $2\!\times\!2$ & periodic &  24 &  36 &  12 &  0 & 1 &  13 &  2 & 0 & 1 \\
@@ -1307,7 +1494,7 @@ The parallel between charge and current is exact
 
 \begin{table}[h]
 \centering
-\caption{Charge--current duality for edge spins on a simplicial complex.
+\caption{Charge--current duality for edge spins on a cell complex.
 Each row shows the vertex-level (0-cell) quantity alongside its face-level
 (2-cell) dual. The spin configuration $\bm\sigma$ plays the role of a
 discrete vector potential; its divergence yields charge, its curl yields
@@ -1378,8 +1565,8 @@ odd-coordinated vertices cannot satisfy the ice rule $Q_v = 0$.
 
 This has immediate consequences for the lattice zoo:
 \begin{itemize}
-\item \textbf{Kagome} (all triangular faces): maximally
-  current-frustrated---every face has $|J_f| \geq 1$.
+\item \textbf{Kagome} (all hexagonal faces): can satisfy
+  $J_f = 0$ on every face (6 edges per face, even).
 \item \textbf{Square lattice} (all square faces): can satisfy
   $J_f = 0$ on every face.
 \item \textbf{Mixed lattices} (shakti, tetris, santa fe): current
@@ -1421,7 +1608,7 @@ and their braiding statistics underlie topological quantum error
 correction.
 
 \paragraph{Discrete electromagnetism.}
-On a simplicial complex, $Q_v = (B_1\bm\sigma)_v$ is the discrete
+On a cell complex, $Q_v = (B_1\bm\sigma)_v$ is the discrete
 divergence and $J_f = (B_2^T\bm\sigma)_f$ is the discrete curl. The
 Hodge Hamiltonian becomes the discrete analogue of electromagnetic
 field energy
@@ -1734,7 +1921,7 @@ complexity that any sampler must navigate.
 \label{sec:summary}
 
 The first part of this document (Secs.~\ref{sec:notation}--\ref{sec:hamiltonian})
-works out the mathematical dictionary between TDL simplicial complexes and the
+works out the mathematical dictionary between TDL cell complexes and the
 ASI charge framework.  The six key results are:
 
 \begin{enumerate}
@@ -1760,7 +1947,7 @@ ASI charge framework.  The six key results are:
 
 The counting table (\cref{tab:counting}) is the most concrete result: it shows
 that the directed-cycle constraint reduces the reachable ice-state count by
-ratios ranging from $\sim$1:2 (kagome $2\!\times\!2$ open) to
+ratios ranging from $\sim$1:6 (Santa Fe $2\!\times\!2$ open) to
 $\sim$1:170{,}000 (tetris $3\!\times\!3$ open).  This
 reduction---invisible from $\beta_1$ alone---seems to be a structural
 property of the lattice, though we do not yet have a good analytical

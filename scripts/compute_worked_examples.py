@@ -7,7 +7,7 @@ ice states, and S matrices. Outputs JSON with all values needed for the HTML.
 
 Minimum valid periodic sizes (avoiding multi-edges / self-loops):
   Square:  3x3  -> n0=9, n1=18, n2=9
-  Kagome:  2x2  -> n0=12, n1=24, n2=12
+  Kagome:  2x2  -> n0=8, n1=12, n2=4
   Shakti:  1x1  -> n0=16, n1=24, n2=8
   Tetris:  2x1  -> n0=16, n1=24, n2=8
   Santa Fe: 1x2 -> n0=12, n1=18, n2=6

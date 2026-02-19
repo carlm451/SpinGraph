@@ -428,8 +428,8 @@ The "100% coverage" reported in Mode A experiments means 100% of states reachabl
 |---------|-----|------------------------|---------------------|----------|
 | Square 4×4 | open | 38 | 2,768 | 1.4% |
 | Square 4×4 | periodic | 299 | 2,768 | 10.8% |
-| Kagome 2×2 | open | 34 | 172 | 19.8% |
-| Kagome 2×2 | periodic | 355 | 7,833 | 4.5% |
+| Kagome 2×2 | open | 1 | 18 | 5.6% |
+| Kagome 2×2 | periodic | 2 | 450 | 0.4% |
 | Santa Fe 2×2 | open | 23 | 23+ | ~100%* |
 | Tetris 2×2 | open | 17 | 86,560 | 0.02% |
 | Shakti 1×1 | open | 3 | 3+ | ~100%* |

@@ -5,11 +5,11 @@
   "ny": 50,
   "boundary": "periodic",
   "face_strategy": "all",
-  "n_vertices": 7500,
-  "n_edges": 15000,
-  "n_faces": 7500,
+  "n_vertices": 5000,
+  "n_edges": 7500,
+  "n_faces": 2500,
   "coordination_dist": {
-    "4": 7500
+    "3": 5000
   },
   "beta_0": 1,
   "beta_1": 2,
@@ -17,22 +17,22 @@
   "euler_consistent": true,
   "method_agreement": true,
   "chain_complex_valid": true,
-  "L0_spectral_gap": 0.00526147965169799,
-  "L1_spectral_gap": 0.0052614796516984195,
-  "compute_time_seconds": 1821.2007448673248,
+  "L0_spectral_gap": 0.005261479651699003,
+  "L1_spectral_gap": 0.005261479651699218,
+  "compute_time_seconds": 305.6551339626312,
   "harmonic_validation": [
     {
       "mode_index": 0,
-      "divergence_norm": 1.7669284862158565e-14,
-      "curl_norm": 1.957165720672858e-14,
+      "divergence_norm": 1.8802009617185657e-14,
+      "curl_norm": 8.052257511238008e-15,
       "divergence_free": true,
       "curl_free": true,
       "is_harmonic": true
     },
     {
       "mode_index": 1,
-      "divergence_norm": 1.7545378930763392e-14,
-      "curl_norm": 2.112314875215811e-14,
+      "divergence_norm": 2.2168401820530994e-14,
+      "curl_norm": 1.533232427191449e-14,
       "divergence_free": true,
       "curl_free": true,
       "is_harmonic": true

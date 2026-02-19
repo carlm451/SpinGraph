@@ -18,7 +18,7 @@ The full eigenvalue spectrum is needed for density-of-states (DOS) plots. The pa
 
 ## Changes Implemented (2026-02-15)
 
-1. **Raised DENSE_THRESHOLD from 5,000 to 15,000** -- unlocks full spectra for Kagome L (n_e=15,000), Shakti M (n_e=9,600), and all L0 matrices through L size.
+1. **Raised DENSE_THRESHOLD from 5,000 to 15,000** -- unlocks full spectra for Kagome L (n_e=7,500), Shakti M (n_e=9,600), and all L0 matrices through L size.
 
 2. **Added `driver='evd'`** to `scipy.linalg.eigh` calls -- uses LAPACK's DSYEVD (divide-and-conquer) which is 2-4x faster than the default DSYEVR for full eigendecomposition. Uses ~50% more memory (3n^2 vs 2n^2 bytes) but well within limits.
 
@@ -159,14 +159,14 @@ Matrix dimensions at each catalog size (periodic BCs, all faces):
 | Lattice | n_v (XS/S/M/L/XL) | n_e (XS/S/M/L/XL) |
 |---------|-------------------|-------------------|
 | Square | 16/100/400/2500/10000 | 32/200/800/5000/20000 |
-| Kagome | 48/300/1200/7500/30000 | 96/600/2400/15000/60000 |
+| Kagome | 32/200/800/5000/20000 | 48/300/1200/7500/30000 |
 | Shakti | 256/1600/6400/40000/160000 | 384/2400/9600/60000/240000 |
 | Tetris | 128/800/3200/20000/80000 | 192/1200/4800/30000/120000 |
 | Santa Fe | 96/600/2400/15000/60000 | 192/1200/4800/22500/90000 |
 
 With DENSE_THRESHOLD = 15,000, full spectra available for:
 - **L0**: All lattices through L size (max n_v = 40,000 for shakti, but we use sparse there; square/kagome/tetris/santa_fe all under 15,000 at L)
-- **L1**: Square through L (5,000), Kagome through L (15,000), Shakti through M (9,600), Tetris through M (4,800), Santa Fe through M (4,800)
+- **L1**: Square through L (5,000), Kagome through L (7,500), Shakti through M (9,600), Tetris through M (4,800), Santa Fe through M (4,800)
 
 ---
 

@@ -175,7 +175,7 @@ Each lattice is defined by a **unit cell** (vertices + edges in a tileable patte
 | Lattice | Full L0 sizes | Full L1 sizes |
 |---|---|---|
 | Square | S, M, L, XL (n₀≤10k) | S, M, L (n₁≤5k) |
-| Kagome | S, M, L (n₀≤7.5k) | S, M, L (n₁≤15k) |
+| Kagome | S, M, L (n₀≤5k) | S, M, L (n₁≤7.5k) |
 | Shakti | S, M (n₀≤6.4k) | S, M (n₁≤9.6k) |
 | Tetris | S, M (n₀≤3.2k) | S, M (n₁≤4.8k) |
 | Santa Fe | S, M, L (n₀≤15k) | S, M (n₁≤3.6k) |
@@ -350,7 +350,7 @@ A Dash/Plotly dashboard for exploring results, run via `python -m dashboard.app`
 - **Spectral distribution plots** (`results/dos_*.png`): Sorted eigenvalues vs normalized index (i/n₀ or i/n₁). Convergence of these curves = approach to thermodynamic-limit integrated DOS. Generated for all lattices with 2+ full-spectrum sizes.
 - **Spectral gap scaling**: c* ≈ 1.0 for square (matching analytical 1D chain result). XS (L=4) excluded from fits due to strong finite-size corrections.
 - **Finite-size effects**: XS points have O(1/L⁴) corrections that bias linear fits in 1/L². Standard practice: exclude L < 10 from scaling fits.
-- **Flat bands**: Kagome L0 shows exact eigenvalue = 6 for top ~33% of spectrum (z=3 coordination). Shakti shows sub-band structure from mixed coordination z=2,3,4.
+- **Flat bands**: Kagome (honeycomb) L0 shows flat bands at eigenvalues 2 and 4 (~13.5% each), max eigenvalue = 6 (= 2z for z=3). Shakti shows sub-band structure from mixed coordination z=2,3,4.
 
 ---
 

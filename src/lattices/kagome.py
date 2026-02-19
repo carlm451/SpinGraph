@@ -1,29 +1,32 @@
-"""Kagome lattice generator.
+"""Kagome (honeycomb) lattice generator.
 
-The kagome lattice is the trihexagonal tiling: corner-sharing triangles
-with hexagonal voids. Every vertex has coordination z=4.
+In the ASI convention, "kagome spin ice" refers to spins on the edges of a
+honeycomb lattice.  The edge midpoints form a kagome pattern, but the vertex
+graph -- where ice rules are enforced -- is the honeycomb lattice with z=3
+at every vertex.
 
-In the ASI context, CLAUDE.md says "all z=3" referring to the honeycomb
-vertex coordination (the kagome is the medial lattice of the honeycomb).
-As an actual graph, kagome vertices have degree 4.
+This module implements the honeycomb vertex graph (z=3), consistent with the
+spin ice literature (e.g. Nature Comms 7, 11446 (2016): "A honeycomb ice is
+often called the Kagome spin ice, as the spins reside on the edges of a
+honeycomb lattice").
 """
 import math
 from .base import LatticeGenerator, UnitCell
 
 
 class KagomeGenerator(LatticeGenerator):
-    """Kagome lattice: 3 vertices per cell, 6 edges per cell.
+    """Honeycomb lattice (kagome ice): 2 vertices per cell, 3 edges per cell.
 
-    Bravais lattice: a1 = (2, 0), a2 = (1, sqrt(3))
+    Bravais lattice: a1 = (sqrt(3), 0), a2 = (sqrt(3)/2, 3/2)
     Vertices per cell:
-      v0 = (0, 0), v1 = (1, 0), v2 = (0.5, sqrt(3)/2)
+      v0 = (0, 0)  (sublattice A)
+      v1 = (0, 1)  (sublattice B)
 
-    Each vertex has coordination z=4.
+    Each vertex has coordination z=3.
 
-    Periodic N*N:
-      n0 = 3N^2, n1 = 6N^2
-      n2 = 3N^2 (all filled: N^2 up-tri + N^2 down-tri + N^2 hex)
-      chi = 0 (torus), beta_1 = 2
+    Periodic NxN:
+      n0 = 2N^2, n1 = 3N^2, n2 = N^2 (one hexagonal face per cell)
+      chi = 0 (torus), beta_1(all) = 2, beta_1(none) = N^2 + 1
     """
 
     name = "kagome"
@@ -31,31 +34,24 @@ class KagomeGenerator(LatticeGenerator):
     def _define_unit_cell(self) -> UnitCell:
         s3 = math.sqrt(3)
         return UnitCell(
-            a1=(2.0, 0.0),
-            a2=(1.0, s3),
+            a1=(s3, 0.0),
+            a2=(s3 / 2, 1.5),
             vertices=[
-                (0.0, 0.0),       # v0
-                (1.0, 0.0),       # v1
-                (0.5, s3 / 2),    # v2
+                (0.0, 0.0),    # v0 (sublattice A)
+                (0.0, 1.0),    # v1 (sublattice B)
             ],
             edges=[
-                # Intra-cell edges (upward triangle)
-                (0, 1, 0, 0),   # v0 -> v1 same cell
-                (1, 2, 0, 0),   # v1 -> v2 same cell
-                (0, 2, 0, 0),   # v0 -> v2 same cell
-                # Inter-cell edges
-                (1, 0, 1, 0),   # v1 -> v0 in cell (i+1, j)
-                (2, 0, 0, 1),   # v2 -> v0 in cell (i, j+1)
-                (2, 1, -1, 1),  # v2 -> v1 in cell (i-1, j+1)
+                # "up" bond: v0 -> v1 in same cell
+                (0, 1, 0, 0),
+                # "upper-right" bond: v1 -> v0 in cell (i, j+1)
+                (1, 0, 0, 1),
+                # "upper-left" bond: v1 -> v0 in cell (i-1, j+1)
+                (1, 0, -1, 1),
             ],
             faces=[
-                # Upward triangle (intra-cell): v0, v1, v2 in cell (i,j)
-                [(0, 0, 0), (1, 0, 0), (2, 0, 0)],
-                # Downward triangle: v1(i,j), v0(i+1,j), v2(i+1,j-1)
-                [(1, 0, 0), (0, 1, 0), (2, 1, -1)],
-                # Hexagon (CCW): v1(i,j), v0(i+1,j), v2(i+1,j),
-                #   v1(i,j+1), v0(i,j+1), v2(i,j)
-                [(1, 0, 0), (0, 1, 0), (2, 1, 0), (1, 0, 1), (0, 0, 1), (2, 0, 0)],
+                # Hexagonal face (CCW):
+                # v0(0,0), v1(0,0), v0(0,1), v1(1,0), v0(1,0), v1(1,-1)
+                [(0, 0, 0), (1, 0, 0), (0, 0, 1), (1, 1, 0), (0, 1, 0), (1, 1, -1)],
             ],
-            expected_coordination={0: 4, 1: 4, 2: 4},
+            expected_coordination={0: 3, 1: 3},
         )

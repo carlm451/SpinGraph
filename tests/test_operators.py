@@ -98,16 +98,22 @@ class TestBuildEIGNOperators:
         result = torch.sparse.mm(ops.L_equ, sigma_t.unsqueeze(-1)).squeeze()
         assert result.norm().item() < 1e-5, f"L_equ @ sigma = {result.norm().item()}"
 
-    def test_L_equ_annihilates_ice_kagome(self, kagome_xs):
-        """L_equ @ sigma_ice = 0 for kagome ice states."""
+    def test_L_equ_ice_kagome(self, kagome_xs):
+        """L_equ @ sigma_ice reflects odd-degree ice rule for kagome (z=3).
+
+        For odd-degree vertices Q_v = ±1 (not 0), so L_equ @ sigma ≠ 0.
+        We verify the ice rule is satisfied: |Q_v| = 1 at odd-degree vertices.
+        """
         B1 = build_B1(kagome_xs.n_vertices, kagome_xs.edge_list)
-        ops = build_eign_operators(B1)
 
         sigma = find_seed_ice_state(B1, kagome_xs.coordination, edge_list=kagome_xs.edge_list)
-        sigma_t = torch.from_numpy(sigma.astype(np.float32))
-
-        result = torch.sparse.mm(ops.L_equ, sigma_t.unsqueeze(-1)).squeeze()
-        assert result.norm().item() < 1e-5
+        charge = B1.toarray() @ sigma
+        for v in range(kagome_xs.n_vertices):
+            z = kagome_xs.coordination[v]
+            if z % 2 == 0:
+                assert abs(charge[v]) < 1e-10, f"Even-z vertex {v}: Q={charge[v]}"
+            else:
+                assert abs(abs(charge[v]) - 1) < 1e-10, f"Odd-z vertex {v}: Q={charge[v]}"
 
     def test_operators_symmetric(self, square_xs):
         """L_equ and L_inv should be symmetric."""

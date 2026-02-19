@@ -47,9 +47,9 @@ State counts are from multi-ordering enumeration (200 random orderings). The "DF
 | square    | 4×4   | open     | 16  | 24  | 9   | 38                     | 25          | yes        | ~2 min          |
 | square    | 4×4   | periodic | 16  | 32  | 17  | 299                    | 52          | yes        | ~6 min          |
 | square    | 6×6   | open     | 36  | 60  | 25  | TBD                    | 3,029       | yes        | ~25 min         |
-| kagome    | 2×2   | open     | 12  | 17  | 6   | TBD                    | 32          | yes        | ~1 min          |
-| kagome    | 2×2   | periodic | 12  | 24  | 13  | 355                    | 189         | yes        | ~5 min          |
-| kagome    | 3×3   | open     | 27  | 43  | 17  | TBD                    | 4,352       | yes        | ~10 min         |
+| kagome    | 2×2   | open     | 8   | 7   | 0   | 1                      | 1           | yes        | trivial         |
+| kagome    | 2×2   | periodic | 8   | 12  | 5   | 2                      | 2           | yes        | ~1 min          |
+| kagome    | 3×3   | open     | 18  | 19  | 2   | 3                      | 3           | yes        | ~1 min          |
 | santa_fe  | 2×2   | open     | 24  | 30  | 7   | TBD                    | 8           | yes        | ~2 min          |
 | santa_fe  | 3×3   | open     | 54  | 72  | 19  | TBD                    | 48          | yes        | ~15 min         |
 | shakti    | 1×1   | open     | 16  | 18  | 2   | TBD                    | 3           | yes        | ~1 min          |
