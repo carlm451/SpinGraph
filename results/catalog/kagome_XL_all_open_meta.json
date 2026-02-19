@@ -5,13 +5,13 @@
   "ny": 100,
   "boundary": "open",
   "face_strategy": "all",
-  "n_vertices": 30000,
-  "n_edges": 59601,
-  "n_faces": 29602,
+  "n_vertices": 20000,
+  "n_edges": 29701,
+  "n_faces": 9702,
   "coordination_dist": {
-    "2": 201,
-    "3": 396,
-    "4": 29403
+    "1": 200,
+    "2": 198,
+    "3": 19602
   },
   "beta_0": 1,
   "beta_1": 0,
@@ -19,7 +19,7 @@
   "euler_consistent": true,
   "method_agreement": true,
   "chain_complex_valid": true,
-  "L0_spectral_gap": 0.00017843607070278675,
-  "L1_spectral_gap": 0.00017843607070299372,
-  "compute_time_seconds": 98.05407094955444
+  "L0_spectral_gap": 0.0001777539701596531,
+  "L1_spectral_gap": 0.00017775397015970976,
+  "compute_time_seconds": 7.245849847793579
 }

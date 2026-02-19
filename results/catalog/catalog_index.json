@@ -34,9 +34,9 @@
     "size_label": "L",
     "face_strategy": "none",
     "boundary": "open",
-    "beta_1": 7302,
-    "n_vertices": 7500,
-    "n_edges": 14801,
+    "beta_1": 2352,
+    "n_vertices": 5000,
+    "n_edges": 7351,
     "n_faces": 0
   },
   {
@@ -135,9 +135,9 @@
     "face_strategy": "all",
     "boundary": "open",
     "beta_1": 0,
-    "n_vertices": 30000,
-    "n_edges": 59601,
-    "n_faces": 29602
+    "n_vertices": 20000,
+    "n_edges": 29701,
+    "n_faces": 9702
   },
   {
     "lattice_name": "kagome",
@@ -147,6 +147,16 @@
     "beta_1": 10001,
     "n_vertices": 20000,
     "n_edges": 30000,
+    "n_faces": 0
+  },
+  {
+    "lattice_name": "kagome",
+    "size_label": "XL",
+    "face_strategy": "none",
+    "boundary": "open",
+    "beta_1": 9702,
+    "n_vertices": 20000,
+    "n_edges": 29701,
     "n_faces": 0
   },
   {
