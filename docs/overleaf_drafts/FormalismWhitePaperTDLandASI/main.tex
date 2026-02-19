@@ -53,7 +53,7 @@
 % ===================================================================
 % FRONT MATTER
 % ===================================================================
-\title{Topological Deep Learning and Artificial Spin Ice:\\ A Mathematical Correspondence and Neural Sampling Proposal}
+\title{Topological Deep Learning and Artificial Spin Ice:\texorpdfstring{\\}{: } A Mathematical Correspondence and Neural Sampling Proposal}
 \author{Carl Merrigan}
 \author{Cristiano Nisoli}
 \author{Claude Opus-4.6}
@@ -91,15 +91,15 @@ invariants catalog listing every simplex count and Betti number under
 both face-filling strategies and both boundary conditions.  Worked
 examples with explicit Laplacian matrices appear in the appendices.
 %
-The second part sketches an idea for future application: using recent
-work on variational autoregressive networks (VAN), message-passing VAN
-(MPVAN), and the EIGN edge-level GNN architecture to build neural samplers
-for spin ice configurations.  We outline two complementary modes---loop-basis
-sampling (Mode~A, guaranteed ice-rule compliance) and direct-edge sampling
-(Mode~B, finite temperature)---and write down the layer update equations
-and training objectives.  These architectures are at a preliminary concept
-stage; there are many implementation and training details still to be
-worked out, and we expect the design to evolve considerably.
+The second part sketches neural samplers for spin ice configurations,
+combining variational autoregressive networks (VAN), message-passing VAN
+(MPVAN), and the EIGN edge-level GNN architecture.  We outline two
+complementary modes---loop-basis sampling (Mode~A, guaranteed ice-rule
+compliance) and direct-edge sampling (Mode~B, finite temperature)---and
+write down the layer update equations and training objectives.  These
+architectures are at a preliminary concept stage; many implementation and
+training details remain to be worked out, and we expect the design to
+evolve considerably.
 We share this document to invite critical review of the ideas before
 investing further in implementation.
 \end{abstract}
@@ -274,7 +274,7 @@ investing further in implementation.
 \caption{Tetris lattice (open BC). Mixed coordination $z \in \{2,3,4\}$ with
   maximal vertex frustration. Top: $2\!\times\!2$ ($n_1 = 38$, $\beta_1 = 7$).
   Bottom: $3\!\times\!3$ ($n_1 = 93$, $\beta_1 = 22$). Tetris exhibits the
-  most extreme directed-cycle reduction: $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}
+  most extreme directed-cycle reduction: $|\varepsilon_{\mathbf{Q}}|/2^{\beta_1}
   = 6 \times 10^{-4}\%$ at $3\!\times\!3$.}
 \label{fig:tetris}
 \end{figure*}
@@ -353,10 +353,10 @@ These are preliminary designs; there are likely many implementation and
 training details that will need to be worked out, and the architectures may
 change substantially as we learn more.
 
-The ice manifold (the degenerate ground-state manifold of a frustrated spin
-ice) is structurally governed by $\ker(B_1)$---either as the ice manifold
-itself (for even-degree vertices) or as the space of fluctuations within it
-(for odd-degree vertices).  The dimension of this space, its combinatorial
+The ice manifold---the degenerate ground-state manifold of a frustrated spin
+ice---is structurally governed by $\ker(B_1)$: for even-degree vertices,
+$\ker(B_1)$ \emph{is} the ice manifold; for odd-degree vertices, it is the
+space of fluctuations within it.  The dimension of this space, its combinatorial
 density (Pauling entropy), and its spectral structure all vary across lattice
 types in ways that ASI physics has characterized in detail.  A particular
 focus of the formalism sections is the relationship between $\beta_1$ and
@@ -444,7 +444,7 @@ minimal loops are the fundamental objects in ASI frustration theory and the
 natural candidates for 2-cells. Given the set of all minimal loops, we
 consider two bracketing strategies:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Face-filling strategies and their effect on $\beta_1$.}
 \label{tab:face_strategies}
@@ -462,7 +462,7 @@ Fill no faces  & $0$     & $0$     & Maximal $\beta_1 = n_1 - n_0 + 1$ \\
 Consider the $3\times 3$ square lattice ($n_0=9$, $n_1^{\text{per}}=18$,
 $n_1^{\text{open}}=12$):
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Boundary condition effects on the $3\times 3$ square lattice.}
 \label{tab:bc_effects}
@@ -484,7 +484,7 @@ $\beta_1$ (no faces filled)        & \textbf{10} & \textbf{4} \\
 
 On the periodic torus, $\beta_1 = 2$ with all faces filled corresponds to the
 two independent winding modes (horizontal and vertical) of $H_1(\mathbb{T}^2)
-\cong \Z^2$. All three horizontal row-loops are \emph{homologous}---they
+\cong \Z^2$. All three horizontal row-loops are \emph{homologous} (equivalent in homology)---they
 differ by the boundary of the faces between them---and similarly for the three
 vertical column-loops. In the open case, every cycle on the planar patch bounds
 a region of faces, so $\beta_1 = 0$ with all faces filled. This makes boundary
@@ -500,7 +500,7 @@ $\beta_1$ floor} (at least~2 for a torus).
 \centering
 \caption{Notation correspondence between TDL and Nisoli's ASI charge framework.}
 \label{tab:notation}
-\small
+\footnotesize
 \begin{tabular}{llll}
 \toprule
 \textbf{Object} & \textbf{TDL Notation} & \textbf{Nisoli Notation} & \textbf{Notes} \\
@@ -716,7 +716,7 @@ $Q_v = 0\;\forall v$ is equivalent to $\bm\sigma \in \ker(B_1)$.
 Total charge is always conserved: $\sum_v Q_v = \mathbf{1}^T B_1\bm\sigma = 0$
 since each column of $B_1$ sums to zero.
 
-\subsection{The $M$ matrix encodes both $S$ and $\mathbf{Q}$}
+\subsection{\texorpdfstring{The $M$ matrix encodes both $S$ and $\mathbf{Q}$}{The M matrix encodes both S and Q}}
 
 The matrix $M = |B_1|\,D_\sigma\,B_1^T$ from \cref{eq:Smatrix} encodes
 both of Nisoli's fundamental objects:
@@ -752,18 +752,18 @@ Two configurations $\bm\sigma, \bm\sigma' \in \calP$ are
 
 The equivalence relation~\eqref{eq:charge_equiv} partitions $\calP$ into
 \textbf{Coulomb classes} (charge sectors) labeled by the charge vector
-$\mathbf{q} = B_1\bm\sigma$:
+$\mathbf{Q} = B_1\bm\sigma$:
 \begin{equation}
-  C_{\mathbf{q}} = \bigl\{\bm\sigma \in \{+1,-1\}^{n_1}
-  : B_1\bm\sigma = \mathbf{q}\bigr\}
+  C_{\mathbf{Q}} = \bigl\{\bm\sigma \in \{+1,-1\}^{n_1}
+  : B_1\bm\sigma = \mathbf{Q}\bigr\}
   = \bigl(\bm\sigma_0 + \ker(B_1)\bigr) \cap \{+1,-1\}^{n_1},
   \label{eq:coulomb_class}
 \end{equation}
 where $\bm\sigma_0$ is any representative. The phase space partitions as
 \begin{equation}
-  \calP = \bigsqcup_{\mathbf{q} \in \calQ} C_{\mathbf{q}},
+  \calP = \bigsqcup_{\mathbf{Q} \in \calQ} C_{\mathbf{Q}},
 \end{equation}
-with charge conservation $\sum_v q_v = 0$ always enforced.
+with charge conservation $\sum_v Q_v = 0$ always enforced.
 
 \subsection{The ice manifold}
 \label{sec:ice_manifold}
@@ -785,11 +785,11 @@ $Q_v = \pm 1$. These residual charges are topologically mandated by parity,
 not excitations. Ice configurations in a given charge sector form an affine
 coset:
 \begin{equation}
-  \calI_{\mathbf{q}} = \{\bm\sigma: B_1\bm\sigma = \mathbf{q}\}
+  \calI_{\mathbf{Q}} = \{\bm\sigma: B_1\bm\sigma = \mathbf{Q}\}
   = \bm\sigma_0 + \ker(B_1).
 \end{equation}
 The full ice manifold is a union over minimal-charge sectors:
-$\calI = \bigcup_{\mathbf{q} \in \calQ_{\min}} \calI_{\mathbf{q}}$.
+$\calI = \bigcup_{\mathbf{Q} \in \calQ_{\min}} \calI_{\mathbf{Q}}$.
 
 Although ice configurations in the odd-degree case do not lie in $\ker(B_1)$,
 the \emph{difference} between any two configurations in the same charge sector
@@ -800,7 +800,7 @@ For even-degree graphs, $\calI = C_{\mathbf{0}}$ is a single Coulomb class
 (Nisoli's ``Coulomb phase''). For odd-degree graphs (e.g., kagome with $z=3$),
 the ice manifold is a union of multiple Coulomb classes.
 
-\subsection{The fluctuation space $\ker(B_1)$}
+\subsection{\texorpdfstring{The fluctuation space $\ker(B_1)$}{The fluctuation space ker(B1)}}
 \label{sec:kerB1}
 
 The divergence-free subspace always has dimension
@@ -863,7 +863,7 @@ to determine exactly for general graphs.
 
 \paragraph{Hierarchy of bounds} for $z=4$ periodic square lattices:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hierarchy of entropy per vertex $s = \ln|\cdot|/n_0$ for ice-state
 counts ($z=4$ periodic square, no faces filled so
@@ -1207,7 +1207,7 @@ the same cycle can be directed in one spin configuration and non-directed
 in another.  A \emph{single} loop flip preserves the ice rule if and only
 if the cycle is directed at the moment of the flip.
 
-\subsubsection{\texorpdfstring{Why $|\calI_{\mathbf{Q}}| < 2^{\beta_1}$}{Why |I_Q| < 2^beta_1}}
+\subsubsection{\texorpdfstring{Why $|\calI_{\mathbf{Q}}| < 2^{\beta_1}$}{Why |I(Q)| < 2\string^beta1}}
 
 Not every $\bm\alpha \in \{0,1\}^{\beta_1}$ produces an ice state.
 The $\bm\alpha$ parameterization flips a set of edges
@@ -1581,12 +1581,12 @@ $^*$ Lower bound; $K=200$ random orderings may not saturate.
 \end{table*}
 
 \textbf{Charge sectors.}
-Vertices with odd coordination number admit $Q_v = \pm 1$. The ice manifold splits
-into charge sectors indexed by the $\pm 1$ pattern at the $n_{\text{odd}}$
-odd-degree vertices, subject to $\sum_v Q_v = 0$. For lattices with all-even
-bulk coordination (e.g., square with $z=4$), periodic BCs give
-$n_{\text{odd}} = 0$ and a single sector; for odd-coordination lattices
-(e.g., kagome with $z=3$), multiple sectors persist even with periodic BCs.
+Recall (\cref{sec:ice_manifold}) that odd-coordination vertices carry residual
+charges $Q_v = \pm 1$, splitting the ice manifold into charge sectors indexed
+by the $\pm 1$ pattern at the $n_{\text{odd}}$ odd-degree vertices. For
+all-even bulk coordination (e.g., square with $z=4$), periodic BCs give a
+single sector; for odd-coordination lattices (e.g., kagome with $z=3$),
+multiple sectors persist even with periodic BCs.
 The sector count explains why $|\calI|$ can exceed $2^{\beta_1}$: the bound
 applies per sector (\cref{kr:loop_basis}), but total states sum across all
 $|\calQ_{\min}|$ sectors.
@@ -1638,7 +1638,7 @@ $B_1$ and $B_2$ decomposes as
   \boxed{\R^{n_1} = \im(B_1^T) \;\oplus\; \im(B_2) \;\oplus\; \ker(L_1)}
   \label{eq:hodge}
 \end{equation}
-where the three subspaces are mutually orthogonal:
+where $\oplus$ denotes orthogonal direct sum and the three subspaces are mutually orthogonal:
 \begin{itemize}
   \item $\im(B_1^T)$: \textbf{gradient} signals---discrete gradients of
     vertex potentials;
@@ -1695,7 +1695,7 @@ The \textbf{Euler characteristic} provides a consistency check:
 
 \subsection{Physical interpretation}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Physical interpretation of Hodge components in spin ice.}
 \label{tab:hodge_physical}
@@ -1836,7 +1836,7 @@ $\beta_1$ counts independent non-bounding loops, and $\beta_2$ counts
 enclosed voids---exactly the intuition from classical homology.
 $\beta_1(\text{none}) = n_1 - n_0 + 1$ regardless of boundary conditions,
 because without faces the upper Laplacian vanishes ($L_1^{\text{up}} = 0$)
-and $\ker(L_1) = \ker(B_1^\top)$.
+and $\ker(L_1) = \ker(B_1)$.
 $\beta_1(\text{all}) = 0$ for open BCs (every cycle on a planar patch
 bounds a union of faces) and $2$ for periodic (the two non-contractible
 winding modes of $H_1(\mathbb{T}^2) \cong \Z^2$).
@@ -1889,7 +1889,7 @@ $L_1^{\text{down}}$. Expanding $\bm\sigma = \sum_i c_i\mathbf{u}_i$:
   \label{eq:H_spectral}
 \end{equation}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Energetic structure from the spectrum of $L_1^{\text{down}}$.}
 \label{tab:spectral_energy}
@@ -1958,9 +1958,9 @@ consistently around a face (a circulating current loop), $|J_f|$ is
 maximized; when they cancel, $J_f = 0$.
 
 The parallel between charge and current is exact
-(Table~\ref{tab:charge_current}).
+(\cref{tab:charge_current}).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Charge--current duality for edge spins on a cell complex.
 Each row shows the vertex-level (0-cell) quantity alongside its face-level
@@ -2406,9 +2406,9 @@ ASI charge framework.  The six key results are:
     $\mathbf{Q} = B_1\bm\sigma$; the ice rule is $\ker(B_1)$.
   \item \textbf{Key Result~\ref{kr:loop_basis}} (Loop-basis parameterization):
     ice states are parameterized by $\bm\alpha \in \{0,1\}^{\beta_1}$, with
-    $|\calI_{\text{reachable}}| \leq 2^{\beta_1}$ per charge sector.
+    $|\calI_{\mathbf{Q}}| = |A_{\mathbf{Q}}| \leq 2^{\beta_1}$ per charge sector.
   \item \textbf{Key Result~\ref{kr:directed_cycle}} (Directed-cycle reduction):
-    the actual reachable count $|\varepsilon_{\mathbf{q}}|$ can be orders of
+    the actual reachable count $|\varepsilon_{\mathbf{Q}}|$ can be orders of
     magnitude below $2^{\beta_1}$, varying by five orders of magnitude across
     the lattice zoo.
   \item \textbf{Key Result~\ref{kr:hodge}} (Hodge decomposition):
@@ -2421,8 +2421,8 @@ ASI charge framework.  The six key results are:
 
 The counting table (\cref{tab:counting}) is the most concrete result: it shows
 that the directed-cycle constraint reduces the reachable ice-state count by
-ratios ranging from $\sim$1:6 (Santa Fe $2\!\times\!2$ open) to
-$\sim$1:170{,}000 (tetris $3\!\times\!3$ open).  This
+ratios ranging from $\sim$18\% (Santa Fe $2\!\times\!2$ open, $23/128$) to
+$6 \times 10^{-4}\%$ (tetris $3\!\times\!3$ open, $25/4{,}194{,}304$).  This
 reduction---invisible from $\beta_1$ alone---seems to be a structural
 property of the lattice, though we do not yet have a good analytical
 understanding of what controls it.
@@ -2436,12 +2436,12 @@ are complementary approaches, but both are at a preliminary design stage.
 
 \paragraph{Open questions and things we are unsure about.}
 \begin{itemize}
-  \item Whether the gap between $|\varepsilon_{\mathbf{q}}|$ and $|\calI|$
+  \item Whether the gap between $|\varepsilon_{\mathbf{Q}}|$ and $|\calI|$
     on even-degree periodic lattices reflects a saturation ceiling of the
     multi-ordering enumeration method or a hard structural limit.
   \item Whether the directed-cycle gating in Mode~A limits the architecture
     too severely on lattices with very low
-    $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ ratios (e.g., tetris).
+    $|\varepsilon_{\mathbf{Q}}|/2^{\beta_1}$ ratios (e.g., tetris).
   \item How many EIGN layers are needed for the message-passing receptive
     field to span the largest loops in the cycle basis.
   \item Whether the causal masking required by Mode~B introduces artifacts
@@ -2589,7 +2589,7 @@ $e_0\!: v_0 \to v_1$,\;
 $e_1\!: v_0 \to v_2$,\;
 $e_2\!: v_2 \to v_1$.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 % Pre-compiled from tikz_triangle.tex (standalone)
 \includegraphics[width=0.45\textwidth]{tikz_triangle}
@@ -2753,7 +2753,7 @@ $e_{16} (v_7\!\to\!v_1)$, $e_{17} (v_8\!\to\!v_2)$.
 \textbf{Counts:} $n_0 = 9$, $n_1 = 18$, $n_2 = 9$.  All vertices have
 coordination $z_v = 4$.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 % Pre-compiled from tikz_torus.tex (standalone)
 \includegraphics[width=0.65\textwidth]{tikz_torus}
