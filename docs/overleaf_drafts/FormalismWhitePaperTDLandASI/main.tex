@@ -24,6 +24,8 @@
 \newtheorem{keyresult}{Key Result}
 \newtheorem{convention}{Convention}
 \newtheorem{correspondence}{Correspondence}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
 
 % --- cleveref formats for custom environments ---
 \crefname{keyresult}{Key Result}{Key Results}
@@ -72,16 +74,19 @@ frameworks and then extend Nisoli's charge Hamiltonian to a \emph{Hodge
 Hamiltonian} that penalizes both topological charge ($B_1\bm\sigma$,
 monopoles) and topological current ($B_2^T\bm\sigma$, vortices),
 unifying both sectors through the full Hodge 1-Laplacian~$L_1$.
-A spanning-tree argument yields the global bound
-$|\mathcal{I}| \leq |\mathcal{Q}_{\min}|\cdot 2^{\beta_1}$
-on the total ice manifold, where $|\mathcal{Q}_{\min}|$ is the number
-of feasible charge sectors---reducing to
-$|\mathcal{I}| \leq 2^{\beta_1}$ when every vertex has even
-coordination.
-Two tables collect the core quantitative results: a counting table showing
-how the directed-cycle constraint reduces the reachable ice-state count
-below the topological bound $2^{\beta_1}$---by up to five orders of
-magnitude across a zoo of eight lattice types---and a topological
+A spanning-tree argument yields the per-sector bound
+$|\mathcal{I}_{\mathbf{Q}}| \leq 2^{\beta_1}$
+on ice states within each charge sector.  We prove a GF(2) bijection
+theorem showing that the $\bm\alpha$ loop-flip parameterization is an exact
+bijection between ice states and a subset of $\{0,1\}^{\beta_1}$, and
+invoke Veblen's theorem to establish that the ice manifold within each
+charge sector is connected under directed cycle moves.
+Two tables collect the core quantitative results: a counting table
+exhibiting the hierarchy
+$|\varepsilon_{\mathbf{Q}}| \leq |\mathcal{I}_{\mathbf{Q}}| \leq 2^{\beta_1}$---where
+$|\varepsilon_{\mathbf{Q}}|$ is the subset reachable by basis-restricted
+sequential sampling, falling below the topological bound by up to five
+orders of magnitude across a zoo of eight lattice types---and a topological
 invariants catalog listing every simplex count and Betti number under
 both face-filling strategies and both boundary conditions.  Worked
 examples with explicit Laplacian matrices appear in the appendices.
@@ -978,9 +983,9 @@ Creates or annihilates a monopole-antimonopole pair.
 \paragraph{Cycles and the cycle space.}
 An \emph{oriented cycle} on $G$ is a vector
 $\mathbf{c} \in \{-1, 0, +1\}^{n_1}$ supported on the edges of a closed
-path, with a consistent flow direction: every vertex on the path has exactly
-one incoming cycle edge ($[B_1]_{v,e} = +1$) and one outgoing cycle edge
-($[B_1]_{v,e'} = -1$), so that
+path, with a consistent algebraic orientation: every vertex on the path has
+exactly one cycle edge with $[B_1]_{v,e}\,c_e = +1$ (entering) and one with
+$[B_1]_{v,e'}\,c_{e'} = -1$ (leaving), so that
 \begin{equation}
   (B_1 \mathbf{c})_v
   = \underbrace{(+1)}_{\text{head of one edge}}
@@ -990,15 +995,26 @@ one incoming cycle edge ($[B_1]_{v,e} = +1$) and one outgoing cycle edge
 \end{equation}
 for every vertex $v$ on the cycle (and trivially zero for vertices off the
 cycle).  Therefore every oriented cycle satisfies
-$\mathbf{c} \in \ker(B_1)$.  More generally, any integer linear
+$\mathbf{c} \in \ker(B_1)$.  This is a property of the cycle vector
+$\mathbf{c}$ alone---it is independent of any spin
+configuration~$\bm\sigma$.  More generally, any integer linear
 combination of simple cycles also lies in $\ker(B_1)$; the full space
 $\ker(B_1)$ is the \textbf{cycle space} of~$G$, with dimension
 $n_1 - n_0 + 1$ for a connected graph (\cref{eq:dim_kerB1}).
 
-\textbf{Loop flip} (flipping all edges along a cycle
-$\mathbf{c} \in \ker(B_1)$): since $B_1\mathbf{c} = \mathbf{0}$
-by~\eqref{eq:cycle_divergence}, the charge at every vertex is unchanged.
-The configuration stays in the same Coulomb class.
+\textbf{Loop flip} (negating all spins along a cycle
+$\mathbf{c} \in \ker(B_1)$): $\sigma_e \mapsto -\sigma_e$ for every
+$e \in \mathrm{supp}(\mathbf{c})$.  This preserves the ice rule
+\emph{when the cycle is directed} in the current configuration
+(\cref{sec:counting_table}).  In the additive picture
+($\bm\sigma \mapsto \bm\sigma + 2\mathbf{c}$), charge preservation
+follows immediately from $B_1\mathbf{c} = \mathbf{0}$; however, the
+result stays in $\{-1,+1\}^{n_1}$ only when the cycle is directed,
+in which case the additive and multiplicative flips coincide.
+When both conditions hold, the configuration stays in the same Coulomb
+class.  A classical theorem of Veblen~\cite{veblen1912} guarantees that
+any two ice states in the same charge sector are connected by a
+sequence of directed cycle reversals (\cref{thm:veblen_connectivity}).
 
 \paragraph{Two kinds of cycle.}
 The Hodge decomposition (\cref{sec:hodge}) refines the cycle space into
@@ -1026,85 +1042,516 @@ Throughout \cref{sec:loop_basis,sec:counting_table}, we use $n_2 = 0$
 (no faces filled), so $\beta_1 = \dim(\ker B_1) = n_1 - n_0 + 1$.
 \end{convention}
 
+\subsubsection{\texorpdfstring{The $\bm\alpha$ parameterization}{The alpha parameterization}}
+
 A basis $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ of $\ker(B_1)$
 consists of $\beta_1$ independent oriented cycles with $B_1\mathbf{l}_i = \mathbf{0}$.
 Given a seed ice state $\bm\sigma_{\text{seed}}$, each cycle defines a
-potential \textbf{loop flip}: reversing all spins along the cycle. Since
-$B_1\mathbf{l}_i = \mathbf{0}$, the flipped configuration remains in
-$\ker(B_1)$. Every ice state reachable via loop flips can be parameterized by
-a binary vector $\bm\alpha \in \{0,1\}^{\beta_1}$:
+potential \textbf{loop flip}: negating all spins along the cycle,
+$\sigma_e \mapsto -\sigma_e$ for every $e \in \mathrm{supp}(\mathbf{l}_i)$.
+A binary vector $\bm\alpha \in \{0,1\}^{\beta_1}$ selects which cycles to
+flip, giving the parameterization
 \begin{equation}
-  \sigma_e = \sigma_{\text{seed},e} \cdot (-1)^{%
+  \sigma_e(\bm\alpha) = \sigma_{\text{seed},e} \cdot (-1)^{%
     \sum_{i:\,e \in \text{supp}(\mathbf{l}_i)} \alpha_i}.
+  \label{eq:alpha_param}
 \end{equation}
+This formula is order-independent: the resulting spin configuration depends
+only on \emph{which} cycles are selected, not on the sequence in which they
+are flipped.  Every $\bm\alpha$ yields a well-defined configuration in
+$\{-1,+1\}^{n_1}$, but not every such configuration is an ice state.
+Whether a cycle flip preserves the ice rule depends on whether the cycle
+is \emph{directed} in the current spin configuration---a concept we now
+illustrate before proceeding to the general theory.
 
-\begin{keyresult}[Loop-Basis Parameterization (Per Charge Sector)]
+\subsubsection{Worked example: directed vs.\ non-directed cycle flips}
+\label{sec:directedness_example}
+
+\Cref{fig:directedness_example} illustrates the key distinction on
+the $4\!\times\!4$ open square lattice ($n_0 = 16$, $n_1 = 24$,
+$\beta_1 = 9$).  Consider an ice state~$\bm\sigma$ and two
+basis cycles, each a unit-cell plaquette.
+
+\paragraph{Directed cycle (\cref{fig:directedness_example}a--b).}
+The blue cycle visits vertices $8 \to 9 \to 13 \to 12 \to 8$,
+forming a square plaquette.  In the current configuration~$\bm\sigma$,
+the spin flow along this cycle is consistent: at every cycle
+vertex, one cycle edge carries spin \emph{in} and one carries spin
+\emph{out}.  The cycle is therefore \emph{directed}.
+Flipping all four cycle edges (\cref{fig:directedness_example}b)
+reverses the arrows but preserves the in/out balance at every vertex:
+$\Delta Q_v = 0$ everywhere, and the result is a new ice state.
+
+\paragraph{Non-directed cycle (\cref{fig:directedness_example}c--d).}
+The red cycle visits vertices $4 \to 5 \to 9 \to 8 \to 4$,
+the plaquette directly above.  In the \emph{same}
+configuration~$\bm\sigma$, the spin flow is not consistent around
+this cycle: at vertex~4, both cycle edges carry spin \emph{into}
+the vertex (``both IN''), and at vertex~8, both carry spin
+\emph{out} (``both OUT'').  The cycle is \emph{not directed}.
+Flipping these four edges (\cref{fig:directedness_example}d)
+reverses the two incoming edges at vertex~4 to outgoing,
+changing the net flow by $\Delta Q_4 = -4$; symmetrically,
+$\Delta Q_8 = +4$.  The result has $|Q_4| = 3$ and $|Q_8| = 3$---a
+monopole--antimonopole pair---violating the ice rule.
+
+Note that directedness is a property of the \emph{pair}
+$(\text{cycle}, \bm\sigma)$, not of the cycle alone.
+Flipping a directed cycle changes $\bm\sigma$ on the flipped edges,
+which can alter the directedness of any other cycle that shares
+edges with it: a cycle that was directed may become non-directed,
+and vice versa.  In this example, the directed flip in panel~(b)
+causes a neighboring cycle (sharing one edge) to lose its directedness.
+This cascading interaction is what makes the decision tree
+nontrivial (\cref{sec:counting_table}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{directedness_example}
+  \caption{Directed vs.\ non-directed cycle flips on the $4\!\times\!4$
+    open square lattice.
+    \textbf{(a)}~An ice state~$\bm\sigma$ with a directed basis cycle
+    (blue): at each cycle vertex, one cycle edge flows in and one flows out.
+    \textbf{(b)}~After flipping the directed cycle, all arrows on the cycle
+    reverse, but the in/out balance is preserved---still an ice state.
+    \textbf{(c)}~The same~$\bm\sigma$ with a non-directed basis cycle
+    (red): vertex~4 has both cycle edges flowing in (orange, ``both IN'');
+    vertex~8 has both flowing out (``both OUT'').
+    \textbf{(d)}~After flipping the non-directed cycle, vertices 4 and 8
+    acquire charges $Q = -3$ and $Q = +3$ (red circles)---a
+    monopole--antimonopole pair that violates the ice rule.}
+  \label{fig:directedness_example}
+\end{figure}
+
+\subsubsection{The GF(2) bijection theorem}
+
+We now show that the $\bm\alpha$ parameterization establishes a bijection
+between ice states in a charge sector and a subset of
+$\{0,1\}^{\beta_1}$.
+
+\begin{theorem}[GF(2) Bijection]
+\label{thm:gf2_bijection}
+Let $G$ be a connected graph with fundamental cycle basis
+$\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ from a spanning tree~$T$.
+Fix a charge vector $\mathbf{Q}$ and a seed ice state
+$\bm\sigma_{\text{seed}}$ with $B_1\bm\sigma_{\text{seed}} = \mathbf{Q}$.
+Define $\calI_{\mathbf{Q}} = \{\bm\sigma \in \{-1,+1\}^{n_1} : B_1\bm\sigma = \mathbf{Q}\}$
+and $A_{\mathbf{Q}} = \{\bm\alpha \in \{0,1\}^{\beta_1} : \bm\sigma(\bm\alpha) \in \calI_{\mathbf{Q}}\}$.
+Then:
+\begin{enumerate}
+  \item \emph{(Injectivity)} The map $\bm\alpha \mapsto \bm\sigma(\bm\alpha)$
+    is injective: distinct $\bm\alpha$'s produce distinct configurations.
+  \item \emph{(Surjectivity)} Every ice state
+    $\bm\sigma' \in \calI_{\mathbf{Q}}$ has a unique
+    $\bm\alpha \in \{0,1\}^{\beta_1}$ with $\bm\sigma(\bm\alpha) = \bm\sigma'$.
+\end{enumerate}
+Hence $|A_{\mathbf{Q}}| = |\calI_{\mathbf{Q}}|$.
+\end{theorem}
+
+\begin{proof}
+\emph{Injectivity.}  The $\bm\alpha$ parameterization acts on
+edges by $\mathrm{GF}(2)$ linear combination: the set of flipped edges is
+$S(\bm\alpha) = \bigoplus_{i:\alpha_i=1} \mathrm{supp}(\mathbf{l}_i)$
+(symmetric difference).  Since the fundamental cycle supports are linearly
+independent over $\mathrm{GF}(2)$~\cite{whitney1932},
+$S(\bm\alpha) = S(\bm\alpha')$ implies $\bm\alpha = \bm\alpha'$.
+Distinct flip sets produce distinct configurations (they differ on at least
+one edge).
+
+\emph{Surjectivity.}  Given $\bm\sigma' \in \calI_{\mathbf{Q}}$, the
+\emph{flip set} $S = \{e : \sigma'_e \neq \sigma_{\text{seed},e}\}$
+satisfies: at every vertex~$v$, the number of edges in~$S$ that are incoming
+at~$v$ (in either $\bm\sigma'$ or $\bm\sigma_{\text{seed}}$) equals the
+number that are outgoing.  This is because
+$B_1\bm\sigma' = B_1\bm\sigma_{\text{seed}} = \mathbf{Q}$, so flipping
+$S$ preserves the charge at every vertex.  Therefore~$S$ has even degree at
+every vertex, which means~$S$ (as an edge set) lies in the $\mathrm{GF}(2)$
+cycle space of~$G$.  Since the fundamental cycle supports form a
+$\mathrm{GF}(2)$ basis for this cycle space, $S$ decomposes uniquely as
+$S = \bigoplus_{i \in J} \mathrm{supp}(\mathbf{l}_i)$ for some
+$J \subseteq \{1, \ldots, \beta_1\}$.  Setting $\alpha_i = 1$ iff
+$i \in J$ gives the unique preimage.
+\end{proof}
+
+\begin{corollary}
+\label{cor:sector_bound}
+$|\calI_{\mathbf{Q}}| = |A_{\mathbf{Q}}| \leq 2^{\beta_1}$.
+\end{corollary}
+
+This recovers the spanning-tree upper bound of \cref{sec:ice_manifold}
+and makes it constructive: the $\bm\alpha$ map provides the explicit
+bijection.
+
+\subsubsection{Directed single-cycle flips}
+
+A single-cycle flip negates $\sigma_e$ on the cycle's support, changing the
+vertex charge at each cycle vertex~$v$ (where exactly two cycle edges meet)
+by
+\begin{equation}
+  \Delta Q_v = -2\bigl([B_1]_{v,e_1}\,\sigma_{e_1}
+               + [B_1]_{v,e_2}\,\sigma_{e_2}\bigr).
+  \label{eq:deltaQ_preview}
+\end{equation}
+If the two cycle edges at $v$ carry spin in \emph{opposite} directions (one
+flowing in, one flowing out), flipping both swaps their roles and
+$\Delta Q_v = 0$: the in/out balance at $v$ is unchanged.  If instead both
+carry spin in the \emph{same} direction, flipping both reverses them and
+$\Delta Q_v = \pm 4$---an ice-rule violation.
+
+A cycle is \emph{directed} in configuration~$\bm\sigma$ when the favorable
+case holds at every vertex: opposite spin flow at each cycle vertex.
+(The precise algebraic criterion appears in
+\cref{sec:counting_table}.)  Directedness is a property of the
+\emph{pair} $(\mathbf{l}_i, \bm\sigma)$, not of $\mathbf{l}_i$ alone:
+the same cycle can be directed in one spin configuration and non-directed
+in another.  A \emph{single} loop flip preserves the ice rule if and only
+if the cycle is directed at the moment of the flip.
+
+\subsubsection{\texorpdfstring{Why $|\calI_{\mathbf{Q}}| < 2^{\beta_1}$}{Why |I_Q| < 2^beta_1}}
+
+Not every $\bm\alpha \in \{0,1\}^{\beta_1}$ produces an ice state.
+The $\bm\alpha$ parameterization flips a set of edges
+$S(\bm\alpha) = \bigoplus_{i:\alpha_i=1} \mathrm{supp}(\mathbf{l}_i)$
+(the symmetric difference of selected basis cycle supports).  The result
+$\bm\sigma(\bm\alpha)$ is an ice state if and only if the charge is
+preserved at every vertex, i.e., the flip set~$S(\bm\alpha)$ has equal
+numbers of in$\to$out and out$\to$in transitions at each vertex~$v$.
+
+For a \emph{single} cycle ($|\{i : \alpha_i = 1\}| = 1$), this reduces to
+the directedness condition: each cycle vertex sees exactly one incoming and
+one outgoing cycle edge.  For \emph{multi-cycle} flips, the condition is
+weaker: the \emph{effective} flip set $S(\bm\alpha)$---which may differ
+from the union of individual cycle supports due to cancellations on shared
+edges---must collectively preserve charge at every vertex.  Two individually
+non-directed cycles can combine to produce a valid flip if their shared-edge
+cancellations restore the charge balance.
+
+\begin{keyresult}[$\bm\alpha$--Ice-State Bijection (Per Charge Sector)]
 \label{kr:loop_basis}
 Let $G$ be a connected graph with $n_2 = 0$, $\bm\sigma_{\text{seed}}$ an ice
-state in charge sector $C_{\mathbf{q}}$, and
+state in charge sector $C_{\mathbf{Q}}$, and
 $\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$ a basis of $\ker(B_1)$.
-Every ice state reachable from $\bm\sigma_{\text{seed}}$ via loop flips is
-encoded by $\bm\alpha \in \{0,1\}^{\beta_1}$, and all reachable states remain
-in $C_{\mathbf{q}}$. This gives
+The $\bm\alpha$ parameterization~\eqref{eq:alpha_param} is a bijection
+between $\calI_{\mathbf{Q}}$ (all ice states in the sector) and the subset
+$A_{\mathbf{Q}} \subseteq \{0,1\}^{\beta_1}$ of charge-preserving
+$\bm\alpha$ vectors (\cref{thm:gf2_bijection}).  This gives
 \begin{equation}
-  |\calI_{\text{reachable}}| \leq 2^{\beta_1}.
+  |\calI_{\mathbf{Q}}| = |A_{\mathbf{Q}}| \leq 2^{\beta_1}.
   \label{eq:loop_bound}
 \end{equation}
-This is a \textbf{per-sector bound}: it limits the number of ice states
-reachable from any single seed. It does not bound the total ice manifold
-$|\calI|$, which sums over all charge sectors and can exceed $2^{\beta_1}$
-when multiple sectors exist.
+This is a \textbf{per-sector bound}: it limits the number of
+ice states within any single charge sector.  The total ice
+manifold $|\calI| = \sum_{\mathbf{Q}} |\calI_{\mathbf{Q}}|$ sums over all
+charge sectors and can exceed $2^{\beta_1}$ when multiple sectors exist.
 \end{keyresult}
+
+\noindent
+The next section gives the precise algebraic definition of directedness,
+derives the charge-preservation identity $\Delta Q_v = 0$ from
+$B_1\mathbf{c} = \mathbf{0}$, and discusses the distinction between
+the full ice manifold and the subset reachable by sequential basis-cycle
+flips.
 
 \subsection{The directed-cycle constraint and counting table}
 \label{sec:counting_table}
 
-\textbf{Definition.} A cycle $\mathbf{c}$ is \emph{directed} in configuration
-$\bm\sigma$ if, at every vertex of the cycle, exactly one cycle edge carries
-spin flowing in and one carries spin flowing out along the cycle direction.
-Equivalently, the cycle carries a consistent ``current.''
+\subsubsection{Alignment signs and the directedness criterion}
 
-\textbf{Why directedness matters.} Flipping a non-directed cycle can violate
-the ice rule. Whether cycle $\mathbf{l}_i$ is directed depends on the
-\emph{current} configuration $\bm\sigma$, which depends on earlier flip
-decisions. This creates a \textbf{pruned decision tree}, not a flat
-$2^{\beta_1}$ product space.
-
-\begin{keyresult}[Directed-Cycle Reduction (Per Charge Sector)]
-\label{kr:directed_cycle}
-The directed-cycle constraint further reduces the reachable states within a
-single charge sector. The multi-ordering reachable set
-$\varepsilon_{\mathbf{q}}$---the union of all states found by depth-first
-search across $K = 200$ random autoregressive orderings---satisfies
+\textbf{Definition.} Let $\mathbf{c} \in \ker(B_1)$ be an oriented cycle
+and $\bm\sigma \in \{-1,+1\}^{n_1}$ a spin configuration.  Define the
+\emph{alignment sign} of each cycle edge $e \in \mathrm{supp}(\mathbf{c})$ as
 \begin{equation}
-  |\varepsilon_{\mathbf{q}}| \leq |\calI_{\mathbf{q}}| \leq 2^{\beta_1}.
-  \label{eq:directed_bound}
+  s_e \;=\; \sigma_e \, c_e \;\in\; \{-1, +1\}.
+  \label{eq:alignment_sign}
 \end{equation}
-The ratio $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ varies by five orders of
+The cycle $\mathbf{c}$ is \emph{directed} in $\bm\sigma$ if the alignment
+sign is constant across the cycle:
+$s_e = s$ for every $e \in \mathrm{supp}(\mathbf{c})$, where $s = +1$ or
+$s = -1$.  Equivalently, at every vertex on the cycle, exactly one cycle edge
+carries spin into the vertex and one carries spin out (consistent
+``spin current'' around the loop).
+
+\emph{Note:} directedness is a property of the \emph{pair}
+$(\mathbf{c}, \bm\sigma)$, not of $\mathbf{c}$ alone.  Every cycle
+$\mathbf{c} \in \ker(B_1)$ is \emph{oriented} (has consistent algebraic
+signs) by definition; directedness additionally requires the physical spins to
+align with that orientation.  Changing $\bm\sigma$ can turn a directed cycle
+into a non-directed one and vice versa.
+
+\subsubsection{Charge preservation for directed single-cycle flips}
+
+Under the multiplicative loop flip $\sigma_e' = -\sigma_e$ for
+$e \in \mathrm{supp}(\mathbf{c})$ (with $\sigma_e' = \sigma_e$ off the
+support), the vertex charge changes by
+%
+\begin{equation}
+  \Delta Q_v
+  \;=\; Q_v' - Q_v
+  \;=\; -2 \!\!\sum_{e \in \mathrm{supp}(\mathbf{c})}
+        [B_1]_{v,e}\,\sigma_e.
+  \label{eq:deltaQ}
+\end{equation}
+%
+Using $c_e^2 = 1$ on the support, write
+$\sigma_e = s_e \cdot c_e$
+where $s_e = \sigma_e\,c_e$ is the alignment sign
+from~\eqref{eq:alignment_sign}.  Substituting into each term of the sum:
+%
+\begin{equation}
+  [B_1]_{v,e}\,\sigma_e
+  \;=\; s_e \cdot [B_1]_{v,e}\,c_e.
+  \label{eq:factor_alignment}
+\end{equation}
+%
+When $\mathbf{c}$ is directed in $\bm\sigma$, the alignment sign is constant
+($s_e = s$ for all $e$), and $s$ factors out of the sum:
+%
+\begin{equation}
+  \Delta Q_v
+  \;=\; -2s \!\!\sum_{e \in \mathrm{supp}(\mathbf{c})}
+        [B_1]_{v,e}\,c_e
+  \;=\; -2s\,(B_1\mathbf{c})_v
+  \;=\; 0,
+  \label{eq:deltaQ_directed}
+\end{equation}
+%
+where the last step uses $\mathbf{c} \in \ker(B_1)$.
+The charge is preserved at every vertex, so the ice rule is maintained.
+When $\mathbf{c}$ is \emph{not} directed, the signs $s_e$ vary across
+edges and do not factor out; generically $\Delta Q_v \neq 0$, violating
+the ice rule.
+
+\subsubsection{Veblen connectivity of the ice manifold}
+\label{sec:veblen}
+
+A fundamental question is whether the ice manifold within a charge sector
+is \emph{connected} under directed cycle moves.  The answer is yes, by a
+classical theorem of Veblen~\cite{veblen1912}:
+
+\begin{theorem}[Veblen Connectivity of Ice States]
+\label{thm:veblen_connectivity}
+Any two ice states $\bm\sigma, \bm\sigma'$ in the same charge sector
+($B_1\bm\sigma = B_1\bm\sigma'$) are connected by a finite sequence of
+directed cycle reversals.
+\end{theorem}
+
+\begin{proof}
+Consider the flip set $S = \{e : \sigma'_e \neq \sigma_e\}$.  Because both
+configurations have identical charge vectors, the subgraph induced by~$S$
+has even degree at every vertex: each vertex sees equally many
+in$\to$out and out$\to$in transitions.  Define an orientation on~$S$ by the
+``new'' direction: edge~$e \in S$ is oriented according to~$\bm\sigma'$
+(equivalently, opposite to~$\bm\sigma$ on these edges).  The resulting
+oriented subgraph is balanced (equal in-degree and out-degree at every
+vertex).  By Veblen's theorem~\cite{veblen1912}, every balanced digraph
+decomposes into edge-disjoint directed cycles $C_1, \ldots, C_k$.  Since
+the cycles are edge-disjoint, reversing $C_1$ in $\bm\sigma$ flips only
+edges of~$C_1$; the remaining cycles $C_2, \ldots, C_k$ remain directed
+in the resulting configuration.  Reversing all $k$ cycles sequentially
+transforms $\bm\sigma$ into~$\bm\sigma'$.
+\end{proof}
+
+\paragraph{Critical consequence.}
+The ice manifold within each charge sector is connected under
+directed cycle moves---there are no ``disconnected islands'' of ice states.
+Every ice state is reachable from every other in the same sector via
+Veblen's decomposition.  (For related lattice-theoretic perspectives on
+orientation spaces, see Propp~\cite{propp2002} and
+Felsner~\cite{felsner2004}.)  The Veblen connecting cycles are, however,
+\emph{arbitrary} directed cycles in the graph, not necessarily basis
+cycles.  A single Veblen cycle may correspond to the
+\emph{simultaneous} flip of multiple basis cycles.
+
+\subsubsection{Sequential basis-cycle enumeration (the pruned decision tree)}
+\label{sec:decision_tree}
+
+Given a seed ice state $\bm\sigma_{\text{seed}}$, a cycle basis
+$\{\mathbf{l}_1, \ldots, \mathbf{l}_{\beta_1}\}$, and a fixed ordering
+(permutation) of the $\beta_1$ cycles, the \textbf{sequential basis-cycle
+enumeration} explores a binary decision tree of depth~$\beta_1$ by the
+following depth-first search (DFS):
+\begin{enumerate}
+  \item Initialize $\bm\sigma \leftarrow \bm\sigma_{\text{seed}}$ and
+    set the current depth $k \leftarrow 1$.
+  \item At depth~$k$, consider cycle $\mathbf{l}_{\pi(k)}$ (where $\pi$
+    is the ordering).
+    \begin{itemize}
+      \item \textbf{No-flip branch} ($\alpha_{\pi(k)} = 0$): leave
+        $\bm\sigma$ unchanged and recurse to depth $k+1$.
+      \item \textbf{Flip branch} ($\alpha_{\pi(k)} = 1$): check whether
+        $\mathbf{l}_{\pi(k)}$ is \emph{directed} in the current
+        $\bm\sigma$ (\cref{eq:alignment_sign,eq:deltaQ_directed}).
+        If yes, set $\sigma_e \leftarrow -\sigma_e$ for all
+        $e \in \mathrm{supp}(\mathbf{l}_{\pi(k)})$ and recurse to
+        depth $k+1$.  If no, \textbf{prune}: this branch is not explored
+        (flipping would violate the ice rule).
+    \end{itemize}
+  \item At depth $\beta_1 + 1$, record $\bm\sigma$ as a reachable state.
+\end{enumerate}
+Each leaf of the unpruned tree corresponds to one
+$\bm\alpha \in \{0,1\}^{\beta_1}$; pruning removes all leaves whose
+path includes a non-directed flip, so the reachable set for a single
+ordering $\pi$ is a subset of the ice manifold.
+
+Because directedness depends on the current $\bm\sigma$---and flipping
+one cycle can change the directedness of another
+(\cref{sec:directedness_example})---different orderings prune different
+branches and discover different states.  The \textbf{multi-ordering
+reachable set} is
+\begin{equation}
+  \varepsilon_{\mathbf{Q}}
+  = \bigcup_{k=1}^{K}
+    \bigl\{\text{states found by DFS with ordering } \pi_k\bigr\},
+  \label{eq:eps_def}
+\end{equation}
+where $\pi_1, \ldots, \pi_K$ are $K$ independent random permutations.
+The count $|\varepsilon_{\mathbf{Q}}|$ grows monotonically with~$K$
+but is bounded above by $|\calI_{\mathbf{Q}}|$; in practice it
+saturates well before $K = 200$ for the small lattices in
+\cref{tab:counting}.  Even in the exhaustive limit
+$K = \beta_1!$ (every possible ordering), the union can remain strictly
+smaller than $|\calI_{\mathbf{Q}}|$; we denote this exhaustive union
+\begin{equation}
+  \varepsilon_{\mathbf{Q}}^{*}
+  = \bigcup_{\pi \in S_{\beta_1}}
+    \bigl\{\text{states found by DFS with ordering } \pi\bigr\},
+  \label{eq:eps_star_def}
+\end{equation}
+where $S_{\beta_1}$ is the symmetric group on $\beta_1$ elements.
+
+\subsubsection{Four distinct quantities}
+\label{sec:three_quantities}
+
+The preceding results distinguish four quantities that must not be
+conflated:
+\begin{enumerate}
+  \item $|\varepsilon_{\mathbf{Q}}|$: the number of states reachable by
+    the sequential basis-cycle DFS of \cref{sec:decision_tree}
+    (union over $K$ random orderings).
+  \item $|\varepsilon_{\mathbf{Q}}^{*}|$: the exhaustive union over
+    \emph{all} $\beta_1!$ orderings~\eqref{eq:eps_star_def}.
+  \item $|\calI_{\mathbf{Q}}|$: the number of ice states in charge sector
+    $\mathbf{Q}$.  By \cref{thm:gf2_bijection}, this equals the number of
+    $\bm\alpha$ vectors that produce ice states: $|\calI_{\mathbf{Q}}| = |A_{\mathbf{Q}}|$.
+  \item $2^{\beta_1}$: the total number of $\bm\alpha$ vectors
+    (the topological upper bound from \cref{cor:sector_bound}).
+\end{enumerate}
+
+The correct ordering is:
+\begin{equation}
+  |\varepsilon_{\mathbf{Q}}|
+  \;\leq\; |\varepsilon_{\mathbf{Q}}^{*}|
+  \;\leq\; |\calI_{\mathbf{Q}}| = |A_{\mathbf{Q}}|
+  \;\leq\; 2^{\beta_1}.
+  \label{eq:four_hierarchy}
+\end{equation}
+
+\paragraph{Why $|\varepsilon_{\mathbf{Q}}^{*}| < |\calI_{\mathbf{Q}}|$.}
+The sequential DFS (\cref{sec:decision_tree}) restricts to flipping
+\emph{individual basis cycles} one at a time.  At each step, a cycle can
+only be flipped if it is directed in the current $\bm\sigma$.  Some ice
+states require \emph{simultaneous} multi-cycle flips: their $\bm\alpha$
+vectors involve basis cycles that are individually non-directed from
+$\bm\sigma_{\text{seed}}$---and remain non-directed after any sequence
+of flips of the other directed basis cycles---yet whose combined effect
+on the flip set $S(\bm\alpha)$ preserves charge at every vertex.  The
+sequential DFS cannot reach these states regardless of ordering, because
+at no point can it flip a non-directed basis cycle.
+
+Exhaustive enumeration over all $\beta_1!$ orderings confirms this is
+a \textbf{fundamental} limitation, not a sampling deficiency.
+On the $3\!\times\!4$ open square ($\beta_1 = 6$), the exhaustive union
+over all $6! = 720$ orderings yields
+$|\varepsilon_{\mathbf{Q}}^{*}| = 10$, while brute-force enumeration
+gives $|\calI_{\mathbf{Q}}| = 14$---a persistent gap of~4 states.
+On the $5\!\times\!3$ open square ($\beta_1 = 8$), the exhaustive union
+over all $8! = 40{,}320$ orderings yields
+$|\varepsilon_{\mathbf{Q}}^{*}| = 27$ vs.\
+$|\calI_{\mathbf{Q}}| = 31$.  In both cases, the missing states have
+$\bm\alpha$ vectors requiring basis cycles (e.g., cycles~2 and~3 in the
+$3\!\times\!4$ lattice) that are \emph{never} directed---not from the
+seed, and not after flipping any combination of the remaining cycles.
+By contrast, thin lattices ($2\!\times\!6$, $3\!\times\!3$, $4\!\times\!3$)
+show $|\varepsilon_{\mathbf{Q}}^{*}| = |\calI_{\mathbf{Q}}|$: all
+orderings together close the gap.
+
+This is an \textbf{algorithmic limitation} of basis-restricted sequential
+sampling, not a topological disconnection.  By
+\cref{thm:veblen_connectivity}, all ice states in the sector are
+connected by arbitrary directed cycle moves (not restricted to the
+basis), so the missing states are topologically accessible---just not
+via the pruned decision tree.
+
+\paragraph{Basis dependence of the gap.}
+The gap $|\varepsilon_{\mathbf{Q}}^{*}| < |\calI_{\mathbf{Q}}|$ depends
+on the choice of spanning tree (and hence cycle basis), not on the ice
+states themselves.  In fact, \emph{every} ice state is reachable by some
+basis.  Given $\bm\sigma' \in \calI_{\mathbf{Q}}$, the flip set
+$S = \{e : \sigma'_e \neq \sigma_{\text{seed},e}\}$ has even degree at
+every vertex (both configurations share the same charge vector), so by
+Veblen's theorem it decomposes into edge-disjoint directed cycles
+$C_1, \ldots, C_k$.  Pick one edge $e_i$ from each~$C_i$; since each
+$C_i$ is a cycle, removing $e_i$ does not disconnect the graph, so there
+exists a spanning tree~$T$ avoiding all $e_1, \ldots, e_k$.  In the
+fundamental cycle basis of~$T$, each $C_i$ is the fundamental cycle of
+$e_i$.  Because the $C_i$ are edge-disjoint, flipping $C_1$ changes no
+edges of $C_2, \ldots, C_k$---so all remain directed and can be flipped
+in any order.  Hence the sequential DFS with basis~$T$ reaches
+$\bm\sigma'$.  Computational verification on the $3\!\times\!4$ open
+square confirms this: sampling over $500$ random spanning trees, some
+bases achieve $|\varepsilon_{\mathbf{Q}}^{*}| = |\calI_{\mathbf{Q}}| = 14$
+while others reach as few as~$1$ state.
+
+\paragraph{Why different orderings find different states.}
+Because directedness depends on $\bm\sigma$, and $\bm\sigma$ changes
+after each flip, the pruned decision tree of
+\cref{sec:decision_tree} is ordering-dependent: a cycle that is directed
+at one point in the sequence may be non-directed at the same depth under
+a different ordering.  This is why the multi-ordering union
+$\varepsilon_{\mathbf{Q}}$~\eqref{eq:eps_def} discovers more states than
+any single ordering.
+
+\begin{keyresult}[Directed-Cycle Reduction and the Four-Quantity Hierarchy]
+\label{kr:directed_cycle}
+Within a single charge sector $C_{\mathbf{Q}}$, four quantities are related
+by the strict hierarchy~\eqref{eq:four_hierarchy}:
+$|\varepsilon_{\mathbf{Q}}| \leq |\varepsilon_{\mathbf{Q}}^{*}|
+  \leq |\calI_{\mathbf{Q}}| = |A_{\mathbf{Q}}| \leq 2^{\beta_1}$.
+The first inequality reflects incomplete sampling of orderings; it can
+be closed by taking $K = \beta_1!$.
+The second inequality is \textbf{basis-dependent}: for a fixed cycle basis,
+even the exhaustive union over all orderings can be strictly smaller than
+$|\calI_{\mathbf{Q}}|$, because some ice states require simultaneous
+multi-cycle flips through basis cycles that are individually never
+directed.  However, every ice state is reachable by \emph{some} basis:
+by Veblen's theorem, the flip set decomposes into edge-disjoint directed
+cycles, and a spanning tree can always be chosen so that these cycles are
+fundamental.  Thus the gap
+$|\varepsilon_{\mathbf{Q}}^{*}| < |\calI_{\mathbf{Q}}|$ reflects the
+choice of basis, not a topological obstruction.
+The third inequality reflects the constraint that not every $\bm\alpha$
+produces an ice state (the effective flip must preserve charge at every
+vertex).
+The ratio $|\varepsilon_{\mathbf{Q}}|/2^{\beta_1}$ varies by five orders of
 magnitude across the Morrison et al.\ lattice zoo (from 18\% on Santa Fe to
 $6 \times 10^{-4}\%$ on tetris $3\times 3$).
 \end{keyresult}
 
-Two irreducible mechanisms make $|\varepsilon_{\mathbf{q}}| \ll 2^{\beta_1}$:
-\begin{enumerate}
-  \item \textbf{Directedness gating:} at each node of the decision tree, if
-    the loop is not directed in the current $\bm\sigma$, the flip branch is
-    pruned entirely.
-  \item \textbf{Path convergence:} different sequences of flip decisions can
-    produce the same final configuration (especially when loops share edges).
-\end{enumerate}
+\subsubsection{Counting table}
 
 \Cref{tab:counting} presents the central quantitative result: the full
 counting table across eight lattice/size/BC combinations.
 
 \begin{table*}[t]
 \centering
-\caption{Directed-cycle reduction across the lattice zoo. $n_{\text{odd}}$:
+\caption{Ice-state counting across the lattice zoo. $n_{\text{odd}}$:
 number of odd-degree vertices. $|\calQ_{\min}|$: number of feasible charge
 sectors. $|\calI_{\text{P}}|$: Pauling approximation.
-$|\calI|$: independently verified ice-state count.
-$|\varepsilon_{\mathbf{q}}|$: multi-ordering reachable states
-($K = 200$ random orderings) within the seed's charge sector.}
+$|\calI|$: independently verified ice-state count (= $|A_{\mathbf{Q}}|$ summed
+over sectors, by \cref{thm:gf2_bijection}).
+$|\varepsilon_{\mathbf{Q}}|$: states reachable by the sequential basis-cycle
+DFS (\cref{sec:decision_tree}; $K = 200$ random orderings) within the seed's
+charge sector---a lower bound on~$|\calI_{\mathbf{Q}}|$.}
 \label{tab:counting}
 \small
 \begin{tabular}{lllrrcrrrrrr}
@@ -1112,7 +1559,7 @@ $|\varepsilon_{\mathbf{q}}|$: multi-ordering reachable states
 \textbf{Lattice} & \textbf{Size} & \textbf{BC} & $n_1$ & $n_{\text{odd}}$
   & $|\calP|$ & $\beta_1$ & $2^{\beta_1}$
   & $|\calQ_{\min}|$ & $|\calI_{\text{P}}|$ & $|\calI|$
-  & $|\varepsilon_{\mathbf{q}}|$ \\
+  & $|\varepsilon_{\mathbf{Q}}|$ \\
 \midrule
 Square  & $4\!\times\!4$ & open     & 24 &  8 & $1.7\!\times\!10^7$  &  9 & 512       &    70 & 2,076              & 2,768             & 38 \\
 Square  & $4\!\times\!4$ & periodic & 32 &  0 & $4.3\!\times\!10^9$  & 17 & 131,072   &     1 & 657                & 2,970             & 299$^*$ \\
@@ -1150,11 +1597,32 @@ ordering. For example: square $4\!\times\!4$ periodic finds 299 states
 vs.\ 27--40 per single ordering ($|\calI| = 2{,}970$); tetris $3\!\times\!3$
 open finds 25 vs.\ 4--6 (a $6\times$ increase).
 
-\textbf{The reduction ratio} $|\varepsilon_{\mathbf{q}}|/2^{\beta_1}$ ranges
+\textbf{The reduction ratio} $|\varepsilon_{\mathbf{Q}}|/2^{\beta_1}$ ranges
 from 18\% (Santa Fe $2\!\times\!2$ open, $23/128$) to
 $6 \times 10^{-4}\%$ (tetris $3\!\times\!3$ open, $25/4{,}194{,}304$).
 This five-order-of-magnitude range---invisible from $\beta_1$ alone---is a
 fundamental structural property of the lattice.
+
+\textbf{Computational verification.}
+For lattices small enough to permit brute-force enumeration of all
+$2^{n_1}$ configurations (square $4\!\times\!4$ open with $n_1 = 24$,
+square $3\!\times\!3$ periodic with $n_1 = 18$), we have verified the
+GF(2) bijection (\cref{thm:gf2_bijection}) directly: every ice state in
+the seed's charge sector has a unique $\bm\alpha$, and
+$|A_{\mathbf{Q}}| = |\calI_{\mathbf{Q}}|$ exactly.  We also confirm the
+strict hierarchy~\eqref{eq:four_hierarchy}: for the $4\!\times\!4$ open
+square, $|\varepsilon_{\mathbf{Q}}| = 38 < |\calI_{\mathbf{Q}}| = 54 < 2^9 = 512$;
+for the $3\!\times\!3$ periodic square,
+$|\varepsilon_{\mathbf{Q}}| = 101 < |\calI_{\mathbf{Q}}| = 148 < 2^{10} = 1024$.
+Examining the 16 ``missing'' states in the open case reveals that their
+$\bm\alpha$ vectors involve basis cycles that are individually non-directed
+from the seed, consistent with the multi-cycle simultaneous-flip mechanism
+described above.  Furthermore, exhaustive enumeration over all $\beta_1!$
+orderings on smaller lattices confirms that the gap
+$|\varepsilon_{\mathbf{Q}}^{*}| < |\calI_{\mathbf{Q}}|$ is fundamental:
+for the $3\!\times\!4$ open square ($\beta_1 = 6$), all $720$ orderings
+together yield only $10$ of $14$ ice states; for the $5\!\times\!3$ open
+square ($\beta_1 = 8$), all $40{,}320$ orderings yield only $27$ of $31$.
 
 % ===================================================================
 % SECTION 6: HODGE DECOMPOSITION
@@ -1649,7 +2117,7 @@ drives signals toward the current-free subspace. Only in
 $\ker(L_1)$---signals that are both charge-free and current-free---do
 features survive both smoothing channels indefinitely. The dimension
 of this protected subspace is $\beta_1$, explaining its role as the
-key topological invariant for oversmoothing resistance.
+key topological invariant for oversmoothing resistance~\cite{li2018deeper}.
 
 For lattice design, this suggests a new axis of control: beyond
 maximizing $\beta_1$ (large harmonic subspace), one can separately tune
@@ -1783,9 +2251,10 @@ $p_i = \mathrm{sigmoid}\!\bigl(\mathrm{MLP}(\mathbf{h}_i)\bigr)$.
 Before sampling $\alpha_i$, we check whether loop~$i$ is a
 \textbf{directed cycle} in the current configuration~$\bm\sigma^{(i)}$
 (all spins flow consistently around the loop).  If it is not, flipping
-loop~$i$ would violate the Ising constraint $\sigma_e \in \{+1,-1\}$, so
-the flip is gated off: $\alpha_i \leftarrow 0$ deterministically.  This
-guarantees that every sample satisfies the ice rule by construction.
+loop~$i$ would violate the ice rule (non-directed flips do not preserve
+vertex charges), so the flip is gated off:
+$\alpha_i \leftarrow 0$ deterministically.  This guarantees that every
+sample satisfies the ice rule by construction.
 
 \paragraph{Training.}
 Because all ice states have $\calH = 0$, the variational free energy
@@ -1810,9 +2279,14 @@ bonus $-\eta\,H(q_\theta)$ is added to prevent premature mode collapse.
 \textbf{Strengths:} every sample is a valid ice state by construction (zero
 ice-rule violations); autoregressive sequence length is $\beta_1$, not
 $n_1$; no causal masking is required.
-\textbf{Limitation:} confined to a single charge sector; the directed-cycle
-constraint means reachable states can be much fewer than $2^{\beta_1}$
-(\cref{tab:counting}).
+\textbf{Limitation:} confined to a single charge sector; the basis-restricted
+sequential sampling (\cref{sec:decision_tree}) reaches only
+$|\varepsilon_{\mathbf{Q}}|$ states, which can be much fewer than
+$|\calI_{\mathbf{Q}}|$ (the true number of ice states in the sector) due
+to the directedness gating at each step
+(\cref{sec:three_quantities,tab:counting}).  By \cref{thm:veblen_connectivity},
+all $|\calI_{\mathbf{Q}}|$ states are connected by arbitrary directed cycle
+moves, but the autoregressive basis-restricted sampler cannot exploit this.
 
 \subsection{Mode B: EdgeMPVAN (direct-edge autoregressive sampling)}
 \label{sec:modeB}
@@ -2072,6 +2546,26 @@ frustrated magnet,''
 C.~Castelnovo, R.~Moessner, and S.~L. Sondhi,
 ``Magnetic monopoles in spin ice,''
 \emph{Nature} \textbf{451}, 42 (2008).
+
+\bibitem{veblen1912}
+O.~Veblen,
+``An application of modular equations in analysis situs,''
+\emph{Ann. Math.} \textbf{14}, 86--94 (1912).
+
+\bibitem{propp2002}
+J.~Propp,
+``Lattice structure for orientations of graphs,''
+arXiv:math/0209005 (2002).
+
+\bibitem{felsner2004}
+S.~Felsner,
+``Lattice structures from planar graphs,''
+\emph{Electron. J. Combin.} \textbf{11}, R15 (2004).
+
+\bibitem{whitney1932}
+H.~Whitney,
+``Non-separable and planar graphs,''
+\emph{Trans. Amer. Math. Soc.} \textbf{34}, 339--362 (1932).
 
 \end{thebibliography}
 
@@ -2587,14 +3081,26 @@ close to Lieb's exact result~\cite{lieb1967}
 $s_{\text{Lieb}} = \tfrac{3}{2}\ln(4/3) \approx 0.431$.
 The small discrepancy is a finite-size effect.
 
-\subsection{Loop basis and reachable states}
+\subsection{Loop basis and ice-state counting}
 
 With no faces filled ($n_2 = 0$):
 $\beta_1 = \dim(\ker B_1) = 18 - 9 + 1 = 10$,
-giving an upper bound of $2^{10} = 1024$ from the loop-flip
-parameterization.  The Pauling estimate is $\approx 38$, so the ratio
-$38/1024 \approx 3.7\%$ reflects severe directed-cycle pruning, consistent
-with the patterns in \cref{tab:counting}.
+giving an upper bound of $2^{10} = 1024$ from the $\bm\alpha$
+parameterization (\cref{thm:gf2_bijection}).  Brute-force enumeration of all
+$2^{18}$ configurations confirms $|\calI| = 148$ ice states (all in a single
+charge sector since all vertices have even coordination $z = 4$).  Thus
+$|\calI| = |A_{\mathbf{Q}}| = 148$, verifying the GF(2) bijection.
+
+The multi-ordering sequential enumeration ($K = 200$) finds
+$|\varepsilon_{\mathbf{Q}}| = 101$ states, confirming the strict hierarchy
+$101 < 148 < 1024$.  The 47 ``missing'' states require simultaneous
+multi-cycle flips (\cref{sec:three_quantities}): their $\bm\alpha$ vectors
+involve basis cycles that are individually non-directed from the seed,
+but whose combined flip sets preserve charge at every vertex.
+
+The Pauling estimate is $\approx 38$, so
+$|\calI|/2^{\beta_1} = 148/1024 \approx 14.5\%$ reflects the fraction of
+$\bm\alpha$ vectors that produce valid ice states.
 
 With all 9 faces filled ($n_2 = 9$): the faces account for 8 of the 10
 independent cycles (9~faces minus one linear relation), leaving
